@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Bars - AudioVisualizer</title>
+    <link rel="stylesheet" href="src/styles/index.css" type="text/css" />
+</head>
+<body>
+<div id="content">
+    <input type="file" id="thefile" accept="audio/*" />
+    <canvas id="canvas"></canvas>
+    <audio id="audio" controls >
+    </audio>
+    <video id="lake" autoPlay loop>
+        <source src="src/assets/coverr-breathtaking-reflection.mp4" type="video/mp4" />
+    </video>
+    <video id="presentation" autoPlay loop>
+        <source src="src/assets/designsystem.mp4" type="video/mp4" />
+    </video>
+    <img src="src/assets/tunafish.jpg" id="tuna" width="100%" height="100%"/>
+    <img src="https://entregurus.com/wp-content/uploads/2018/10/EntreGurus-Tomato-Timer-The-Pomodoro-Technique-1080x675.jpg" id="tomato" />
+</div>
+</body>
+<script>
+	const hello = () => console.log('hello');
+	hello();
+</script>
+<script>
+	window.onload = function() {
+
+		var file = document.getElementById("thefile");
+		var audio = document.getElementById("audio");
+        var tuna = document.getElementById("tuna");
+        var tomato = document.getElementById("tomato");
+        var lake = document.getElementById("lake");
+        var presentation = document.getElementById("presentation");
+
+		file.onchange = function() {
+			var files = this.files;
+			audio.src = URL.createObjectURL(files[0]);
+			audio.load();
+			audio.play();
+			var context = new AudioContext();
+			var src = context.createMediaElementSource(audio);
+			var analyser = context.createAnalyser();
+
+			var canvas = document.getElementById("canvas");
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			var ctx = canvas.getContext("2d");
+
+			src.connect(analyser);
+			analyser.connect(context.destination);
+
+			analyser.fftSize = 256;
+
+			var bufferLength = analyser.frequencyBinCount;
+			console.log(bufferLength);
+
+			var dataArray = new Uint8Array(bufferLength);
+			console.log(dataArray.length);
+
+			var WIDTH = canvas.width;
+			var HEIGHT = canvas.height;
+
+			var barWidth = (WIDTH / bufferLength) * 2.5;
+			var barHeight;
+			var x = 0;
+
+			function renderFrame() {
+				requestAnimationFrame(renderFrame);
+
+				x = 0;
+
+				analyser.getByteFrequencyData(dataArray);
+
+                var pat2 = ctx.createPattern(lake, "no-repeat");
+				ctx.fillStyle = pat2;
+				ctx.fillRect(0, 0, WIDTH, HEIGHT);
+				var centerWidth = WIDTH/2
+				var centerHeight = HEIGHT/2
+
+				for (var i = 0; i < bufferLength && i % 25 === 0; i++) {
+
+
+					barHeight = dataArray[i];
+					var r = barHeight + (25 * (i/bufferLength));
+					var g = 250 * (i/bufferLength);
+					var b = 255;
+					// ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+                    var pat = ctx.createPattern(presentation, "no-repeat");
+					ctx.fillStyle = pat;
+
+
+                    // the triangle
+					ctx.beginPath();
+					ctx.moveTo(centerWidth, centerHeight - barHeight );
+					ctx.lineTo(centerWidth - barHeight, centerHeight + barHeight);
+					ctx.lineTo(centerWidth + barHeight, centerHeight + barHeight);
+					ctx.closePath();
+					ctx.stroke();
+                    // ctx.clip();
+					// 				ctx.rotate(180);
+
+                    // the image
+                    // ctx.drawImage(tuna, 0, 0, WIDTH, HEIGHT, centerWidth - centerWidth/2, centerHeight - centerHeight/2, WIDTH, HEIGHT);
+
+                  // ctx.fillRect(x,HEIGHT - barHeight - i*10, barWidth,  barHeight - i*10);
+					// if (dataArray[i] > 140 && dataArray[i] < 180) {
+					// 	ctx.fillStyle = "rgb(0,0,0)";
+					// }
+                  //
+					// if (dataArray[i] > 180) {
+					// 	ctx.fillStyle = pat;
+					// }
+                    // if (dataArray[i] < 80) {
+                    //     ctx.fillStyle = pat2;
+                    // }
+                        ctx.fillStyle = pat;
+					ctx.fill();
+					x += barWidth + 1;
+
+				}
+			}
+
+			audio.play();
+			renderFrame();
+		};
+	};
+</script>
+<!---->
+
+<!---->
+</body>
+</html>
