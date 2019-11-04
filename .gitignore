@@ -21,6 +21,9 @@ lib-cov
 .DS_Store
 .idea
 
+# video files
+.mp4
+
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
