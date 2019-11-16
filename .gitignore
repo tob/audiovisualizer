@@ -23,6 +23,7 @@ lib-cov
 
 # video files
 .mp4
+.mp3
 
 # Coverage directory used by tools like istanbul
 coverage
