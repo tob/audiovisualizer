@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AudioVisualizer</title>
+    <link rel="stylesheet" href="../styles/index.css" type="text/css" />
+    <script>
+      function loadJS(v) {
+        var d = document,
+          h = d.getElementsByTagName("head")[0],
+          newScript;
+        try {
+          h.removeChild(d.getElementById("visualizer"));
+        } catch (e) {}
+        newScript = d.createElement("script");
+        newScript.id = "visualizer";
+        // // newScript.type = "application/javascript";
+        newScript.src = "src/javascript/" + v + ".js";
+        h.appendChild(newScript);
+      }
+    </script>
+  </head>
+  <body>
+    <div>
+      <select lang="en" onchange="loadJS(this.value)">
+        <option selected="selected" disabled="true">
+          Select a keyboard language</option
+        >
+        <option value="bars">bars</option>
+        <option value="triangle">triangle</option>
+        <option value="videoTriangle">video triangle</option>
+        <option value="hy">mic</option>
+      </select>
+    </div>
+    <div id="content">
+      <canvas id="canvas"></canvas>
+      <audio id="audio" src="../assets/birds.mp3" controls></audio>
+      <video id="lake" autoplay muted loop>
+        <source
+                src="../assets/coverr-breathtaking-reflection.mp4"
+                type="video/mp4"
+        />
+      </video>
+      <video id="gif" autoplay muted loop>
+        <source src="../assets/space.mp4" type="video/mp4" />
+      </video>
+      <img
+              id="desert"
+              src="https://media.worldnomads.com/learnimages/2019/july2019/desertphotography/ruben-bagues-WIoeSvwJYRQ-unsplash.jpg"
+      />
+    </div>
+  </body>
+</html>
