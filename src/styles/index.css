@@ -6,12 +6,17 @@
 }
 
 #canvas {
-    /*position: fixed;*/
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background: black;
+}
+
+#gif {
+    position: absolute;
+    top: 40%;
+    left: 40%;
 }
 
 audio {
