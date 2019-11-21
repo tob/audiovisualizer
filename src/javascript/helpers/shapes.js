@@ -1,3 +1,8 @@
+// return true if in range, otherwise false
+function inRange(x, min = 0, max) {
+  return (x - min) * (x - max) <= 0;
+}
+
 // Centered triangles
 const increment = (canvasWidth, barHeight, speed) => {
   if (barHeight > speed) {
@@ -144,20 +149,35 @@ function fork(x, y, volume) {
 }
 
 // Walking circles
-function walkingCircles({ ctx, x = 0, y = 0, volume = 90, repeats = 1, fillStyle, strokeStyle }) {
+function walkingCircles({
+  ctx,
+  x = 0,
+  y = 0,
+  volume = 90,
+  repeats = 1,
+  fillStyle,
+  strokeStyle
+}) {
   for (let i = 0; i <= repeats; i++) {
+    // const yPosition = inRange(y + volume * i, 0, HEIGHT) ? (y + volume) * i + (y + volume)/i;
+    if (effect) {
+      ctx.globalCompositeOperation = effect;
+    }
     // TOP CIRCLE
     ctx.beginPath();
-    ctx.arc(x, (y + volume )* i, volume, 0, 2 * Math.PI);
+    ctx.arc(x, (HEIGHT / repeats) * i - volume * i, volume * i, 0, 2 * Math.PI);
 
-	  if (strokeStyle) {
-		  ctx.strokeStyle = strokeStyle;
-		  ctx.stroke();
-	  }
+    if (strokeStyle) {
+      ctx.strokeStyle = strokeStyle;
+      ctx.stroke();
+    }
 
-	  if (fillStyle) {
-		  ctx.fillStyle = fillStyle;
-		  ctx.fill();
-	  }
+    if (fillStyle) {
+      ctx.fillStyle = fillStyle;
+      ctx.fill();
+    }
+    // if (effect) {
+    //   ctx.globalCompositeOperation = null;
+    // }
   }
 }

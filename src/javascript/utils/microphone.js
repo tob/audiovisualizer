@@ -1,30 +1,32 @@
 /*
 Setup microphone
 */
-var audioContext = null;
-var meter = null;
-var canvasContext = null;
-var WIDTH = window.innerWidth;
-var HEIGHT = window.innerHeight;
-var rafID = null;
+let audioContext = null,
+  canvas = null,
+  recorder = null,
+  meter = null,
+  canvasContext = null,
+  WIDTH = window.innerWidth,
+  HEIGHT = window.innerHeight,
+  rafID = null;
 
-window.onload = function() {
-  // grab our canvas
-  setupCanvas();
-  canvasContext = document.getElementById("canvas").getContext("2d");
+// User Interaction required to allow mic to listen
+function resumePlayback(audioContext) {
+  audioContext.resume().then(() => {
+    console.log("Playback resumed successfully");
+  });
+}
+
+// Start listening to Mic and draws
+function startVisualization() {
   // monkeypatch Web Audio
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
   // grab an audio context
   audioContext = new AudioContext();
-  // One-liner to resume playback when user interacted with the page.
-  document.getElementById("button").addEventListener("click", function() {
-    audioContext.resume().then(() => {
-      document.getElementById("button").style.visibility = "hidden";
-      document.getElementById("button").style.opacity = "0";
-      console.log("Playback resumed successfully");
-    });
-  });
+
+  // // One-liner to resume playback when user interacted with the page.
+  // startButton.addEventListener("click", () => resumePlayback(audioContext));
 
   // Attempt to get audio input
   try {
@@ -53,7 +55,7 @@ window.onload = function() {
   } catch (e) {
     alert("getUserMedia threw exception :" + e);
   }
-};
+}
 
 function didntGetStream() {
   alert("Stream generation failed.");

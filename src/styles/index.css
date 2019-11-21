@@ -1,65 +1,77 @@
 #thefile {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 100;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+}
+
+.body {
+  font-family: "Tomorrow", sans-serif;
 }
 
 #canvas {
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: black;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+
+.assets-container {
+  display: none;
 }
 
 #gif {
-    position: absolute;
-    top: 40%;
-    left: 40%;
+  position: absolute;
+  top: 40%;
+  left: 40%;
+}
+
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#main {
+  transition: margin-left 0.5s;
 }
 
 audio {
-    position: fixed;
-    left: 10px;
-    bottom: 10px;
-    width: calc(100% - 20px);
-    display:none;
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  width: calc(100% - 20px);
+  display: none;
 }
 
-
-#button {
-    top: 0;
-     position: absolute;
-     left: 0;
-    border: 0;
-    display: inline-block;
-    white-space: nowrap;
-    vertical-align: middle;
-    text-align: center;
-    cursor: pointer;
-    box-sizing: border-box;
-    text-decoration: none;
-    font-size: 2.875rem;
-    font-weight: normal;
-    font-family: "Arial W01 Rounded Bold",sans-serif;
-    padding: 0.75rem 1.5rem;
-    line-height: 17;
-    letter-spacing: 0.025rem;
-    min-width: 22.375rem;
-    color: #fff;
-    background-color: #dd5800;
-    border-radius: 0.25rem;
-    width: 100%;
-    height: 100%;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s, visibility 0.3s;
-    -webkit-transition: opacity 0.3s, visibility 0.3s;
-}
+/*#button {*/
+/*    top: 0;*/
+/*     position: absolute;*/
+/*     left: 0;*/
+/*    border: 0;*/
+/*    display: inline-block;*/
+/*    white-space: nowrap;*/
+/*    vertical-align: middle;*/
+/*    text-align: center;*/
+/*    cursor: pointer;*/
+/*    box-sizing: border-box;*/
+/*    text-decoration: none;*/
+/*    font-size: 2.875rem;*/
+/*    font-weight: normal;*/
+/*    font-family: "Arial W01 Rounded Bold",sans-serif;*/
+/*    padding: 0.75rem 1.5rem;*/
+/*    line-height: 17;*/
+/*    letter-spacing: 0.025rem;*/
+/*    min-width: 22.375rem;*/
+/*    color: #fff;*/
+/*    background-color: #dd5800;*/
+/*    border-radius: 0.25rem;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    opacity: 1;*/
+/*    visibility: visible;*/
+/*    transition: opacity 0.3s, visibility 0.3s;*/
+/*    -webkit-transition: opacity 0.3s, visibility 0.3s;*/
+/*}*/
 
 #button:visited {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
 }
