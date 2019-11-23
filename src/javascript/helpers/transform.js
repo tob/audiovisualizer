@@ -21,10 +21,40 @@ const rotate = ({ x, y, drawShape, degree, clockwise, repeat }) => {
   if (repeat > 1) {
     let i;
     for (i = 0; i <= repeat; i++) {
-      degree += i * (360/repeat);
+      degree += i * (360 / repeat);
       rotate({ x, y, drawShape, degree, clockwise });
     }
   }
 };
 
+const updateDirection = ({ x, y, sensibility, volume, speed }) => {
+  let top =
+    (isFinite(Math.abs(volume * speed / sensibility)) &&
+      Math.abs(volume * speed / sensibility) ) ||
+    0;
+  let left =
+    (isFinite(Math.abs(volume * speed / sensibility)) &&
+      Math.abs(volume * speed / sensibility)) ||
+    0;
 
+  if (x > WIDTH) {
+    dx = -1;
+  }
+
+  if (x < 0) {
+    dx = 1;
+  }
+
+  if (y > HEIGHT) {
+    dy = -1;
+  }
+
+  if (y < 0) {
+    dy = 1;
+  }
+
+  return {
+    top: dy === 1 ? top : -top,
+    left: dx === 1 ? left : -left
+  };
+};
