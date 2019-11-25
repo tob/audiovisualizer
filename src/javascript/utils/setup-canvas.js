@@ -4,6 +4,25 @@ let speed = 5;
 let size = 1;
 let listening = false;
 let effect = false;
+let colorWell = {
+  r: 0,
+  g: 255,
+  b: 255
+};
+
+function hexToRGB(hexColor) {
+  return {
+    r: (hexColor >> 16) & 0xff,
+    g: (hexColor >> 8) & 0xff,
+    b: hexColor & 0xff
+  };
+}
+
+const updateColor = () => {
+  colorWell = hexToRGB(
+    document.getElementById("colorWell").value.replace('#', '0x')
+  );
+};
 
 const appendImage = (canvas, target, downloadButton) => {
   // set canvasImg image src to data
@@ -160,6 +179,11 @@ window.onload = () => {
         (size = document.getElementsByClassName("controller__slider-size")[0]
           .value)
     );
+
+  // grab color selector
+  document
+    .getElementsByClassName("controller__colorWell")[0]
+    .addEventListener("change", updateColor);
 
   // grab effect selector
   document

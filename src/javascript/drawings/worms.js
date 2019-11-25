@@ -1,7 +1,7 @@
 const colours = ["red", "orange", "yellow", "pink", "purple"];
 let style = "black";
 let counter = 0;
-let x =  Math.floor(Math.random() * (window.innerWidth - 1)) + 1;
+let x = Math.floor(Math.random() * (window.innerWidth - 1)) + 1;
 let y = Math.floor(Math.random() * (window.innerHeight - 1)) + 1;
 const forks = "FORKS";
 let current = 0;
@@ -31,22 +31,23 @@ function drawLoop() {
       )
   );
 
+  console.log(volume)
   // COLOR SHADES
   const gradient = `rgb(
         ${0},
         ${255 - volume},
         ${255 - volume})`;
   const gradient1 = `rgb(
-        ${0},
-        ${volume},
-        ${volume}, 0.5)`;
+        ${colorWell.r - volume},
+        ${colorWell.g - volume},
+        ${colorWell.b - volume}, 0.5)`;
   const gradient2 = `rgb(
-        ${255 - volume},
-        ${volume},
-        ${volume}, 0.5)`;
+        ${255 - colorWell.r - volume},
+        ${255 - colorWell.g - volume},
+        ${255 - colorWell.b - volume}, 0.5)`;
 
   canvasContext.lineWidth = 3;
-	ctx.globalCompositeOperation = effect;
+  canvasContext.globalCompositeOperation = effect;
 
   let { top, left } = updateDirection({
     x: Math.floor(x),
@@ -161,9 +162,9 @@ function drawLoop() {
   });
 
   canvasContext.beginPath();
-  canvasContext.strokeStyle = 'black';
-  canvasContext.fillRect(WIDTH- x, HEIGHT - y,volume *size, 100 *size,);
-  canvasContext.strokeRect(WIDTH- x, HEIGHT - y,volume *size, 100 *size,);
+  canvasContext.strokeStyle = "black";
+  canvasContext.fillRect(WIDTH - x, HEIGHT - y, volume * size, 100 * size);
+  canvasContext.strokeRect(WIDTH - x, HEIGHT - y, volume * size, 100 * size);
 
   // ROTATING SQUARES
   // canvasContext.strokeStyle = gradient2;
