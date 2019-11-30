@@ -1,9 +1,37 @@
 let sensibility = 100;
 let itemsNumber = 5;
-let speed = 30;
+let speed = 5;
 let size = 1;
 let listening = false;
 let effect = false;
+let colorWell = {
+  r: 0,
+  g: 255,
+  b: 255
+};
+
+function hexToRGB(hexColor) {
+  return {
+    r: (hexColor >> 16) & 0xff,
+    g: (hexColor >> 8) & 0xff,
+    b: hexColor & 0xff
+  };
+}
+
+const updateColor = () => {
+  colorWell = hexToRGB(
+    document.getElementById("colorWell").value.replace('#', '0x')
+  );
+};
+
+const appendImage = (canvas, target, downloadButton) => {
+  // set canvasImg image src to data
+  canvas.toBlob(function(blob) {
+    target.src = URL.createObjectURL(blob);
+    downloadButton.href = URL.createObjectURL(blob);
+    downloadButton.download = `${Date.now()}-audiovisual.png`;
+  }, "image/png");
+};
 
 const handleMicrophone = button => {
   if (button.classList.contains("controller__button-start")) {
@@ -64,12 +92,14 @@ const setupCanvas = () => {
 function openNav() {
   document.getElementById("mySidenav").style.width = "250px";
   document.getElementById("main").style.marginLeft = "250px";
+  document.getElementsByClassName("snapshot")[0].style.marginLeft = "250px";
 }
 
 /* Set the width of the side navigation to 0 and the left margin of the page content to 0 */
 function closeNav() {
   document.getElementById("mySidenav").style.width = "0";
   document.getElementById("main").style.marginLeft = "0";
+  document.getElementsByClassName("snapshot")[0].style.marginLeft = "0";
 }
 
 // Start
@@ -85,6 +115,15 @@ window.onload = () => {
   const recordButton = document.getElementsByClassName(
     "controller__button-record"
   )[0];
+  const saveImageButton = document.getElementsByClassName(
+    "controller__button-saveImage"
+  )[0];
+
+  const snapshot = document.getElementsByClassName("snapshot")[0];
+
+  const downloadButton = document.getElementsByClassName(
+    "snapshot__download"
+  )[0];
 
   // Create Recorder
   recorder = new CanvasRecorder(canvas);
@@ -93,6 +132,9 @@ window.onload = () => {
   startButton.addEventListener("click", () => handleMicrophone(startButton));
   recordButton.addEventListener("click", () =>
     handleRecording(recordButton, recorder)
+  );
+  saveImageButton.addEventListener("click", () =>
+    appendImage(canvas, snapshot, downloadButton)
   );
 
   // grab itemsNumber slider
@@ -124,9 +166,8 @@ window.onload = () => {
     .addEventListener(
       "change",
       () =>
-        (speed =
-          255 -
-          document.getElementsByClassName("controller__slider-speed")[0].value)
+        (speed = document.getElementsByClassName("controller__slider-speed")[0]
+          .value)
     );
 
   // grab size slider
@@ -139,13 +180,18 @@ window.onload = () => {
           .value)
     );
 
-	// grab effect selector
-	document
-		.getElementsByClassName("controller__select")[0]
-		.addEventListener(
-			"change",
-			() =>
-				(effect = document.getElementsByClassName("controller__select")[0]
-					.value)
-		);
+  // grab color selector
+  document
+    .getElementsByClassName("controller__colorWell")[0]
+    .addEventListener("change", updateColor);
+
+  // grab effect selector
+  document
+    .getElementsByClassName("controller__select")[0]
+    .addEventListener(
+      "change",
+      () =>
+        (effect = document.getElementsByClassName("controller__select")[0]
+          .value)
+    );
 };

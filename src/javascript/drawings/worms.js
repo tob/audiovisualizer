@@ -1,7 +1,7 @@
 const colours = ["red", "orange", "yellow", "pink", "purple"];
 let style = "black";
 let counter = 0;
-let x = 0;
+let x = Math.floor(Math.random() * (window.innerWidth - 1)) + 1;
 let y = Math.floor(Math.random() * (window.innerHeight - 1)) + 1;
 const forks = "FORKS";
 let current = 0;
@@ -13,6 +13,8 @@ const backgrounds = [
   "deer.jpg",
   "whale.jpg"
 ];
+let dx = 1,
+  dy = 1;
 
 const center = { width: window.innerWidth / 2, height: window.innerHeight };
 
@@ -29,35 +31,39 @@ function drawLoop() {
       )
   );
 
+  console.log(volume)
   // COLOR SHADES
   const gradient = `rgb(
         ${0},
         ${255 - volume},
         ${255 - volume})`;
   const gradient1 = `rgb(
-        ${0},
-        ${volume},
-        ${volume}, 0.5)`;
+        ${colorWell.r - volume},
+        ${colorWell.g - volume},
+        ${colorWell.b - volume}, 0.5)`;
   const gradient2 = `rgb(
-        ${255 - volume},
-        ${volume},
-        ${volume}, 0.5)`;
+        ${255 - colorWell.r - volume},
+        ${255 - colorWell.g - volume},
+        ${255 - colorWell.b - volume}, 0.5)`;
 
   canvasContext.lineWidth = 3;
+  canvasContext.globalCompositeOperation = effect;
 
-  if (volume > sensibility && volume < sensibility * 2) {
-    x += volume / sensibility;
-    // y += volume / 2;
-    if (x >= WIDTH) {
-      x = 20;
-      // y += volume / sensibility;
-      y = Math.floor(Math.random() * (HEIGHT - volume)) + volume;
-    }
-    if (y >= HEIGHT) {
-      y = volume;
-    }
-  }
+  let { top, left } = updateDirection({
+    x: Math.floor(x),
+    y: Math.floor(y),
+    volume: volume,
+    sensibility: sensibility,
+    speed: speed,
+    shouldUpdate: volume > sensibility && volume < sensibility * 2
+  });
 
+  // console.log("top,left", top, left);
+
+  x += left;
+  y += top;
+
+  // console.log("x,y", x, y);
   //   rotate({
   //     x: WIDTH / 2,
   //     y: HEIGHT / 2,
@@ -89,23 +95,23 @@ function drawLoop() {
   counter += Math.floor(((0.1 * volume) / sensibility) * 10);
 
   if (document.getElementsByClassName("controller__slider-rotate")[0].checked) {
-    rotate({
-      x: WIDTH / 2,
-      y: HEIGHT / 2,
-      drawShape: () =>
-        star({
-          R: volume * size,
-          cX: 0,
-          cY: 0,
-          N: Math.floor(volume / 5),
-          fillStyle: gradient1,
-          strokeStyle: "black",
-          ctx: canvasContext
-        }),
-      speed: speed,
-      degree: counter,
-      repeat: 4
-    });
+    // rotate({
+    //   x: WIDTH / 2,
+    //   y: HEIGHT / 2,
+    //   drawShape: () =>
+    //     star({
+    //       R: volume * size,
+    //       cX: 0,
+    //       cY: 0,
+    //       N: Math.floor(volume / 5),
+    //       fillStyle: gradient1,
+    //       strokeStyle: "black",
+    //       ctx: canvasContext
+    //     }),
+    //   speed: speed,
+    //   degree: counter,
+    //   repeat: 4
+    // });
     rotate({
       x: WIDTH / 2,
       y: HEIGHT / 2,
@@ -126,17 +132,42 @@ function drawLoop() {
   } else {
     walkingCircles({
       ctx: canvasContext,
-      x: x,
+      x: WIDTH - x,
       y: y,
       volume: (volume / 10) * size,
       repeats: itemsNumber,
-      // strokeStyle: 'black',
+      strokeStyle: "black",
       fillStyle: gradient2
     });
   }
 
+  star({
+    R: volume * size,
+    cX: x,
+    cY: y,
+    N: itemsNumber > 3 ? itemsNumber : 3,
+    fillStyle: gradient1,
+    strokeStyle: "black",
+    ctx: canvasContext
+  });
+
+  star({
+    R: volume * size,
+    cX: x,
+    cY: HEIGHT - y,
+    N: itemsNumber > 3 ? itemsNumber : 3,
+    fillStyle: gradient2,
+    strokeStyle: "black",
+    ctx: canvasContext
+  });
+
+  canvasContext.beginPath();
+  canvasContext.strokeStyle = "black";
+  canvasContext.fillRect(WIDTH - x, HEIGHT - y, volume * size, 100 * size);
+  canvasContext.strokeRect(WIDTH - x, HEIGHT - y, volume * size, 100 * size);
+
   // ROTATING SQUARES
-  canvasContext.strokeStyle = gradient2;
+  // canvasContext.strokeStyle = gradient2;
 
   //TEXT
   // canvasContext.beginPath();

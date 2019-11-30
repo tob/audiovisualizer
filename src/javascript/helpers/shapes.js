@@ -160,12 +160,19 @@ function walkingCircles({
 }) {
   for (let i = 0; i <= repeats; i++) {
     // const yPosition = inRange(y + volume * i, 0, HEIGHT) ? (y + volume) * i + (y + volume)/i;
-    if (effect) {
-      ctx.globalCompositeOperation = effect;
-    }
+
+    let { top, left } = updateDirection({
+      x: x +1,
+      y: (HEIGHT / 2 / repeats) * i,
+      sensibility: i,
+      volume: volume,
+      speed: speed,
+      shouldUpdate: true
+    });
+
     // TOP CIRCLE
     ctx.beginPath();
-    ctx.arc(x, (HEIGHT / repeats) * i - volume * i, volume * i, 0, 2 * Math.PI);
+    ctx.arc(x + left, y + top, volume * i, 0, 2 * Math.PI);
 
     if (strokeStyle) {
       ctx.strokeStyle = strokeStyle;

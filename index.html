@@ -36,13 +36,25 @@
         <a class="controller__button-start"
           >Start <i class="fa fa-play"></i>
         </a>
+        <br />
+        <a class="controller__button-saveImage"
+          ><i class="fa fa-image"></i> Snapshot</a
+        >
+
+        <a class="snapshot__download" href="#" download=""
+          ><i class="fa fa-download"></i> Save Img</a
+        >
+        <br />
+        <a class="controller__button-record"
+          ><i class="fa fa-circle"></i> Record</a
+        >
 
         <h4>Items number</h4>
         <input
           type="range"
           min="1"
-          max="10"
-          value="3"
+          max="20"
+          value="10"
           class="slider controller__slider-itemsNumber"
           id="repeats"
         />
@@ -61,7 +73,7 @@
         <input
           type="range"
           min="1"
-          max="100"
+          max="10"
           value="1"
           class="slider controller__slider-size"
           id="size"
@@ -71,8 +83,8 @@
         <input
           type="range"
           min="1"
-          max="100"
-          value="50"
+          max="50"
+          value="10"
           class="slider controller__slider-speed"
         />
 
@@ -82,11 +94,16 @@
           <span class="controller__toggle"></span>
         </label>
 
+        <h4>Color</h4>
+        <label class="controller__colorWell">
+          <input type="color" value="#00FFFF" id="colorWell" />
+        </label>
+
         <!-- Full list of blend modes here
         https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation -->
         <h4>Effect</h4>
         <select name="effect" class="controller__select">
-          <option value="null">No effect</option>
+          <option value="source-over">No effect</option>
           <option value="multiply">multiply</option>
           <option value="lighten">lighten</option>
           <option value="difference">difference</option>
@@ -99,18 +116,13 @@
           <option value="xor">xor</option>
           <option value="copy">copy</option>
           <option value="destination-atop">destination-atop</option>
-          <option value="destination-atop">destination-over</option>
+          <option value="destination-over">destination-over</option>
           <option value="destination-out">destination-out</option>
           <option value="destination-in">destination-in</option>
-          <option value="source-over">source-over</option>
           <option value="source-out">source-out</option>
           <option value="source-in">source-in</option>
           <option value="source-atop">source-atop</option>
         </select>
-
-        <a class="controller__button-record"
-          ><i class="fa fa-circle"></i> Record</a
-        >
       </div>
     </div>
     <span class="body__open-sidebar" onclick="openNav()"
@@ -121,6 +133,9 @@
     </div>
     <div class="assets-container">
       <img id="background" src="src/assets/desertdog.jpg" />
+    </div>
+    <div>
+      <img class="snapshot" src="src/assets/desertdog.jpg" />
     </div>
   </body>
 </html>
