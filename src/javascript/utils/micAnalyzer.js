@@ -20,8 +20,6 @@ SOFTWARE.
 var audioContext = null;
 var meter = null;
 var canvasContext = null;
-var WIDTH = window.innerWidth;
-var HEIGHT = window.innerHeight;
 var rafID = null;
 let lake;
 let desert;

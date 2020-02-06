@@ -22,8 +22,8 @@ lib-cov
 .idea
 
 # video files
-.mp4
-.mp3
+*.mp4
+*.mp3
 
 # Coverage directory used by tools like istanbul
 coverage

@@ -1,10 +1,8 @@
-const colours = ["red", "orange", "yellow", "pink", "purple"];
 let style = "black";
 let counter = 0;
-let x = Math.floor(Math.random() * (window.innerWidth - 1)) + 1;
-let y = Math.floor(Math.random() * (window.innerHeight - 1)) + 1;
+let x = Math.floor(Math.random() * (WIDTH - 1)) + 1;
+let y = Math.floor(Math.random() * (HEIGHT - 1)) + 1;
 const forks = "FORKS";
-let current = 0;
 const backgrounds = [
   "desertdog.jpg",
   "fox.jpg",
@@ -16,9 +14,15 @@ const backgrounds = [
 let dx = 1,
   dy = 1;
 
-const center = { width: window.innerWidth / 2, height: window.innerHeight };
+const center = { width: WIDTH / 2, height: HEIGHT/2 };
+
 
 function drawLoop() {
+  const newEyes = document.getElementById("newEyes");
+  newEyes.width = "100%";
+  newEyes.height = "100%";
+  const pat = canvasContext.createPattern(newEyes, "repeat");
+
   // check if we're currently clipping
   if (meter.checkClipping()) canvasContext.fillStyle = "white";
   else canvasContext.fillStyle = "#000000";
@@ -31,23 +35,15 @@ function drawLoop() {
       )
   );
 
-  console.log(volume)
   // COLOR SHADES
-  const gradient = `rgb(
-        ${0},
-        ${255 - volume},
-        ${255 - volume})`;
-  const gradient1 = `rgb(
+  const gradient2 = `rgb(
         ${colorWell.r - volume},
         ${colorWell.g - volume},
-        ${colorWell.b - volume}, 0.5)`;
-  const gradient2 = `rgb(
+        ${colorWell.b - volume}, ${opacity})`;
+  const gradient1 = `rgb(
         ${255 - colorWell.r - volume},
         ${255 - colorWell.g - volume},
-        ${255 - colorWell.b - volume}, 0.5)`;
-
-  canvasContext.lineWidth = 3;
-  canvasContext.globalCompositeOperation = effect;
+        ${255 - colorWell.b - volume}, ${opacity})`;
 
   let { top, left } = updateDirection({
     x: Math.floor(x),
@@ -58,132 +54,114 @@ function drawLoop() {
     shouldUpdate: volume > sensibility && volume < sensibility * 2
   });
 
-  // console.log("top,left", top, left);
+  x += volume > 100 ? left : 0;
+  y += volume > 200 ? top : 0;
 
-  x += left;
-  y += top;
-
-  // console.log("x,y", x, y);
-  //   rotate({
-  //     x: WIDTH / 2,
-  //     y: HEIGHT / 2,
-  //     drawShape: () =>
-  //       walkingCircles({
-  //         ctx: canvasContext,
-  //         x: x/2  - volume/2,
-  //         y: y - volume/2,
-  //         volume: volume/10,
-  //         repeats: 1,
-  //         // strokeStyle: 'black',
-  //         fillStyle:gradient2,
-  //       }),
-  //     speed: speed,
-  //     degree: Math.floor(Math.random() * Math.floor(360)),
-  //     clockwise: true,
-  //     repeat: 0
-  //   });
-  // }
-
-  canvasContext.fillStyle = gradient2;
-  canvasContext.strokeStyle = gradient2;
-
-  // canvasContext.fillStyle = style;
+  canvasContext.fillStyle = pat;
 
   if (counter >= 360) {
     counter = 0;
   }
   counter += Math.floor(((0.1 * volume) / sensibility) * 10);
 
-  if (document.getElementsByClassName("controller__slider-rotate")[0].checked) {
-    // rotate({
-    //   x: WIDTH / 2,
-    //   y: HEIGHT / 2,
-    //   drawShape: () =>
-    //     star({
-    //       R: volume * size,
-    //       cX: 0,
-    //       cY: 0,
-    //       N: Math.floor(volume / 5),
-    //       fillStyle: gradient1,
-    //       strokeStyle: "black",
-    //       ctx: canvasContext
-    //     }),
-    //   speed: speed,
-    //   degree: counter,
-    //   repeat: 4
-    // });
+  const drawAll = () => {
+    walkingCircles({
+      ctx: canvasContext,
+      x: x - volume / 2,
+      y: y - volume / 2,
+      volume: volume + size*20,
+      // strokeStyle: gradient1,
+      fillStyle: pat
+    })
+    star({
+      R: volume * size,
+      cX: x,
+      cY: y,
+      N: itemsNumber > 3 ? itemsNumber : 3,
+      fillStyle: pat,
+      ctx: canvasContext
+    });
+
+    star({
+      R: volume * size,
+      cX: 0,
+      cY: 0,
+      N: itemsNumber > 3 ? itemsNumber : 3,
+      fillStyle: pat,
+      ctx: canvasContext
+    });
+
+    canvasContext.beginPath();
+    canvasContext.fillStyle = pat;
+    canvasContext.fillRect(WIDTH - x, HEIGHT - y, volume * size, 100 * size);
+  };
+
+  // CLEAR canvas
+  // canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
+  // canvasContext.save();
+  // canvasContext.fillStyle = pat;
+  // canvasContext.fillRect(0, 0, WIDTH, HEIGHT);
+  // canvasContext.restore();
+
+  canvasContext.save();
+  canvasContext.globalCompositeOperation = effect;
+  canvasContext.fillStyle = gradient2;
+  canvasContext.fillRect(0, 0, WIDTH, HEIGHT);
+  canvasContext.restore();
+
+  if (document.getElementsByClassName("controller__slider-rotate")[0].checked || volume > 150) {
     rotate({
       x: WIDTH / 2,
       y: HEIGHT / 2,
-      drawShape: () =>
-        walkingCircles({
-          ctx: canvasContext,
-          x: x / 2 - volume / 2,
-          y: y - volume / 2,
-          volume: (volume / 10) * size,
-          repeats: itemsNumber,
-          strokeStyle: "black",
-          fillStyle: gradient2
-        }),
+      drawShape: drawAll,
       speed: speed,
       degree: counter,
       repeat: 4
     });
   } else {
-    walkingCircles({
-      ctx: canvasContext,
-      x: WIDTH - x,
-      y: y,
-      volume: (volume / 10) * size,
-      repeats: itemsNumber,
-      strokeStyle: "black",
-      fillStyle: gradient2
-    });
+    drawAll();
   }
 
-  star({
-    R: volume * size,
-    cX: x,
-    cY: y,
-    N: itemsNumber > 3 ? itemsNumber : 3,
-    fillStyle: gradient1,
-    strokeStyle: "black",
-    ctx: canvasContext
-  });
 
-  star({
-    R: volume * size,
-    cX: x,
-    cY: HEIGHT - y,
-    N: itemsNumber > 3 ? itemsNumber : 3,
-    fillStyle: gradient2,
-    strokeStyle: "black",
-    ctx: canvasContext
-  });
 
-  canvasContext.beginPath();
-  canvasContext.strokeStyle = "black";
-  canvasContext.fillRect(WIDTH - x, HEIGHT - y, volume * size, 100 * size);
-  canvasContext.strokeRect(WIDTH - x, HEIGHT - y, volume * size, 100 * size);
 
-  // ROTATING SQUARES
-  // canvasContext.strokeStyle = gradient2;
+  // drawTriangle({
+  //   ctx: canvasContext,
+  //   x: center.width,
+  //   y: HEIGHT/2,
+  //   barHeight: volume,
+  //   width: size * volume,
+  //   speed: speed,
+  //   offset: 1,
+  //   style: pat
+  // })
+
+  // drawTriangle({
+  //   ctx: canvasContext,
+  //   canvasWidth: WIDTH,
+  //   canvasHeight: HEIGHT,
+  //   barHeight: volume,
+  //   width: size * volume,
+  //   speed: speed,
+  //   offset: 50,
+  //   style: pat
+  // });
 
   //TEXT
-  // canvasContext.beginPath();
-  // canvasContext.fillStyle = gradient2;
-  // canvasContext.font = `${volume / 3}px Tomorrow`;
-  // canvasContext.textAlign = "center";
-  // canvasContext.fillText(`WHAT IS THE FUTURE OF `, WIDTH / 2, HEIGHT / 2);
-  // canvasContext.fillText(`${forks}?`, WIDTH / 2, HEIGHT / 2 + volume / 2);
-  //
-  // canvasContext.strokeStyle = "black";
-  // canvasContext.lineWidth = 2;
-  // canvasContext.strokeText(`WHAT IS THE FUTURE OF `, WIDTH / 2, HEIGHT / 2);
-  // canvasContext.strokeText(`${forks}?`, WIDTH / 2, HEIGHT / 2 + volume / 2);
+  canvasContext.beginPath();
+  canvasContext.fillStyle = gradient2;
+  canvasContext.font = `${volume / 3}px Tomorrow`;
+  canvasContext.textAlign = "center";
+  canvasContext.fillText(`WHAT IS THE FUTURE OF `, WIDTH / 2, HEIGHT / 2);
+  canvasContext.fillText(`${forks}?`, WIDTH / 2, HEIGHT / 2 + volume / 2);
+
+  canvasContext.strokeStyle = "black";
+  canvasContext.lineWidth = 2;
+  canvasContext.strokeText(`WHAT IS THE FUTURE OF `, WIDTH / 2, HEIGHT / 2);
+  canvasContext.strokeText(`${forks}?`, WIDTH / 2, HEIGHT / 2 + volume / 2);
 
   // // draw a bar based on the current volume
-  // canvasContext.fillRect(x, y, volume*1.4, 150+ volume);
+  canvasContext.fillRect(x, y, volume*1.4, 150+ volume);
 
   if (listening) {
     // set up the next visual callback

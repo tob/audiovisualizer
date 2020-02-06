@@ -1,87 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>Bars - AudioVisualizer</title>
     <link rel="stylesheet" href="../styles/index.css" type="text/css" />
-</head>
-<body>
-<div id="content">
-    <input type="file" id="thefile" accept="audio/*" />
-    <canvas id="canvas"></canvas>
-    <audio id="audio" controls >
-    </audio>
-</div>
-</body>
-<script>
-	const hello = () => console.log('hello');
-	hello();
-</script>
-<script>
-	window.onload = function() {
-		console.log('this is happening inside')
+  </head>
+  <body>
+    <div id="content">
+      <input type="file" id="thefile" accept="audio/*" />
+      <canvas id="canvas"></canvas>
+      <audio id="audio" controls></audio>
+    </div>
+  </body>
+  <script>
+    const hello = () => console.log("hello");
+    hello();
+  </script>
+  <script>
+    window.onload = function() {
+      console.log("this is happening inside");
 
-		var file = document.getElementById("thefile");
-		var audio = document.getElementById("audio");
+      var file = document.getElementById("thefile");
+      var audio = document.getElementById("audio");
 
-		file.onchange = function() {
-			var files = this.files;
-			audio.src = URL.createObjectURL(files[0]);
-			audio.load();
-			audio.play();
-			var context = new AudioContext();
-			var src = context.createMediaElementSource(audio);
-			var analyser = context.createAnalyser();
+      file.onchange = function() {
+        var files = this.files;
+        audio.src = URL.createObjectURL(files[0]);
+        audio.load();
+        audio.play();
+        var context = new AudioContext();
 
-			var canvas = document.getElementById("canvas");
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
-			var ctx = canvas.getContext("2d");
 
-			src.connect(analyser);
-			analyser.connect(context.destination);
+        var src = context.createMediaElementSource(audio);
+        var analyser = context.createAnalyser();
 
-			analyser.fftSize = 256;
+        var canvas = document.getElementById("canvas");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        var ctx = canvas.getContext("2d");
 
-			var bufferLength = analyser.frequencyBinCount;
-			console.log(bufferLength);
+        src.connect(analyser);
+        analyser.connect(context.destination);
 
-			var dataArray = new Uint8Array(bufferLength);
+        analyser.fftSize = 256;
 
-			var WIDTH = canvas.width;
-			var HEIGHT = canvas.height;
+        var bufferLength = analyser.frequencyBinCount;
 
-			var barWidth = (WIDTH / bufferLength) * 2.5;
-			var barHeight;
-			var x = 0;
+        var dataArray = new Uint8Array(bufferLength);
 
-			function renderFrame() {
-				requestAnimationFrame(renderFrame);
+        var WIDTH = canvas.width;
+        var HEIGHT = canvas.height;
 
-				x = 0;
+        var barWidth = (WIDTH / bufferLength);
+        var barHeight;
+        var x = 0;
 
-				analyser.getByteFrequencyData(dataArray);
+        function renderFrame() {
+          requestAnimationFrame(renderFrame);
 
-				ctx.fillStyle = "#000";
-				ctx.fillRect(0, 0, WIDTH, HEIGHT);
+          x = 0;
 
-				for (var i = 0; i < bufferLength; i++) {
-					barHeight = dataArray[i];
+          analyser.getByteFrequencyData(dataArray);
 
-					var r = barHeight + (25 * (i/bufferLength));
-					var g = 250 * (i/bufferLength);
-					var b = 255;
-					ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
-					ctx.fillRect(x,HEIGHT - barHeight - i*10, barWidth,  barHeight - i*10);
-					x += barWidth + 1;
+          ctx.fillStyle = "#000";
+          ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-				}
-			}
+          for (var i = 0; i < bufferLength; i++) {
+            barHeight = dataArray[i];
+            var r = barHeight + 25 * (i / bufferLength);
+            var g = 250 * (i / bufferLength);
+            var b = 255;
 
-			audio.play();
-			renderFrame();
-		};
-	};
-</script>
-<script src="../javascript/utils/audioanalyzer.js" type="javascript"></script>
+            ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+
+            if (i < 96) {
+              ctx.fillStyle = "yellow";
+            }
+
+            if (i < 64) {
+              ctx.fillStyle = "green";
+            }
+
+            if (i < 32) {
+              ctx.fillStyle = "red";
+            }
+
+            if (i > 96) {
+              ctx.fillStyle = "blue";
+            }
+
+            ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
+
+            x += barWidth + 1;
+          }
+        }
+
+        audio.play();
+        renderFrame();
+      };
+    };
+  </script>
+  <script src="../javascript/utils/audioanalyzer.js" type="javascript"></script>
 </html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Face - AudioVisualizer</title>
+    <link rel="stylesheet" href="src/styles/index.css" type="text/css" />
+    <link rel="stylesheet" href="src/styles/sidenav.css" type="text/css" />
+    <link rel="stylesheet" href="src/styles/controller.css" type="text/css" />
+
+    <!-- Add Font from fonts.googlepis -->
+    <link
+            href="https://fonts.googleapis.com/css?family=Tomorrow:800"
+            rel="stylesheet"
+    />
+    <!-- Add icon library -->
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <script src="src/javascript/utils/setup-canvas.js"></script>
+    <!--        <script src="javascript/drawings/futureforks.js"></script>-->
+    <script src="src/javascript/drawings/face.js"></script>
+    <script src="src/javascript/helpers/transform.js"></script>
+    <script src="src/javascript/helpers/shapes.js"></script>
+    <script src="src/javascript/utils/microphone.js"></script>
+    <script src="src/javascript/utils/volumeMeter.js"></script>
+    <script src="src/javascript/utils/recorder.js"></script>
+</head>
+<body class="body">
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"
+    >&times;</a
+    >
+    <div class="controller">
+        <a class="controller__button-start"
+        >Start <i class="fa fa-play"></i>
+        </a>
+        <a class="controller__button-saveImage"
+        ><i class="fa fa-image"></i> Snapshot</a
+        >
+        <a class="snapshot__download" href="#" download=""
+        ><i class="fa fa-download"></i> Save Img</a
+        >
+        <a class="controller__button-record"
+        ><i class="fa fa-circle"></i> Record</a
+        >
+
+        <span class="controller_button">
+          <h4>Items number</h4>
+          <input
+                  type="number"
+                  min="3"
+                  max="20"
+                  value="10"
+                  class="slider controller__slider-itemsNumber"
+                  id="repeats"
+          />
+        </span>
+        <span class="controller_button">
+          <h4>Sensibility</h4>
+          <input
+                  type="range"
+                  min="1"
+                  max="255"
+                  value="100"
+                  class="slider controller__slider-sensibility"
+                  id="sensibility"
+          />
+        </span>
+
+        <span class="controller_button">
+          <h4>Size</h4>
+          <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value="1"
+                  class="slider controller__slider-size"
+                  id="size"
+          />
+        </span>
+
+        <span class="controller_button">
+          <h4>Speed</h4>
+          <input
+                  type="range"
+                  min="1"
+                  max="50"
+                  value="10"
+                  class="slider controller__slider-speed"
+          />
+        </span>
+
+        <span class="controller_button">
+          <h4>Opacity</h4>
+          <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  value="50"
+                  class="slider controller__slider-opacity"
+          />
+        </span>
+
+        <span class="controller_button">
+          <h4>Rotate</h4>
+          <label class="controller__switch">
+            <input type="checkbox" class="controller__slider-rotate" />
+            <span class="controller__toggle"></span>
+          </label>
+        </span>
+
+        <span class="controller_button">
+          <h4>Move</h4>
+          <label class="controller__switch">
+            <input type="checkbox" class="controller__slider-move" />
+            <span class="controller__toggle"></span>
+          </label>
+        </span>
+
+        <span class="controller_button">
+          <h4>Color</h4>
+          <label class="controller__colorWell">
+            <input type="color" value="#00FFFF" id="colorWell" />
+          </label>
+        </span>
+
+        <span class="controller_button">
+          <!-- Full list of blend modes here
+        https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation -->
+          <h4>Effect</h4>
+          <select name="effect" class="controller__select">
+            <option value="source-over">No effect</option>
+            <option value="multiply">multiply</option>
+            <option value="lighten">lighten</option>
+            <option value="difference">difference</option>
+            <option value="exclusion">exclusion</option>
+            <option value="color-dodge">color dodge</option>
+            <option value="luminosity">luminosity</option>
+            <option value="darken">darken</option>
+            <option value="screen">screen</option>
+            <option value="overlay">overlay</option>
+            <option value="xor">xor</option>
+            <option value="copy">copy</option>
+            <option value="destination-atop">destination-atop</option>
+            <option value="destination-over">destination-over</option>
+            <option value="destination-out">destination-out</option>
+            <option value="destination-in">destination-in</option>
+            <option value="source-out">source-out</option>
+            <option value="source-in">source-in</option>
+            <option value="source-atop">source-atop</option>
+          </select>
+        </span>
+    </div>
+</div>
+<span class="body__open-sidebar" onclick="openNav()"
+><i class="fa fa-cog"></i> AudioVisual Settings</span
+>
+<div id="main">
+    <canvas id="canvas"></canvas>
+</div>
+<div class="assets-container">
+    <img id="background" src="src/assets/desertdog.jpg" />
+</div>
+<div>
+    <img class="snapshot" src="src/assets/desertdog.jpg" />
+</div>
+<div>
+    <video id="newEyes" autoplay muted loop>
+        <source src="./src/assets/newEyes.mp4" />
+    </video>
+</div>
+</body>
+</html>
