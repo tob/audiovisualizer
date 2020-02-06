@@ -77,7 +77,6 @@ function volumeAudioProcess( event ) {
 			this.lastClip = window.performance.now();
 		}
 		sum += x * x;
-
 	}
 
 	// ... then take the square root of the sum.

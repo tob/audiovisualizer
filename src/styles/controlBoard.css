@@ -1,0 +1,48 @@
+#controlboard {
+  background: #222222;
+  color: #efefef;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.controller {
+  display: flex;
+}
+
+.container-buttons__title {
+  width: 100%;
+  text-align: center;
+  background: aquamarine;
+  padding: 1em;
+}
+
+.container-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0.25em;
+  max-width: 20em;
+  background: #efefef;
+  color: #222222;
+  font-size: 0.8em;
+  border-radius: 0.2em;
+}
+
+.controller__button {
+  padding: 0.25em;
+  margin: 0 0.25em;
+  flex-grow: 1;
+}
+
+.controller__button h4 {
+  font-size: 0.8em;
+  margin: 0 0 0.5em 0;
+}
+
+.controller__button:hover {
+  background: red;
+  color: white;
+}

@@ -6,8 +6,6 @@ let audioContext = null,
   recorder = null,
   meter = null,
   canvasContext = null,
-  WIDTH = window.innerWidth,
-  HEIGHT = window.innerHeight,
   rafID = null;
 
 // User Interaction required to allow mic to listen

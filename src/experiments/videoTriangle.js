@@ -100,7 +100,6 @@ const start = function() {
   const desert = document.getElementById("desert");
   const gif = document.getElementById("gif");
   const canvas = document.getElementById("canvas");
-  var ctx = canvas.getContext("2d");
 
   // size elements
   canvas.width = window.innerWidth;
@@ -109,15 +108,15 @@ const start = function() {
   lake.height = window.innerHeight;
   gif.width = window.innerWidth;
   gif.height = window.innerHeight;
-  const WIDTH = canvas.width;
-  const HEIGHT = canvas.height;
+
+  var ctx = canvas.getContext("2d");
 
   const animateShape = (shape, props, layers, styles) => {
     for (i = 0; i <= layers; i++) {
       const style = i % 2 === 0 ? 1 : i % 3 === 0 ? 2 : 0;
       props.style = styles[style];
 
-      props.offset = -((WIDTH * 2) / layers) * i;
+      props.offset = -((window.innerWidth * 2) / layers) * i;
       shape(props);
     }
   };
@@ -135,7 +134,8 @@ const start = function() {
   const dataArray = new Uint8Array(bufferLength);
 
   function renderFrame() {
-    const pat = ctx.createPattern(lake, "repeat");
+    // const pat = ctx.createPattern(lake, "repeat");
+    const pat = 'white';
     const pat2 = ctx.createPattern(gif, "repeat");
     const pat3 = ctx.createPattern(desert, "repeat");
     state.background = state.counter % 2 === 0 ? pat : pat2;
@@ -149,9 +149,9 @@ const start = function() {
       state.barHeight = dataArray[i] > state.sensibility ? dataArray[i] : 0;
       const { barHeight } = state;
 
-      state.triangleWidth += increment(WIDTH, barHeight, state.sensibility);
+      state.triangleWidth += increment(window.innerWidth, barHeight, state.sensibility);
 
-      if (state.triangleWidth >= WIDTH * 2) {
+      if (state.triangleWidth >= window.innerWidth * 2) {
         state.triangleWidth = 0;
         // state.background = foreground;
       }
@@ -160,8 +160,8 @@ const start = function() {
         drawTriangle,
         {
           ctx: ctx,
-          canvasWidth: WIDTH,
-          canvasHeight: HEIGHT,
+          canvasWidth: window.innerWidth,
+          canvasHeight: window.innerHeight,
           barHeight: barHeight,
           width: state.triangleWidth,
           speed: state.sensibility,
@@ -180,4 +180,6 @@ const start = function() {
   renderFrame();
 };
 
-start();
+window.onload = function () {
+  start();
+}

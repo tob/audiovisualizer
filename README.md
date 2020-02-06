@@ -6,3 +6,9 @@ Audiovisuals based on microphone input.
 Tested only on Chrome.
 
 Doesn't require server, it's plain javascript and very little html.
+
+
+## 1 pattern
+
+## 2 shape
+

@@ -1,13 +1,90 @@
-let sensibility = 100;
-let itemsNumber = 5;
-let speed = 5;
-let size = 1;
-let listening = false;
-let effect = false;
-let colorWell = {
-  r: 0,
-  g: 255,
-  b: 255
+let sensibility = 100,
+  itemsNumber = 5,
+  speed = 5,
+  size = 1,
+  opacity = 50,
+  listening = false,
+  effect = false,
+  WIDTH = window.innerWidth,
+  HEIGHT = window.innerHeight,
+  colorWell = {
+    r: 255,
+    g: 0,
+    b: 255
+  };
+
+const settings = {
+  shape: {
+    list: ["circle", "square", "triangle", "star", "ninja"],
+    value: "triangle"
+  },
+  pattern: {
+    list: [
+      "center",
+      "random",
+      "line",
+      "spiral",
+      "diagonal",
+      "grid",
+      "cone1",
+      "cone2",
+      "circle",
+      "cursor"
+    ],
+    value: "center"
+  },
+  size: {
+    min: 0,
+    max: 10,
+    value: 5
+  },
+  range: {
+    list: ["bass", "tenor", "alto", "soprano", "all"],
+    value: "all"
+  },
+  speed: {
+    min: 0,
+    max: 10,
+    value: 5
+  },
+  opacity: {
+    min: 0,
+    max: 100,
+    value: 50
+  },
+  effect: {
+    list: [
+      "source-over",
+      "multiply",
+      "lighten",
+      "difference",
+      "exclusion",
+      "color-dodge",
+      "luminosity",
+      "darken",
+      "screen",
+      "overlay",
+      "xor",
+      "copy",
+      "destination-atop",
+      "destination-over",
+      "destination-out",
+      "destination-in",
+      "source-out",
+      "source-in",
+      "source-atop"
+    ],
+    value: "source-over"
+  },
+  color: {
+    value: "#00FFFF"
+  },
+  rotate: {
+    clockwise: true
+  },
+  twist: {
+    checked: false,
+  }
 };
 
 function hexToRGB(hexColor) {
@@ -18,10 +95,11 @@ function hexToRGB(hexColor) {
   };
 }
 
-const updateColor = () => {
-  colorWell = hexToRGB(
-    document.getElementById("colorWell").value.replace('#', '0x')
-  );
+const updateOpacity = (i, volume) => {
+  opacity =
+    volume ||
+    document.getElementsByClassName(`controller__slider-opacity-${1}`)[0]
+      .value / 100;
 };
 
 const appendImage = (canvas, target, downloadButton) => {
@@ -36,7 +114,6 @@ const appendImage = (canvas, target, downloadButton) => {
 const handleMicrophone = button => {
   if (button.classList.contains("controller__button-start")) {
     listening = true;
-    startVisualization();
     button.style.color = "red";
     button.classList.remove("controller__button-start");
     button.classList.add("controller__button-pause");
@@ -81,17 +158,10 @@ const handleRecording = (button, recorder) => {
   }
 };
 
-const setupCanvas = () => {
-  const canvas = document.getElementById("canvas");
-  // size elements
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-};
-
 /* Set the width of the side navigation to 250px and the left margin of the page content to 250px */
 function openNav() {
   document.getElementById("mySidenav").style.width = "250px";
-  document.getElementById("main").style.marginLeft = "250px";
+  // document.getElementById("main").style.marginLeft = "250px";
   document.getElementsByClassName("snapshot")[0].style.marginLeft = "250px";
 }
 
@@ -104,13 +174,11 @@ function closeNav() {
 
 // Start
 window.onload = () => {
-  // grab our canvas
-  setupCanvas();
-  canvas = document.getElementById("canvas");
-  canvasContext = canvas.getContext("2d");
-
   const startButton = document.getElementsByClassName(
     "controller__button-start"
+  )[0];
+  const plusButton = document.getElementsByClassName(
+    "controller__button-add"
   )[0];
   const recordButton = document.getElementsByClassName(
     "controller__button-record"
@@ -125,11 +193,21 @@ window.onload = () => {
     "snapshot__download"
   )[0];
 
-  // Create Recorder
-  recorder = new CanvasRecorder(canvas);
+  const controlBoard =
+    document.getElementsByClassName("controller")[0] ||
+    document.getElementById("controlboard");
+
+  const main =
+    document.getElementById("main");
 
   // Grab buttons and assign functions onClick
-  startButton.addEventListener("click", () => handleMicrophone(startButton));
+  startButton.addEventListener("click", () => {
+    handleMicrophone(startButton);
+    const canvas = addCanvas(main, controlBoard, settings);
+    // Create Recorder
+    recorder = new CanvasRecorder(canvas);
+    startAudioVisual();
+  });
   recordButton.addEventListener("click", () =>
     handleRecording(recordButton, recorder)
   );
@@ -137,61 +215,10 @@ window.onload = () => {
     appendImage(canvas, snapshot, downloadButton)
   );
 
-  // grab itemsNumber slider
-  document
-    .getElementsByClassName("controller__slider-itemsNumber")[0]
-    .addEventListener(
-      "change",
-      () =>
-        (itemsNumber = document.getElementsByClassName(
-          "controller__slider-itemsNumber"
-        )[0].value)
-    );
-
-  // grab sensibility slider
-  document
-    .getElementsByClassName("controller__slider-sensibility")[0]
-    .addEventListener(
-      "change",
-      () =>
-        (sensibility =
-          255 -
-          document.getElementsByClassName("controller__slider-sensibility")[0]
-            .value)
-    );
-
-  // grab speed slider
-  document
-    .getElementsByClassName("controller__slider-speed")[0]
-    .addEventListener(
-      "change",
-      () =>
-        (speed = document.getElementsByClassName("controller__slider-speed")[0]
-          .value)
-    );
-
-  // grab size slider
-  document
-    .getElementsByClassName("controller__slider-size")[0]
-    .addEventListener(
-      "change",
-      () =>
-        (size = document.getElementsByClassName("controller__slider-size")[0]
-          .value)
-    );
-
-  // grab color selector
-  document
-    .getElementsByClassName("controller__colorWell")[0]
-    .addEventListener("change", updateColor);
-
-  // grab effect selector
-  document
-    .getElementsByClassName("controller__select")[0]
-    .addEventListener(
-      "change",
-      () =>
-        (effect = document.getElementsByClassName("controller__select")[0]
-          .value)
-    );
+  // grab Add button and create dashboard
+  plusButton.addEventListener("click", () => {
+    addCanvas(main, controlBoard, settings);
+    // recorder = new CanvasRecorder(canvas);
+    startAudioVisual();
+  });
 };
