@@ -4,9 +4,9 @@ const updateControllersValues = index => {
       min: 0,
       max: 50
     },
-    'bug-FIXME': {
+    "bug-FIXME": {
       min: 50,
-      max: 100,
+      max: 100
     },
     tenor: {
       min: 100,
@@ -77,8 +77,7 @@ const updateControllersValues = index => {
 
 function startAudioVisual() {
   "use strict";
-  let counter = 0;
-
+  const angles = {};
 
   const soundAllowed = function(stream) {
     //Audio stops listening in FF without // window.persistAudioStream = stream;
@@ -105,7 +104,6 @@ function startAudioVisual() {
       // For each canvas do a drawing
       if (canvasses.length >= 1) {
         canvasses.map((canvas, index) => {
-
           index++;
           const canvasContext = canvas.getContext("2d");
 
@@ -127,7 +125,7 @@ function startAudioVisual() {
             ctx: canvasContext,
             x: canvas.width / 2,
             y: canvas.height / 2,
-            degree: counter,
+            degree: angles[`canvas${index}`],
             clockwise: true,
             active: active,
             drawShape: () => {
@@ -142,12 +140,12 @@ function startAudioVisual() {
           ${colorWell.r - volume},
           ${colorWell.g - volume},
           ${colorWell.b - volume},
-          ${opacity/100})`;
+          ${opacity / 100})`;
                 let customColor = `rgb(
           ${colorWell.r + volume},
           ${colorWell.g + volume},
           ${colorWell.b + volume},
-          ${opacity/100})`;
+          ${opacity / 100})`;
 
                 canvasContext.fillStyle = customColor2;
 
@@ -181,12 +179,16 @@ function startAudioVisual() {
               }
             }
           });
-          if (counter >= 360) {
-            counter = 0;
+          if (angles[`canvas${index}`] >= 360) {
+            angles[`canvas${index}`] = 0;
           }
 
-          counter += (volume * speed) / 10000;
-
+          if (angles[`canvas${index}`]) {
+            angles[`canvas${index}`] += (volume * speed) / 10000;
+          } else {
+            angles[`canvas${index}`] = 0.1;
+          }
+          
           canvasContext.globalCompositeOperation = document.getElementsByClassName(
             `controller__select-effect-${index}`
           )[0].value;

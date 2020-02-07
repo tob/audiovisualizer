@@ -14,9 +14,9 @@ let sensibility = 100,
   };
 
 const settings = {
-  shape: {
-    list: ["circle", "square", "triangle", "star", "ninja"],
-    value: "triangle"
+  range: {
+    list: ["bass", "bug-FIXME", "tenor", "alto", "soprano", "all"],
+    value: "all"
   },
   pattern: {
     list: [
@@ -33,19 +33,20 @@ const settings = {
     ],
     value: "line"
   },
+  shape: {
+    list: ["circle", "square", "triangle", "star", "ninja"],
+    value: "triangle"
+  },
   size: {
     min: 0,
     max: 10,
     value: 5
   },
-  range: {
-    list: ["bass", "bug-FIXME", "tenor", "alto", "soprano", "all"],
-    value: "all"
+  stroke: {
+    checked: false
   },
-  speed: {
-    min: 0,
-    max: 10,
-    value: 5
+  color: {
+    value: "#00FFFF"
   },
   opacity: {
     min: 0,
@@ -76,17 +77,16 @@ const settings = {
     ],
     value: "source-over"
   },
-  color: {
-    value: "#00FFFF"
-  },
-  stroke: {
+  twist: {
     checked: false
   },
   rotate: {
     clockwise: true
   },
-  twist: {
-    checked: false
+  speed: {
+    min: 0,
+    max: 10,
+    value: 5
   }
 };
 
