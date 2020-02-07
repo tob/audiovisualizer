@@ -2,7 +2,11 @@ const updateControllersValues = index => {
   const ranges = {
     bass: {
       min: 0,
-      max: 100
+      max: 50
+    },
+    'bug-FIXME': {
+      min: 50,
+      max: 100,
     },
     tenor: {
       min: 100,
@@ -45,6 +49,10 @@ const updateControllersValues = index => {
     `controller__slider-twist-${index}`
   )[0].checked;
 
+  const stroke = document.getElementsByClassName(
+    `controller__slider-stroke-${index}`
+  )[0].checked;
+
   let colorWell = hexToRGB(
     document
       .getElementsByClassName(`controller__slider-color-${index}`)[0]
@@ -62,7 +70,8 @@ const updateControllersValues = index => {
     colorWell,
     opacity,
     active,
-    twist
+    twist,
+    stroke
   };
 };
 
@@ -108,7 +117,8 @@ function startAudioVisual() {
             colorWell,
             opacity,
             active,
-            twist
+            twist,
+            stroke
           } = updateControllersValues(index);
 
           canvasContext.clearRect(0, 0, canvas.width, canvas.height);
@@ -165,7 +175,7 @@ function startAudioVisual() {
                         )[0].value || "circle",
                       i,
                       style: customColor,
-                      stroke: "black"
+                      stroke: stroke
                     })
                 });
               }

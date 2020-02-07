@@ -29,7 +29,7 @@ const createButtons = (parent, settings, i) => {
   containerButtons.className = "container-buttons";
   const containerTitle = document.createElement("h4");
   containerTitle.innerText = `level - ${i}`;
-  containerTitle.className = 'container-buttons__title';
+  containerTitle.className = "container-buttons__title";
   parent.appendChild(containerButtons);
   containerButtons.appendChild(containerTitle);
 
@@ -80,8 +80,6 @@ const createButtons = (parent, settings, i) => {
           element.innerText = option;
           input.appendChild(element);
         });
-
-      default:
         break;
     }
   }

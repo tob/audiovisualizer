@@ -31,7 +31,7 @@ const settings = {
       "circle",
       "cursor"
     ],
-    value: "center"
+    value: "line"
   },
   size: {
     min: 0,
@@ -39,7 +39,7 @@ const settings = {
     value: 5
   },
   range: {
-    list: ["bass", "tenor", "alto", "soprano", "all"],
+    list: ["bass", "bug-FIXME", "tenor", "alto", "soprano", "all"],
     value: "all"
   },
   speed: {
@@ -79,11 +79,14 @@ const settings = {
   color: {
     value: "#00FFFF"
   },
+  stroke: {
+    checked: false
+  },
   rotate: {
     clockwise: true
   },
   twist: {
-    checked: false,
+    checked: false
   }
 };
 
@@ -197,8 +200,7 @@ window.onload = () => {
     document.getElementsByClassName("controller")[0] ||
     document.getElementById("controlboard");
 
-  const main =
-    document.getElementById("main");
+  const main = document.getElementById("main");
 
   // Grab buttons and assign functions onClick
   startButton.addEventListener("click", () => {
