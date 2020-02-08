@@ -97,102 +97,109 @@ function startAudioVisual() {
       analyser.getByteFrequencyData(frequencyArray);
       let volume;
 
+      const settings = Array.prototype.slice.apply(
+        document.getElementsByClassName("container-buttons")
+      );
+
+
       const canvasses = Array.prototype.slice.apply(
         document.querySelectorAll("canvas")
       );
+      canvasses.map((canvas, index) => {
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      });
 
-      // For each canvas do a drawing
-      if (canvasses.length >= 1) {
-        canvasses.map((canvas, index) => {
-          index++
-          index = document.getElementsByClassName(`controller__select-canvas-${index}`)[0].value;
-          const canvasContext = canvas.getContext("2d");
+      // For each setting do a drawing
+      settings.map((setting, index) => {
+        index++;
 
-          let {
-            frequencyMin,
-            frequencyMax,
-            rotationSpeed,
-            size,
-            colorWell,
-            opacity,
-            twist,
-            stroke,
-            clear
-          } = updateControllersValues(index);
+        const canvas = document.getElementsByClassName(
+          `canvas-${
+            document.getElementsByClassName(
+              `controller__select-canvas-${index}`
+            )[0].value
+          }`
+        )[0];
+        const canvasContext = canvas.getContext("2d");
 
-          clear && canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+        let {
+          frequencyMin,
+          frequencyMax,
+          rotationSpeed,
+          size,
+          colorWell,
+          opacity,
+          twist,
+          stroke,
+          clear
+        } = updateControllersValues(index);
 
-          rotate({
-            ctx: canvasContext,
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            degree: angles[`canvas${index}`],
-            drawShape: () => {
-              // For each frequency draw something
-              for (let i = frequencyMin; i < frequencyMax; i++) {
-                volume =
-                  Math.floor(frequencyArray[i]) -
-                  (Math.floor(frequencyArray[i]) % 5);
+        // clear && canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+        canvasContext.globalCompositeOperation = document.getElementsByClassName(
+          `controller__select-effect-${index}`
+        )[0].value;
 
-                updateOpacity(index);
-                let customColor2 = `rgb(
-          ${colorWell.r - volume},
-          ${colorWell.g - volume},
-          ${colorWell.b - volume},
-          ${opacity / 100})`;
-                let customColor = `rgb(
+        rotate({
+          ctx: canvasContext,
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          degree: angles[`canvas${index}`],
+          drawShape: () => {
+            // For each frequency draw something
+            for (let i = frequencyMin; i < frequencyMax; i++) {
+              volume =
+                Math.floor(frequencyArray[i]) -
+                (Math.floor(frequencyArray[i]) % 5);
+
+              let customColor = `rgb(
           ${colorWell.r + volume},
           ${colorWell.g + volume},
           ${colorWell.b + volume},
           ${opacity / 100})`;
 
-                canvasContext.fillStyle = customColor2;
+              setting.style.backgroundColor =  customColor;
 
-                pattern({
-                  ctx: canvasContext,
-                  canvas: canvas,
-                  radius: (volume / 5) * size,
-                  width: (volume / 5) * size,
-                  volume,
-                  i,
-                  mode:
-                    document.getElementsByClassName(
-                      `controller__select-pattern-${index}`
-                    )[0].value || "circle",
-                  twist,
-                  shape: (x, y) =>
-                    drawShape({
-                      x: x,
-                      y: y,
-                      ctx: canvasContext,
-                      width: (volume / 5) * size,
-                      mode:
-                        document.getElementsByClassName(
-                          `controller__select-shape-${index}`
-                        )[0].value || "circle",
-                      i,
-                      style: customColor,
-                      stroke: stroke
-                    })
-                });
-              }
+              pattern({
+                ctx: canvasContext,
+                canvas: canvas,
+                radius: (volume / 5) * size,
+                width: (volume / 5) * size,
+                volume,
+                i,
+                mode:
+                  document.getElementsByClassName(
+                    `controller__select-pattern-${index}`
+                  )[0].value || "circle",
+                twist,
+                shape: (x, y) =>
+                  drawShape({
+                    x: x,
+                    y: y,
+                    ctx: canvasContext,
+                    width: (volume / 5) * size,
+                    mode:
+                      document.getElementsByClassName(
+                        `controller__select-shape-${index}`
+                      )[0].value || "circle",
+                    i,
+                    style: customColor,
+                    stroke: stroke
+                  })
+              });
             }
-          });
-          if (angles[`canvas${index}`] >= 360) {
-            angles[`canvas${index}`] = 0;
           }
-
-          if (angles[`canvas${index}`]) {
-            angles[`canvas${index}`] += (volume * rotationSpeed) / 10000;
-          } else {
-            angles[`canvas${index}`] = 0.1;
-          }
-
-          canvasContext.globalCompositeOperation = document.getElementsByClassName(
-            `controller__select-effect-${index}`
-          )[0].value;
         });
-      }
+        if (angles[`canvas${index}`] >= 360) {
+          angles[`canvas${index}`] = 0;
+        }
+
+        if (angles[`canvas${index}`]) {
+          angles[`canvas${index}`] += (volume * rotationSpeed) / 10000;
+        } else {
+          angles[`canvas${index}`] = 0.1;
+        }
+      });
     };
 
     doDraw();
