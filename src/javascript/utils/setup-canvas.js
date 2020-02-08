@@ -85,6 +85,9 @@ const settings = {
     max: 10,
     value: 1
   },
+  clear: {
+    checked: false
+  },
   // saveImage: {
   //   icon: "fa-image"
   // },
