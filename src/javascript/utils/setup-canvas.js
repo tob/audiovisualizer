@@ -14,14 +14,13 @@ let sensibility = 100,
   };
 
 const settings = {
-  shape: {
-    list: ["circle", "square", "triangle", "star", "ninja"],
-    value: "triangle"
+  range: {
+    list: ["bass", "bug-FIXME", "tenor", "alto", "soprano", "all"],
+    value: "all"
   },
   pattern: {
     list: [
       "center",
-      "random",
       "line",
       "spiral",
       "diagonal",
@@ -29,23 +28,25 @@ const settings = {
       "cone1",
       "cone2",
       "circle",
-      "cursor"
+      "cursor",
+      "random"
     ],
-    value: "center"
+    value: "line"
+  },
+  shape: {
+    list: ["triangle", "square", "circle", "star", "ninja"],
+    value: "square"
   },
   size: {
     min: 0,
-    max: 10,
+    max: 15,
     value: 5
   },
-  range: {
-    list: ["bass", "tenor", "alto", "soprano", "all"],
-    value: "all"
+  stroke: {
+    checked: false
   },
-  speed: {
-    min: 0,
-    max: 10,
-    value: 5
+  color: {
+    value: "#00FFFF"
   },
   opacity: {
     min: 0,
@@ -76,15 +77,23 @@ const settings = {
     ],
     value: "source-over"
   },
-  color: {
-    value: "#00FFFF"
-  },
-  rotate: {
-    clockwise: true
-  },
   twist: {
-    checked: false,
-  }
+    checked: false
+  },
+  rotationSpeed: {
+    min: -10,
+    max: 10,
+    value: 1
+  },
+  // saveImage: {
+  //   icon: "fa-image"
+  // },
+  // download: {
+  //   icon: "fa-download"
+  // },
+  // record: {
+  //   icon: "fa-circle"
+  // }
 };
 
 function hexToRGB(hexColor) {
@@ -180,40 +189,39 @@ window.onload = () => {
   const plusButton = document.getElementsByClassName(
     "controller__button-add"
   )[0];
-  const recordButton = document.getElementsByClassName(
-    "controller__button-record"
-  )[0];
-  const saveImageButton = document.getElementsByClassName(
-    "controller__button-saveImage"
-  )[0];
-
-  const snapshot = document.getElementsByClassName("snapshot")[0];
-
-  const downloadButton = document.getElementsByClassName(
-    "snapshot__download"
-  )[0];
+  // const recordButton = document.getElementsByClassName(
+  //   "controller__button-record"
+  // )[0];
+  // const saveImageButton = document.getElementsByClassName(
+  //   "controller__button-saveImage"
+  // )[0];
+  //
+  // const snapshot = document.getElementsByClassName("snapshot")[0];
+  //
+  // const downloadButton = document.getElementsByClassName(
+  //   "snapshot__download"
+  // )[0];
 
   const controlBoard =
     document.getElementsByClassName("controller")[0] ||
     document.getElementById("controlboard");
 
-  const main =
-    document.getElementById("main");
+  const main = document.getElementById("main");
 
   // Grab buttons and assign functions onClick
   startButton.addEventListener("click", () => {
     handleMicrophone(startButton);
     const canvas = addCanvas(main, controlBoard, settings);
     // Create Recorder
-    recorder = new CanvasRecorder(canvas);
+    // recorder = new CanvasRecorder(canvas);
     startAudioVisual();
   });
-  recordButton.addEventListener("click", () =>
-    handleRecording(recordButton, recorder)
-  );
-  saveImageButton.addEventListener("click", () =>
-    appendImage(canvas, snapshot, downloadButton)
-  );
+  // recordButton.addEventListener("click", () =>
+  //   handleRecording(recordButton, recorder)
+  // );
+  // saveImageButton.addEventListener("click", () =>
+  //   appendImage(canvas, snapshot, downloadButton)
+  // );
 
   // grab Add button and create dashboard
   plusButton.addEventListener("click", () => {

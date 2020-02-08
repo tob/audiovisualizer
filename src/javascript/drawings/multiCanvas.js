@@ -2,6 +2,10 @@ const updateControllersValues = index => {
   const ranges = {
     bass: {
       min: 0,
+      max: 50
+    },
+    "bug-FIXME": {
+      min: 50,
       max: 100
     },
     tenor: {
@@ -29,20 +33,20 @@ const updateControllersValues = index => {
   const frequencyMax = ranges[range].max;
 
   // Get user input
-  const speed = document.getElementsByClassName(
-    `controller__slider-speed-${index}`
+  const rotationSpeed = document.getElementsByClassName(
+    `controller__slider-rotationSpeed-${index}`
   )[0].value;
 
   const size = document.getElementsByClassName(
     `controller__slider-size-${index}`
   )[0].value;
 
-  const active = document.getElementsByClassName(
-    `controller__slider-rotate-${index}`
-  )[0].checked;
-
   const twist = document.getElementsByClassName(
     `controller__slider-twist-${index}`
+  )[0].checked;
+
+  const stroke = document.getElementsByClassName(
+    `controller__slider-stroke-${index}`
   )[0].checked;
 
   let colorWell = hexToRGB(
@@ -57,19 +61,18 @@ const updateControllersValues = index => {
   return {
     frequencyMin,
     frequencyMax,
-    speed,
+    rotationSpeed,
     size,
     colorWell,
     opacity,
-    active,
-    twist
+    twist,
+    stroke
   };
 };
 
 function startAudioVisual() {
   "use strict";
-  let counter = 0;
-
+  const angles = {};
 
   const soundAllowed = function(stream) {
     //Audio stops listening in FF without // window.persistAudioStream = stream;
@@ -96,19 +99,18 @@ function startAudioVisual() {
       // For each canvas do a drawing
       if (canvasses.length >= 1) {
         canvasses.map((canvas, index) => {
-
           index++;
           const canvasContext = canvas.getContext("2d");
 
           let {
             frequencyMin,
             frequencyMax,
-            speed,
+            rotationSpeed,
             size,
             colorWell,
             opacity,
-            active,
-            twist
+            twist,
+            stroke
           } = updateControllersValues(index);
 
           canvasContext.clearRect(0, 0, canvas.width, canvas.height);
@@ -117,9 +119,7 @@ function startAudioVisual() {
             ctx: canvasContext,
             x: canvas.width / 2,
             y: canvas.height / 2,
-            degree: counter,
-            clockwise: true,
-            active: active,
+            degree: angles[`canvas${index}`],
             drawShape: () => {
               // For each frequency draw something
               for (let i = frequencyMin; i < frequencyMax; i++) {
@@ -132,12 +132,12 @@ function startAudioVisual() {
           ${colorWell.r - volume},
           ${colorWell.g - volume},
           ${colorWell.b - volume},
-          ${opacity/100})`;
+          ${opacity / 100})`;
                 let customColor = `rgb(
           ${colorWell.r + volume},
           ${colorWell.g + volume},
           ${colorWell.b + volume},
-          ${opacity/100})`;
+          ${opacity / 100})`;
 
                 canvasContext.fillStyle = customColor2;
 
@@ -165,17 +165,21 @@ function startAudioVisual() {
                         )[0].value || "circle",
                       i,
                       style: customColor,
-                      stroke: "black"
+                      stroke: stroke
                     })
                 });
               }
             }
           });
-          if (counter >= 360) {
-            counter = 0;
+          if (angles[`canvas${index}`] >= 360) {
+            angles[`canvas${index}`] = 0;
           }
 
-          counter += (volume * speed) / 10000;
+          if (angles[`canvas${index}`]) {
+            angles[`canvas${index}`] += (volume * rotationSpeed) / 10000;
+          } else {
+            angles[`canvas${index}`] = 0.1;
+          }
 
           canvasContext.globalCompositeOperation = document.getElementsByClassName(
             `controller__select-effect-${index}`

@@ -160,7 +160,7 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
   switch (mode) {
     case "square":
       ctx.fillRect(x - width / 2, y - width / 2, width, width);
-      ctx.strokeRect(x - width / 2, y - width / 2, width, width);
+      stroke && ctx.strokeRect(x - width / 2, y - width / 2, width, width);
       break;
     case "circle":
       ctx.arc(x, y, width, 0, 2 * Math.PI);
@@ -254,9 +254,7 @@ function pattern({
     x: xPos,
     y: yPos,
     drawShape: () => shape(xPos, yPos),
-    degree: (360 / 255) * (volume / 255),
-    clockwise: i % 2 == 0,
-    active: twist
+    degree: twist && (360 / 255) * (volume / 255),
   });
 }
 
