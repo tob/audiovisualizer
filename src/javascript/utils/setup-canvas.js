@@ -84,7 +84,16 @@ const settings = {
     min: -10,
     max: 10,
     value: 1
-  }
+  },
+  // saveImage: {
+  //   icon: "fa-image"
+  // },
+  // download: {
+  //   icon: "fa-download"
+  // },
+  // record: {
+  //   icon: "fa-circle"
+  // }
 };
 
 function hexToRGB(hexColor) {
@@ -180,18 +189,18 @@ window.onload = () => {
   const plusButton = document.getElementsByClassName(
     "controller__button-add"
   )[0];
-  const recordButton = document.getElementsByClassName(
-    "controller__button-record"
-  )[0];
-  const saveImageButton = document.getElementsByClassName(
-    "controller__button-saveImage"
-  )[0];
-
-  const snapshot = document.getElementsByClassName("snapshot")[0];
-
-  const downloadButton = document.getElementsByClassName(
-    "snapshot__download"
-  )[0];
+  // const recordButton = document.getElementsByClassName(
+  //   "controller__button-record"
+  // )[0];
+  // const saveImageButton = document.getElementsByClassName(
+  //   "controller__button-saveImage"
+  // )[0];
+  //
+  // const snapshot = document.getElementsByClassName("snapshot")[0];
+  //
+  // const downloadButton = document.getElementsByClassName(
+  //   "snapshot__download"
+  // )[0];
 
   const controlBoard =
     document.getElementsByClassName("controller")[0] ||
@@ -204,15 +213,15 @@ window.onload = () => {
     handleMicrophone(startButton);
     const canvas = addCanvas(main, controlBoard, settings);
     // Create Recorder
-    recorder = new CanvasRecorder(canvas);
+    // recorder = new CanvasRecorder(canvas);
     startAudioVisual();
   });
-  recordButton.addEventListener("click", () =>
-    handleRecording(recordButton, recorder)
-  );
-  saveImageButton.addEventListener("click", () =>
-    appendImage(canvas, snapshot, downloadButton)
-  );
+  // recordButton.addEventListener("click", () =>
+  //   handleRecording(recordButton, recorder)
+  // );
+  // saveImageButton.addEventListener("click", () =>
+  //   appendImage(canvas, snapshot, downloadButton)
+  // );
 
   // grab Add button and create dashboard
   plusButton.addEventListener("click", () => {

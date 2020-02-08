@@ -1,4 +1,8 @@
 const getType = setting => {
+  if (setting.icon) {
+    return "button";
+  }
+
   if (!setting.value) {
     return "checkbox";
   }
@@ -12,16 +16,6 @@ const getType = setting => {
   }
 
   return "color";
-  //
-  // const type = () => setting.min && "number";
-  //
-  // return type();
-  // return (
-  //   (setting.min && "number") ||
-  //   (setting.list && "select") ||
-  //   (!setting.value && "toggle") ||
-  //   "color"
-  // );
 };
 
 const createButtons = (parent, settings, i) => {
@@ -33,12 +27,15 @@ const createButtons = (parent, settings, i) => {
   parent.appendChild(containerButtons);
   containerButtons.appendChild(containerTitle);
 
+  // Control visualization
   for (let setting in settings) {
-    const { list, value, min, max } = settings[setting];
+    const { list, value, min, max, icon } = settings[setting];
     const type = getType(settings[setting]);
 
     const button = document.createElement("span");
-    button.className = "controller__button";
+    button.className = icon
+      ? `controller__button controller__button-${icon}`
+      : "controller__button";
     containerButtons.appendChild(button);
 
     const titleButton = document.createElement("p");
@@ -80,6 +77,11 @@ const createButtons = (parent, settings, i) => {
           element.innerText = option;
           input.appendChild(element);
         });
+
+      case "button":
+        const settingIcon = document.createElement("i");
+        settingIcon.className = `fa ${icon}`;
+        containerInput.appendChild(settingIcon);
         break;
     }
   }
