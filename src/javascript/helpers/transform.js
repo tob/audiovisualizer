@@ -1,38 +1,33 @@
-const rotate = ({ctx, x, y, drawShape, degree, clockwise, active }) => {
-  if (!active){
-    drawShape();
-    return;
-  }
-
-
+const rotate = ({ ctx, x, y, drawShape, degree }) => {
   if (degree >= 360 || degree <= -360) {
     return;
   }
-  ctx.save();
-  ctx.translate(x, y);
 
-  // Rotate 1 degree
-  // ctx.rotate(Math.PI / 180);
+  if (degree !== 0) {
+    ctx.save();
+    ctx.translate(x, y);
 
-  if (clockwise) {
-    ctx.rotate(-degree);
+    // Rotate 1 degree
+    // ctx.rotate(Math.PI / 180);
+
+    ctx.rotate(degree);
+    ctx.translate(-x, -y);
+    drawShape();
+
+    ctx.restore();
   } else {
-    ctx.rotate(+degree);
+    drawShape();
   }
-  ctx.translate(-x, -y);
-  drawShape();
-
-  ctx.restore();
 };
 
 const updateDirection = ({ x, y, sensibility, volume, speed }) => {
   let top =
-    (isFinite(Math.abs(volume * speed / sensibility)) &&
-      Math.abs(volume * speed / sensibility) ) ||
+    (isFinite(Math.abs((volume * speed) / sensibility)) &&
+      Math.abs((volume * speed) / sensibility)) ||
     0;
   let left =
-    (isFinite(Math.abs(volume * speed / sensibility)) &&
-      Math.abs(volume * speed / sensibility)) ||
+    (isFinite(Math.abs((volume * speed) / sensibility)) &&
+      Math.abs((volume * speed) / sensibility)) ||
     0;
 
   if (x > WIDTH) {

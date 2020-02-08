@@ -21,7 +21,6 @@ const settings = {
   pattern: {
     list: [
       "center",
-      "random",
       "line",
       "spiral",
       "diagonal",
@@ -29,17 +28,18 @@ const settings = {
       "cone1",
       "cone2",
       "circle",
-      "cursor"
+      "cursor",
+      "random"
     ],
     value: "line"
   },
   shape: {
-    list: ["circle", "square", "triangle", "star", "ninja"],
-    value: "triangle"
+    list: ["triangle", "square", "circle", "star", "ninja"],
+    value: "square"
   },
   size: {
     min: 0,
-    max: 10,
+    max: 15,
     value: 5
   },
   stroke: {
@@ -80,13 +80,10 @@ const settings = {
   twist: {
     checked: false
   },
-  rotate: {
-    clockwise: true
-  },
-  speed: {
-    min: 0,
+  rotationSpeed: {
+    min: -10,
     max: 10,
-    value: 5
+    value: 1
   }
 };
 

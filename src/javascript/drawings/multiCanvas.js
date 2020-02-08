@@ -33,17 +33,13 @@ const updateControllersValues = index => {
   const frequencyMax = ranges[range].max;
 
   // Get user input
-  const speed = document.getElementsByClassName(
-    `controller__slider-speed-${index}`
+  const rotationSpeed = document.getElementsByClassName(
+    `controller__slider-rotationSpeed-${index}`
   )[0].value;
 
   const size = document.getElementsByClassName(
     `controller__slider-size-${index}`
   )[0].value;
-
-  const active = document.getElementsByClassName(
-    `controller__slider-rotate-${index}`
-  )[0].checked;
 
   const twist = document.getElementsByClassName(
     `controller__slider-twist-${index}`
@@ -65,11 +61,10 @@ const updateControllersValues = index => {
   return {
     frequencyMin,
     frequencyMax,
-    speed,
+    rotationSpeed,
     size,
     colorWell,
     opacity,
-    active,
     twist,
     stroke
   };
@@ -110,11 +105,10 @@ function startAudioVisual() {
           let {
             frequencyMin,
             frequencyMax,
-            speed,
+            rotationSpeed,
             size,
             colorWell,
             opacity,
-            active,
             twist,
             stroke
           } = updateControllersValues(index);
@@ -126,8 +120,6 @@ function startAudioVisual() {
             x: canvas.width / 2,
             y: canvas.height / 2,
             degree: angles[`canvas${index}`],
-            clockwise: true,
-            active: active,
             drawShape: () => {
               // For each frequency draw something
               for (let i = frequencyMin; i < frequencyMax; i++) {
@@ -184,11 +176,11 @@ function startAudioVisual() {
           }
 
           if (angles[`canvas${index}`]) {
-            angles[`canvas${index}`] += (volume * speed) / 10000;
+            angles[`canvas${index}`] += (volume * rotationSpeed) / 10000;
           } else {
             angles[`canvas${index}`] = 0.1;
           }
-          
+
           canvasContext.globalCompositeOperation = document.getElementsByClassName(
             `controller__select-effect-${index}`
           )[0].value;

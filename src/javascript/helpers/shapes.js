@@ -254,9 +254,7 @@ function pattern({
     x: xPos,
     y: yPos,
     drawShape: () => shape(xPos, yPos),
-    degree: (360 / 255) * (volume / 255),
-    clockwise: i % 2 == 0,
-    active: twist
+    degree: twist && (360 / 255) * (volume / 255),
   });
 }
 
