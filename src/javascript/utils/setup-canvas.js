@@ -14,11 +14,18 @@ let sensibility = 100,
   };
 
 const settings = {
+  canvas: {
+    icon: "fa-layer-group",
+    list: [1, 2, 3, 4],
+    value: 1
+  },
   range: {
+    icon: "fa-assistive-listening-systems",
     list: ["bass", "bug-FIXME", "tenor", "alto", "soprano", "all"],
     value: "all"
   },
   pattern: {
+    icon: "fa-route",
     list: [
       "center",
       "line",
@@ -34,26 +41,32 @@ const settings = {
     value: "line"
   },
   shape: {
+    icon: "fa-shapes",
     list: ["triangle", "square", "circle", "star", "ninja"],
     value: "square"
   },
   size: {
+    icon: "fa-search-plus",
     min: 0,
     max: 15,
     value: 5
   },
   stroke: {
+    icon: "fa-pen",
     checked: false
   },
   color: {
+    icon: "fa-palette",
     value: "#00FFFF"
   },
   opacity: {
+    icon: "fa-eye",
     min: 0,
     max: 100,
     value: 50
   },
   effect: {
+    icon: "fa-chess-board",
     list: [
       "source-over",
       "multiply",
@@ -78,16 +91,19 @@ const settings = {
     value: "source-over"
   },
   twist: {
+    icon: "fa-biohazard",
     checked: false
   },
   rotationSpeed: {
+    icon: "fa-sync",
     min: -10,
     max: 10,
     value: 1
   },
   clear: {
-    checked: false
-  },
+    icon: "fa-bomb",
+    checked: true
+  }
   // saveImage: {
   //   icon: "fa-image"
   // },

@@ -1,8 +1,4 @@
 const getType = setting => {
-  if (setting.icon) {
-    return "button";
-  }
-
   if (!setting.value) {
     return "checkbox";
   }
@@ -21,15 +17,15 @@ const getType = setting => {
 const createButtons = (parent, settings, i) => {
   const containerButtons = document.createElement("div");
   containerButtons.className = "container-buttons";
-  const containerTitle = document.createElement("h4");
-  containerTitle.innerText = `level - ${i}`;
-  containerTitle.className = "container-buttons__title";
+  // const containerTitle = document.createElement("h4");
+  // containerTitle.innerText = `level - ${i}`;
+  // containerTitle.className = "container-buttons__title";
   parent.appendChild(containerButtons);
-  containerButtons.appendChild(containerTitle);
+  // containerButtons.appendChild(containerTitle);
 
   // Control visualization
   for (let setting in settings) {
-    const { list, value, min, max, icon } = settings[setting];
+    const { list, value, min, max, icon, checked } = settings[setting];
     const type = getType(settings[setting]);
 
     const button = document.createElement("span");
@@ -38,9 +34,13 @@ const createButtons = (parent, settings, i) => {
       : "controller__button";
     containerButtons.appendChild(button);
 
-    const titleButton = document.createElement("p");
-    titleButton.innerText = setting;
-    button.appendChild(titleButton);
+    // const titleButton = document.createElement("p");
+    // titleButton.innerText = setting;
+    // button.appendChild(titleButton);
+
+    const settingIcon = document.createElement("i");
+    settingIcon.className = `fa ${icon}`;
+    button.appendChild(settingIcon);
 
     const containerInput = document.createElement("label");
     containerInput.className =
@@ -60,13 +60,14 @@ const createButtons = (parent, settings, i) => {
     switch (type) {
       case "number":
         input.min = min;
-        input.max = max;
+        input.max = max || i;
         input.innerText = value;
         break;
       case "checkbox":
         const toggle = document.createElement("span");
         toggle.className = "controller__toggle";
         containerInput.appendChild(toggle);
+        toggle.checked = checked;
         break;
       case "select":
         input.className = `controller__select-${setting}-${i}`;
@@ -77,11 +78,6 @@ const createButtons = (parent, settings, i) => {
           element.innerText = option;
           input.appendChild(element);
         });
-
-      case "button":
-        const settingIcon = document.createElement("i");
-        settingIcon.className = `fa ${icon}`;
-        containerInput.appendChild(settingIcon);
         break;
     }
   }

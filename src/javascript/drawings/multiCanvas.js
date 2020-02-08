@@ -49,6 +49,10 @@ const updateControllersValues = index => {
     `controller__slider-stroke-${index}`
   )[0].checked;
 
+  const clear = document.getElementsByClassName(
+    `controller__slider-clear-${index}`
+  )[0].checked;
+
   let colorWell = hexToRGB(
     document
       .getElementsByClassName(`controller__slider-color-${index}`)[0]
@@ -66,7 +70,8 @@ const updateControllersValues = index => {
     colorWell,
     opacity,
     twist,
-    stroke
+    stroke,
+    clear
   };
 };
 
@@ -99,7 +104,8 @@ function startAudioVisual() {
       // For each canvas do a drawing
       if (canvasses.length >= 1) {
         canvasses.map((canvas, index) => {
-          index++;
+          index++
+          index = document.getElementsByClassName(`controller__select-canvas-${index}`)[0].value;
           const canvasContext = canvas.getContext("2d");
 
           let {
@@ -110,10 +116,11 @@ function startAudioVisual() {
             colorWell,
             opacity,
             twist,
-            stroke
+            stroke,
+            clear
           } = updateControllersValues(index);
 
-          canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+          clear && canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 
           rotate({
             ctx: canvasContext,
