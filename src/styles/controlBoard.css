@@ -20,21 +20,27 @@
   padding: 1em;
 }
 
+label {
+  margin-left: 1em;
+}
+
 .container-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0.25em;
-  max-width: 20em;
   background: #efefef;
   color: #222222;
   font-size: 0.8em;
   border-radius: 0.2em;
+  padding: 0.5em;
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
 }
 
 .controller__button {
-  padding: 0.25em;
-  margin: 0 0.25em;
+  padding: 0.5em;
   flex-grow: 1;
+  flex-direction: row;
+  align-items: center;
+  align-content: space-between;
 }
 
 .controller__button h4 {
