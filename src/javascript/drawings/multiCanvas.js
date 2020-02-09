@@ -28,9 +28,8 @@ const updateControllersValues = index => {
 
   const canvas = document.getElementsByClassName(
     `canvas-${
-      document.getElementsByClassName(
-        `controller__select-canvas-${index}`
-      )[0].value
+      document.getElementsByClassName(`controller__select-canvas-${index}`)[0]
+        .value
     }`
   )[0];
   const canvasContext = canvas.getContext("2d");
@@ -115,7 +114,7 @@ function startAudioVisual() {
       // Clear All Canvas before mapping settings again to draw.
       // this prevent settings deleting each other.
       settings.map((setting, i) => {
-        i++
+        i++;
         let canvas = document.getElementsByClassName(
           `canvas-${
             document.getElementsByClassName(`controller__select-canvas-${i}`)[0]
@@ -128,7 +127,6 @@ function startAudioVisual() {
         )[0].checked;
         clear && ctx.clearRect(0, 0, canvas.width, canvas.height);
       });
-
 
       // For each setting do a drawing
       settings.map((setting, index) => {
@@ -148,14 +146,13 @@ function startAudioVisual() {
           canvasContext
         } = updateControllersValues(index);
 
-        // clear && canvasContext.clearRect(0, 0, canvas.width, canvas.height);
         canvasContext.globalCompositeOperation = effect;
 
         rotate({
           ctx: canvasContext,
           x: canvas.width / 2,
           y: canvas.height / 2,
-          degree: angles[`canvas${index}`],
+          degree: rotationSpeed/1 === 0 ? 0 : angles[`canvas${index}`],
           drawShape: () => {
             // For each frequency draw something
             for (let i = frequencyMin; i < frequencyMax; i++) {
