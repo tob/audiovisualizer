@@ -26,6 +26,19 @@ const updateControllersValues = index => {
     }
   };
 
+  const canvas = document.getElementsByClassName(
+    `canvas-${
+      document.getElementsByClassName(
+        `controller__select-canvas-${index}`
+      )[0].value
+    }`
+  )[0];
+  const canvasContext = canvas.getContext("2d");
+
+  const effect = document.getElementsByClassName(
+    `controller__select-effect-${index}`
+  )[0].value;
+
   const range =
     document.getElementsByClassName(`controller__select-range-${index}`)[0]
       .value || "all";
@@ -49,10 +62,6 @@ const updateControllersValues = index => {
     `controller__slider-stroke-${index}`
   )[0].checked;
 
-  const clear = document.getElementsByClassName(
-    `controller__slider-clear-${index}`
-  )[0].checked;
-
   let colorWell = hexToRGB(
     document
       .getElementsByClassName(`controller__slider-color-${index}`)[0]
@@ -71,13 +80,14 @@ const updateControllersValues = index => {
     opacity,
     twist,
     stroke,
-    clear
+    effect,
+    canvasContext,
+    canvas
   };
 };
 
 function startAudioVisual() {
   "use strict";
-  const angles = {};
 
   const soundAllowed = function(stream) {
     //Audio stops listening in FF without // window.persistAudioStream = stream;
@@ -91,37 +101,38 @@ function startAudioVisual() {
     analyser.fftSize = 1024;
 
     const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
+    const angles = {};
+    let volume;
 
     var doDraw = function() {
       requestAnimationFrame(doDraw);
       analyser.getByteFrequencyData(frequencyArray);
-      let volume;
 
       const settings = Array.prototype.slice.apply(
         document.getElementsByClassName("container-buttons")
       );
 
-
-      const canvasses = Array.prototype.slice.apply(
-        document.querySelectorAll("canvas")
-      );
-      canvasses.map((canvas, index) => {
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Clear All Canvas before mapping settings again to draw.
+      // this prevent settings deleting each other.
+      settings.map((setting, i) => {
+        i++
+        let canvas = document.getElementsByClassName(
+          `canvas-${
+            document.getElementsByClassName(`controller__select-canvas-${i}`)[0]
+              .value
+          }`
+        )[0];
+        let ctx = canvas.getContext("2d");
+        const clear = document.getElementsByClassName(
+          `controller__slider-clear-${i}`
+        )[0].checked;
+        clear && ctx.clearRect(0, 0, canvas.width, canvas.height);
       });
+
 
       // For each setting do a drawing
       settings.map((setting, index) => {
         index++;
-
-        const canvas = document.getElementsByClassName(
-          `canvas-${
-            document.getElementsByClassName(
-              `controller__select-canvas-${index}`
-            )[0].value
-          }`
-        )[0];
-        const canvasContext = canvas.getContext("2d");
 
         let {
           frequencyMin,
@@ -132,13 +143,13 @@ function startAudioVisual() {
           opacity,
           twist,
           stroke,
-          clear
+          effect,
+          canvas,
+          canvasContext
         } = updateControllersValues(index);
 
         // clear && canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-        canvasContext.globalCompositeOperation = document.getElementsByClassName(
-          `controller__select-effect-${index}`
-        )[0].value;
+        canvasContext.globalCompositeOperation = effect;
 
         rotate({
           ctx: canvasContext,
@@ -158,7 +169,7 @@ function startAudioVisual() {
           ${colorWell.b + volume},
           ${opacity / 100})`;
 
-              setting.style.backgroundColor =  customColor;
+              setting.style.backgroundColor = customColor;
 
               pattern({
                 ctx: canvasContext,

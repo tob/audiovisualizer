@@ -246,6 +246,5 @@ window.onload = () => {
   plusButton.addEventListener("click", () => {
     addCanvas(main, controlBoard, settings);
     // recorder = new CanvasRecorder(canvas);
-    startAudioVisual();
   });
 };
