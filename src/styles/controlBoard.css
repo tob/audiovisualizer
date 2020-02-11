@@ -4,13 +4,14 @@
   padding: 0.5em;
   border-radius: 0.5em;
   display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: space-around;
+  flex-direction: column;
+  z-index: 1;
+  width: fit-content;
 }
 
-.controller {
+#controller {
   display: flex;
+  z-index: 1;
 }
 
 .container-buttons__title {
@@ -31,8 +32,12 @@ label {
   border-radius: 0.2em;
   padding: 0.5em;
   display: flex;
-  flex-direction: column;
-  align-content: space-between;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: start;
+  margin: 0.3em 0;
+  z-index: 1;
+  max-width: 30vw;
 }
 
 .controller__button {
@@ -40,7 +45,6 @@ label {
   flex-grow: 1;
   flex-direction: row;
   align-items: center;
-  align-content: space-between;
 }
 
 .controller__button h4 {
