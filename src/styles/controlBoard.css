@@ -6,7 +6,6 @@
   display: flex;
   flex-direction: column;
   z-index: 1;
-  width: fit-content;
 }
 
 #controller {
@@ -30,17 +29,26 @@ label {
   color: #222222;
   font-size: 0.8em;
   border-radius: 0.2em;
-  padding: 0.5em;
+  padding: 0.3em 3em 0.3em 0;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: start;
+  justify-content: center;
   margin: 0.3em 0;
   z-index: 1;
-  max-width: 30vw;
+  align-items: center;
+}
+
+.container-buttons:after {
+  content: "\f0dc";
+  font-family: FontAwesome;
+  font-size: 3em;
+  margin-right: -0.75em;
+  cursor: grab;
 }
 
 .controller__button {
+  display: flex;
   padding: 0.5em;
   flex-grow: 1;
   flex-direction: row;

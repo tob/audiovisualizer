@@ -1,10 +1,10 @@
-const updateControllersValues = index => {
+const updateControllersValues = (setting, index) => {
   const ranges = {
-    bass: {
+    "low bass": {
       min: 0,
       max: 50
     },
-    "bug-FIXME": {
+    bass: {
       min: 50,
       max: 100
     },
@@ -26,50 +26,41 @@ const updateControllersValues = index => {
     }
   };
 
-  const canvas = document.getElementsByClassName(
-    `canvas-${
-      document.getElementsByClassName(`controller__select-canvas-${index}`)[0]
-        .value
-    }`
-  )[0];
+  const canvas = document.getElementsByClassName(`canvas-1`)[0];
+  // // canvas selector
+  // document.getElementsByClassName(
+  //   `canvas-${
+  //     document.getElementsByClassName(`controller__select-canvas-${index}`)[0]
+  //       .value
+  //   }`
+  // )[0];
+
   const canvasContext = canvas.getContext("2d");
 
-  const effect = document.getElementsByClassName(
-    `controller__select-effect-${index}`
-  )[0].value;
+  const effect = setting.children[7].children[1].children[0].value;
 
-  const range =
-    document.getElementsByClassName(`controller__select-range-${index}`)[0]
-      .value || "all";
+  const range = setting.children[0].children[1].children[0].value;
   const frequencyMin = ranges[range].min;
   const frequencyMax = ranges[range].max;
 
-  // Get user input
-  const rotationSpeed = document.getElementsByClassName(
-    `controller__slider-rotationSpeed-${index}`
-  )[0].value;
+  const pattern = setting.children[1].children[1].children[0].value;
 
-  const size = document.getElementsByClassName(
-    `controller__slider-size-${index}`
-  )[0].value;
+  const shape = setting.children[2].children[1].children[0].value;
 
-  const twist = document.getElementsByClassName(
-    `controller__slider-twist-${index}`
-  )[0].checked;
+  const size = setting.children[3].children[1].children[0].value;
 
-  const stroke = document.getElementsByClassName(
-    `controller__slider-stroke-${index}`
-  )[0].checked;
+  const stroke = setting.children[4].children[1].children[0].checked;
 
   let colorWell = hexToRGB(
-    document
-      .getElementsByClassName(`controller__slider-color-${index}`)[0]
-      .value.replace("#", "0x")
+    setting.children[5].children[1].children[0].value.replace("#", "0x")
   );
 
-  let opacity = document.getElementsByClassName(
-    `controller__slider-opacity-${index}`
-  )[0].value;
+  let opacity = setting.children[6].children[1].children[0].value;
+
+  const twist = setting.children[8].children[1].children[0].checked;
+
+  const rotationSpeed = setting.children[9].children[1].children[0].value;
+
   return {
     frequencyMin,
     frequencyMax,
@@ -81,14 +72,17 @@ const updateControllersValues = index => {
     stroke,
     effect,
     canvasContext,
-    canvas
+    canvas,
+    pattern,
+    shape
   };
 };
 
-function startAudioVisual() {
+function startAudioVisual(main, controlBoard, settings) {
   "use strict";
 
   const soundAllowed = function(stream) {
+    addCanvas(main, controlBoard, settings);
     //Audio stops listening in FF without // window.persistAudioStream = stream;
     //https://bugzilla.mozilla.org/show_bug.cgi?id=965483
     //https://support.mozilla.org/en-US/questions/984179
@@ -100,7 +94,10 @@ function startAudioVisual() {
     analyser.fftSize = 1024;
 
     const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
-    const angles = {};
+    const state = {
+      angles: {},
+      prevColorWell: null
+    };
     let volume;
 
     var doDraw = function() {
@@ -111,22 +108,31 @@ function startAudioVisual() {
         document.getElementsByClassName("container-buttons")
       );
 
-      // Clear All Canvas before mapping settings again to draw.
-      // this prevent settings deleting each other.
-      settings.map((setting, i) => {
-        i++;
-        let canvas = document.getElementsByClassName(
-          `canvas-${
-            document.getElementsByClassName(`controller__select-canvas-${i}`)[0]
-              .value
-          }`
-        )[0];
-        let ctx = canvas.getContext("2d");
-        const clear = document.getElementsByClassName(
-          `controller__slider-clear-${i}`
-        )[0].checked;
-        clear && ctx.clearRect(0, 0, canvas.width, canvas.height);
-      });
+      // Clear Canvas
+      // const canvases = Array.prototype.slice.apply(
+      //   document.getElementsByTagName("canvas")
+      // );
+      // // Clear All Canvas before mapping settings again to draw.
+      // // this prevent settings deleting each other.
+      // settings.map((setting, i) => {
+      //   i++;
+      //   let canvas = document.getElementsByClassName(
+      //     `canvas-${
+      //       document.getElementsByClassName(`controller__select-canvas-${i}`)[0]
+      //         .value
+      //     }`
+      //   )[0];
+      //   let ctx = canvas.getContext("2d");
+      //   const clear = document.getElementsByClassName(
+      //     `controller__slider-clear-${i}`
+      //   )[0].checked;
+      //   clear && ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // });
+      //
+      // canvases.map(canvas => {
+      //   let ctx = canvas.getContext("2d");
+      //   ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // });
 
       // For each setting do a drawing
       settings.map((setting, index) => {
@@ -143,16 +149,25 @@ function startAudioVisual() {
           stroke,
           effect,
           canvas,
-          canvasContext
-        } = updateControllersValues(index);
+          canvasContext,
+          pattern,
+          shape
+        } = updateControllersValues(setting, index);
+
+        let { angles } = state;
 
         canvasContext.globalCompositeOperation = effect;
+
+        if (colorWell !== state.prevColorWell) {
+          state.prevColorWell = colorWell;
+          setting.style.backgroundColor = `rgb(${colorWell.r},${colorWell.g},${colorWell.b}, 100)`;
+        }
 
         rotate({
           ctx: canvasContext,
           x: canvas.width / 2,
           y: canvas.height / 2,
-          degree: rotationSpeed/1 === 0 ? 0 : angles[`canvas${index}`],
+          degree: rotationSpeed / 1 === 0 ? 0 : angles[`canvas${index}`],
           drawShape: () => {
             // For each frequency draw something
             for (let i = frequencyMin; i < frequencyMax; i++) {
@@ -166,19 +181,14 @@ function startAudioVisual() {
           ${colorWell.b + volume},
           ${opacity / 100})`;
 
-              setting.style.backgroundColor = customColor;
-
-              pattern({
+              drawPattern({
                 ctx: canvasContext,
                 canvas: canvas,
                 radius: (volume / 5) * size,
                 width: (volume / 5) * size,
                 volume,
                 i,
-                mode:
-                  document.getElementsByClassName(
-                    `controller__select-pattern-${index}`
-                  )[0].value || "circle",
+                mode: pattern,
                 twist,
                 shape: (x, y) =>
                   drawShape({
@@ -186,10 +196,7 @@ function startAudioVisual() {
                     y: y,
                     ctx: canvasContext,
                     width: (volume / 5) * size,
-                    mode:
-                      document.getElementsByClassName(
-                        `controller__select-shape-${index}`
-                      )[0].value || "circle",
+                    mode: shape,
                     i,
                     style: customColor,
                     stroke: stroke
