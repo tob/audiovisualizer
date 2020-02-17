@@ -1,10 +1,10 @@
 #controlboard {
-  background: #222222;
+  background-color: rgba(50, 50, 50, 50%);
   color: #efefef;
   padding: 0.5em;
   border-radius: 0.5em;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   z-index: 1;
 }
 
@@ -63,4 +63,29 @@ label {
 .controller__button:hover {
   background: red;
   color: white;
+}
+
+
+/*test - override dragula default css*/
+.gu-mirror {
+  position: fixed !important;
+  margin: 0 !important;
+  z-index: 9999 !important;
+  opacity: 0.8;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80);
+}
+.gu-hide {
+  display: none !important;
+}
+.gu-unselectable {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+.gu-transit {
+  opacity: 0.2;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
 }

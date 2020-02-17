@@ -108,31 +108,40 @@ function startAudioVisual(main, controlBoard, settings) {
         document.getElementsByClassName("container-buttons")
       );
 
+
+
       // Clear Canvas
-      // const canvases = Array.prototype.slice.apply(
-      //   document.getElementsByTagName("canvas")
-      // );
-      // // Clear All Canvas before mapping settings again to draw.
-      // // this prevent settings deleting each other.
-      // settings.map((setting, i) => {
-      //   i++;
-      //   let canvas = document.getElementsByClassName(
-      //     `canvas-${
-      //       document.getElementsByClassName(`controller__select-canvas-${i}`)[0]
-      //         .value
-      //     }`
-      //   )[0];
-      //   let ctx = canvas.getContext("2d");
-      //   const clear = document.getElementsByClassName(
-      //     `controller__slider-clear-${i}`
-      //   )[0].checked;
-      //   clear && ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // });
-      //
-      // canvases.map(canvas => {
-      //   let ctx = canvas.getContext("2d");
-      //   ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // });
+      const clearCanvas = document.getElementsByClassName(
+        `controller__clear`
+      )[0].checked;
+
+      if (clearCanvas) {
+        const canvases = Array.prototype.slice.apply(
+          document.getElementsByTagName("canvas")
+        );
+        //
+        // // Clear All Canvas before mapping settings again to draw.
+        // // this prevent settings deleting each other.
+        // settings.map((setting, i) => {
+        //   i++;
+        //   let canvas = document.getElementsByClassName(
+        //     `canvas-${
+        //       document.getElementsByClassName(`controller__select-canvas-${i}`)[0]
+        //         .value
+        //     }`
+        //   )[0];
+        //   let ctx = canvas.getContext("2d");
+        //   const clear = document.getElementsByClassName(
+        //     `controller__slider-clear-${i}`
+        //   )[0].checked;
+        //   clear && ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // });
+        //
+        canvases.map(canvas => {
+          let ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+      }
 
       // For each setting do a drawing
       settings.map((setting, index) => {

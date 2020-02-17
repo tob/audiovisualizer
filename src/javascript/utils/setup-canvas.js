@@ -152,10 +152,10 @@ const handleMicrophone = (button, main, controlBoard, settings) => {
     startAudioVisual(main, controlBoard, settings);
   } else {
     listening = false;
-    button.style.color = "#ccc";
-    button.classList.remove("controller__button-pause");
-    button.classList.add("controller__button-start");
-    button.innerHTML = "Start <i class='fa fa-play'></i>";
+    // button.style.color = "#ccc";
+    // button.classList.remove("controller__button-pause");
+    // button.classList.add("controller__button-start");
+    // button.innerHTML = "Start <i class='fa fa-play'></i>";
     button.classList.toggle("blink", listening);
   }
 };
@@ -232,9 +232,12 @@ window.onload = () => {
 
   // Add drag and drop feature for draw settings
   dragula([controlBoard], {
-    revertOnSpill: false,
-    removeOnSpill: true,
-    copySortSource: true,
+    revertOnSpill: true,
+    removeOnSpill: false,
+    copySortSource: false,
+    moves: function (el, container, handle) {
+      return handle.classList.contains('container-buttons');
+    },
     direction: "vertical"
   });
 
