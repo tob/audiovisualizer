@@ -17,6 +17,8 @@ const getType = setting => {
 const createButtons = (parent, settings, i) => {
   const containerButtons = document.createElement("div");
   containerButtons.className = "container-buttons";
+  containerButtons.draggable = true;
+  // containerButtons.style.order = i;
   // const containerTitle = document.createElement("h4");
   // containerTitle.innerText = `level - ${i}`;
   // containerTitle.className = "container-buttons__title";

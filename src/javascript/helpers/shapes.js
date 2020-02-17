@@ -190,7 +190,7 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
   }
 }
 
-function pattern({
+function drawPattern({
   ctx,
   canvas,
   radius,
@@ -244,7 +244,7 @@ function pattern({
         (canvas.height / 15) * Math.floor(i / 15) -
         (volume * size) / 2 +
         canvas.height / 15 / 2
-    }
+    },
   };
   const xPos = modes[mode].x;
   const yPos = modes[mode].y;

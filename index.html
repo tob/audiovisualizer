@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Drawings - AudioVisualizer</title>
+    <title>AudioVisualizer</title>
     <link rel="stylesheet" href="src/styles/index.css" type="text/css" />
     <link rel="stylesheet" href="src/styles/controlBoard.css" type="text/css" />
     <link rel="stylesheet" href="src/styles/controller.css" type="text/css" />
@@ -13,7 +13,13 @@
       rel="stylesheet"
     />
     <!-- Add icon library -->
-    <script src="https://kit.fontawesome.com/c06c02b965.js" crossorigin="anonymous"></script>
+    <script
+      src="https://kit.fontawesome.com/c06c02b965.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Add draggable library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
 
     <script src="src/javascript/utils/setup-canvas.js"></script>
     <script src="src/javascript/drawings/multiCanvas.js"></script>
@@ -24,40 +30,50 @@
     <script src="src/javascript/utils/recorder.js"></script>
   </head>
   <body class="body">
-    <div id="main">
+    <div class="header">
       <h1>Audiovisualizer</h1>
-    </div>
-    <div id="controller">
-      <a class="controller__button controller__button-start"
-      >Start <i class="fa fa-play"></i>
-      </a>
-      <a class="controller__button controller__button-add"
-      >+++<i class="fa fa-plus"></i>
-      </a>
-    </div>
+      <div id="controller">
+        <a class="controller__button controller__button-start"
+          >Start <i class="fa fa-play"></i>
+        </a>
+        <a class="controller__button controller__button-add"
+          >+++<i class="fa fa-plus"></i>
+        </a>
+        <!--      <a class="controller__button controller__button-saveImage"-->
+        <!--      ><i class="fa fa-image"></i> Snapshot</a-->
+        <!--      >-->
+        <!--      <a class="controller__button snapshot__download" href="#" download=""-->
+        <!--      ><i class="fa fa-download"></i> Save Img</a-->
+        <!--      >-->
+        <!--      <a class=" controller__button controller__button-record"-->
+        <!--      ><i class="fa fa-circle"></i> Record</a-->
 
+      <span class="controller__button">
+        <i class="fa fa-hat-wizard" aria-hidden="true"></i>
+        <label class="controller__switch"
+          ><input
+            type="checkbox"
+            class="controller__clear"
+            value="undefined"/><span class="controller__toggle"></span
+        ></label>
+      </span>
+      </div>
+    </div>
     <div id="controlboard"></div>
-<!--    <div class="assets-container">-->
-<!--      <img id="background" src="src/assets/desertdog.jpg" />-->
-<!--    </div>-->
-<!--    <div>-->
-<!--      <img class="snapshot" src="src/assets/desertdog.jpg" />-->
-<!--    </div>-->
+
+    <div id="main"></div>
+
+    <!--    <div class="assets-container">-->
+    <!--      <img id="background" src="src/assets/desertdog.jpg" />-->
+    <!--    </div>-->
+    <!--    <div>-->
+    <!--      <img class="snapshot" src="src/assets/desertdog.jpg" />-->
+    <!--    </div>-->
+
     <div>
       <video id="newEyes" controls autoplay muted loop>
         <source src="./src/assets/newEyes.mp4" type="video/mp4" />
       </video>
     </div>
-<!--    <div>-->
-<!--      <a class="controller__button controller__button-saveImage"-->
-<!--      ><i class="fa fa-image"></i> Snapshot</a-->
-<!--      >-->
-<!--      <a class="controller__button snapshot__download" href="#" download=""-->
-<!--      ><i class="fa fa-download"></i> Save Img</a-->
-<!--      >-->
-<!--      <a class=" controller__button controller__button-record"-->
-<!--      ><i class="fa fa-circle"></i> Record</a-->
-<!--      >-->
-<!--    </div>-->
   </body>
 </html>

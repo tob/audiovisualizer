@@ -8,20 +8,20 @@ let sensibility = 100,
   WIDTH = window.innerWidth,
   HEIGHT = window.innerHeight,
   colorWell = {
-    r: 255,
-    g: 0,
+    r: 150,
+    g: 130,
     b: 255
   };
 
 const settings = {
-  canvas: {
-    icon: "fa-layer-group",
-    list: [1, 2, 3, 4],
-    value: 1
-  },
+  // canvas: {
+  //   icon: "fa-layer-group",
+  //   list: [1], //, 2, 3, 4],
+  //   value: 1
+  // },
   range: {
     icon: "fa-assistive-listening-systems",
-    list: ["bass", "bug-FIXME", "tenor", "alto", "soprano", "all"],
+    list: ["low bass", "bass", "tenor", "alto", "soprano", "all"],
     value: "all"
   },
   pattern: {
@@ -100,10 +100,10 @@ const settings = {
     max: 10,
     value: 1
   },
-  clear: {
-    icon: "fa-bomb",
-    checked: true
-  }
+  // clear: {
+  //   icon: "fa-bomb",
+  //   checked: true
+  // }
   // saveImage: {
   //   icon: "fa-image"
   // },
@@ -139,7 +139,7 @@ const appendImage = (canvas, target, downloadButton) => {
   }, "image/png");
 };
 
-const handleMicrophone = button => {
+const handleMicrophone = (button, main, controlBoard, settings) => {
   if (button.classList.contains("controller__button-start")) {
     listening = true;
     button.style.color = "red";
@@ -147,12 +147,15 @@ const handleMicrophone = button => {
     button.classList.add("controller__button-pause");
     button.innerHTML = "Listening <i class='fa fa-volume-up'></i>";
     button.classList.toggle("blink", listening);
+    // Create Recorder
+    // recorder = new CanvasRecorder(canvas);
+    startAudioVisual(main, controlBoard, settings);
   } else {
     listening = false;
-    button.style.color = "#ccc";
-    button.classList.remove("controller__button-pause");
-    button.classList.add("controller__button-start");
-    button.innerHTML = "Start <i class='fa fa-play'></i>";
+    // button.style.color = "#ccc";
+    // button.classList.remove("controller__button-pause");
+    // button.classList.add("controller__button-start");
+    // button.innerHTML = "Start <i class='fa fa-play'></i>";
     button.classList.toggle("blink", listening);
   }
 };
@@ -227,13 +230,20 @@ window.onload = () => {
 
   const main = document.getElementById("main");
 
+  // Add drag and drop feature for draw settings
+  dragula([controlBoard], {
+    revertOnSpill: true,
+    removeOnSpill: false,
+    copySortSource: false,
+    moves: function (el, container, handle) {
+      return handle.classList.contains('container-buttons');
+    },
+    direction: "vertical"
+  });
+
   // Grab buttons and assign functions onClick
   startButton.addEventListener("click", () => {
-    handleMicrophone(startButton);
-    const canvas = addCanvas(main, controlBoard, settings);
-    // Create Recorder
-    // recorder = new CanvasRecorder(canvas);
-    startAudioVisual();
+    handleMicrophone(startButton, main, controlBoard, settings);
   });
   // recordButton.addEventListener("click", () =>
   //   handleRecording(recordButton, recorder)
@@ -244,7 +254,12 @@ window.onload = () => {
 
   // grab Add button and create dashboard
   plusButton.addEventListener("click", () => {
-    addCanvas(main, controlBoard, settings);
+    const i =
+      Array.prototype.slice.apply(
+        document.getElementsByClassName("container-buttons")
+      ).length + 1;
+    createButtons(controlBoard, settings, i);
+    // addCanvas(main, controlBoard, settings);
     // recorder = new CanvasRecorder(canvas);
   });
 };
