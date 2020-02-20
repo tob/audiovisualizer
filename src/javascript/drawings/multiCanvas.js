@@ -81,6 +81,7 @@ const updateControllersValues = (setting, index) => {
 function startAudioVisual(main, controlBoard, settings) {
   "use strict";
 
+
   const soundAllowed = function(stream) {
     addCanvas(main, controlBoard, settings);
     //Audio stops listening in FF without // window.persistAudioStream = stream;
@@ -147,6 +148,8 @@ function startAudioVisual(main, controlBoard, settings) {
       settings.map((setting, index) => {
         index++;
 
+        let data = updateControllersValues(index);
+
         let {
           frequencyMin,
           frequencyMax,
@@ -161,9 +164,13 @@ function startAudioVisual(main, controlBoard, settings) {
           canvasContext,
           pattern,
           shape
-        } = updateControllersValues(setting, index);
+        } = data;
 
         let { angles } = state;
+
+        // let urlParameters = Object.entries(data).map(e => e.join('=')).join('&');
+        // state.data.search_params.set(`level-${index}`, urlParameters);
+        // window.location.search = state.data.search_params.toString();
 
         canvasContext.globalCompositeOperation = effect;
 
