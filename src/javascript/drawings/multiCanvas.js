@@ -1,4 +1,4 @@
-const updateControllersValues = (setting, index) => {
+const updateControllersValues = (setting) => {
   const ranges = {
     "low bass": {
       min: 0,
@@ -51,9 +51,9 @@ const updateControllersValues = (setting, index) => {
 
   const stroke = setting.children[4].children[1].children[0].checked;
 
-  let colorWell = hexToRGB(
-    setting.children[5].children[1].children[0].value.replace("#", "0x")
-  );
+  const color = setting.children[5].children[1].children[0].value;
+
+  let colorWell = hexToRGB(color.replace("#", "0x"));
 
   let opacity = setting.children[6].children[1].children[0].value;
 
@@ -74,16 +74,16 @@ const updateControllersValues = (setting, index) => {
     canvasContext,
     canvas,
     pattern,
-    shape
+    color,
+    shape,
+    range
   };
 };
 
-function startAudioVisual(main, controlBoard, settings) {
+function startAudioVisual() {
   "use strict";
 
-
   const soundAllowed = function(stream) {
-    addCanvas(main, controlBoard, settings);
     //Audio stops listening in FF without // window.persistAudioStream = stream;
     //https://bugzilla.mozilla.org/show_bug.cgi?id=965483
     //https://support.mozilla.org/en-US/questions/984179
@@ -97,19 +97,23 @@ function startAudioVisual(main, controlBoard, settings) {
     const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
     const state = {
       angles: {},
-      prevColorWell: null
+      prevColorWell: null,
+      data: { search_params: new URLSearchParams(window.location.search) }
     };
     let volume;
 
     var doDraw = function() {
+      if (!listening) {
+        console.log('STOP DRAW');
+        return
+      }
+
       requestAnimationFrame(doDraw);
       analyser.getByteFrequencyData(frequencyArray);
 
       const settings = Array.prototype.slice.apply(
         document.getElementsByClassName("container-buttons")
       );
-
-
 
       // Clear Canvas
       const clearCanvas = document.getElementsByClassName(
@@ -148,7 +152,7 @@ function startAudioVisual(main, controlBoard, settings) {
       settings.map((setting, index) => {
         index++;
 
-        let data = updateControllersValues(index);
+        let data = updateControllersValues(setting, index);
 
         let {
           frequencyMin,
@@ -168,9 +172,17 @@ function startAudioVisual(main, controlBoard, settings) {
 
         let { angles } = state;
 
-        // let urlParameters = Object.entries(data).map(e => e.join('=')).join('&');
-        // state.data.search_params.set(`level-${index}`, urlParameters);
+        let urlParameters = Object.entries(data)
+          .map(e => e.join("="))
+          .join("&");
+        state.data.search_params.set(`level-${index}`, urlParameters);
         // window.location.search = state.data.search_params.toString();
+
+        if (window.history.pushState) {
+          const newURL = new URL(window.location.href);
+          newURL.search = state.data.search_params.toString();
+          window.history.pushState({ path: newURL.href }, "", newURL.href);
+        }
 
         canvasContext.globalCompositeOperation = effect;
 

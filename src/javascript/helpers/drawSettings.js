@@ -1,14 +1,14 @@
 const getType = setting => {
-  if (!setting.value) {
-    return "checkbox";
-  }
-
   if (setting.max) {
     return "number";
   }
 
   if (setting.list) {
     return "select";
+  }
+
+  if (setting.checked) {
+    return "checkbox";
   }
 
   return "color";
@@ -74,18 +74,20 @@ const createButtons = (parent, settings, i) => {
       case "select":
         input.className = `controller__select-${setting}-${i}`;
         // create option value for each option and append inside selector
-        settings[setting].list.map(option => {
+        list.map(option => {
           let element = document.createElement("option");
           element.value = option;
           element.innerText = option;
           input.appendChild(element);
         });
+
+        input.selectedIndex = list.indexOf(value);
         break;
     }
   }
 };
 
-const addCanvas = (main, controlboard, settings) => {
+const addCanvas = (main) => {
   const ctx = document.createElement("canvas");
   const i =
     Array.prototype.slice.apply(document.getElementsByTagName("canvas"))
@@ -95,6 +97,5 @@ const addCanvas = (main, controlboard, settings) => {
   ctx.width = window.innerWidth;
   ctx.height = window.innerHeight;
   main.appendChild(ctx);
-  createButtons(controlboard, settings, i);
   return ctx;
 };

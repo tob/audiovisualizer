@@ -58,19 +58,8 @@ function fork(x, y, volume) {
   canvasContext.fill();
 }
 
-const drawCircle = ({ ctx, x, y, radius, volume }) => {
-  // ctx.arc(
-  //   circlePos(1, adjustedLength, i).width / 2,
-  //   circlePos(1, adjustedLength, i).height / 2,
-  //   (adjustedLength / 10) * size,
-  //   0,
-  //   2 * Math.PI
-  // );
-};
-
 // draw spiral
 function circlePos(radius, volume, i) {
-  const diameter = (radius + volume) * size;
   return {
     width: radius * Math.cos((i * (Math.PI * 2)) / 255),
     height: radius * Math.sin((i * (Math.PI * 2)) / 255)
