@@ -1,4 +1,4 @@
-const updateControllersValues = (setting) => {
+const updateControllersValues = setting => {
   const ranges = {
     "low bass": {
       min: 0,
@@ -104,8 +104,8 @@ function startAudioVisual() {
 
     var doDraw = function() {
       if (!listening) {
-        console.log('STOP DRAW');
-        return
+        console.log("STOP DRAW");
+        return;
       }
 
       requestAnimationFrame(doDraw);
@@ -175,13 +175,17 @@ function startAudioVisual() {
         let urlParameters = Object.entries(data)
           .map(e => e.join("="))
           .join("&");
+        // console.log("URL params", urlParameters);
         state.data.search_params.set(`level-${index}`, urlParameters);
         // window.location.search = state.data.search_params.toString();
 
         if (window.history.pushState) {
           const newURL = new URL(window.location.href);
           newURL.search = state.data.search_params.toString();
-          window.history.pushState({ path: newURL.href }, "", newURL.href);
+
+          if (window.location.search !== newURL.search) {
+            window.history.pushState({ path: newURL.href }, "", newURL.href);
+          }
         }
 
         canvasContext.globalCompositeOperation = effect;
