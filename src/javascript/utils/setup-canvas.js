@@ -1,24 +1,9 @@
-let sensibility = 100,
-  itemsNumber = 5,
-  speed = 5,
-  size = 1,
-  opacity = 50,
+let size = 1,
   listening = false,
-  effect = false,
   WIDTH = window.innerWidth,
-  HEIGHT = window.innerHeight,
-  colorWell = {
-    r: 150,
-    g: 130,
-    b: 255
-  };
+  HEIGHT = window.innerHeight;
 
 const settings = {
-  // canvas: {
-  //   icon: "fa-layer-group",
-  //   list: [1], //, 2, 3, 4],
-  //   value: 1
-  // },
   range: {
     icon: "fa-assistive-listening-systems",
     list: ["low bass", "bass", "tenor", "alto", "soprano", "all"],
@@ -49,21 +34,21 @@ const settings = {
     icon: "fa-search-plus",
     min: 0,
     max: 15,
-    value: 5
+    value: 7
   },
   stroke: {
     icon: "fa-pen",
-    checked: false
+    checked: true
   },
   color: {
     icon: "fa-palette",
-    value: "#00FFFF"
+    value: "#ff0f22"
   },
   opacity: {
     icon: "fa-eye",
     min: 0,
     max: 100,
-    value: 50
+    value: 70
   },
   effect: {
     icon: "fa-chess-board",
@@ -92,27 +77,14 @@ const settings = {
   },
   twist: {
     icon: "fa-biohazard",
-    checked: false
+    checked: true
   },
   rotationSpeed: {
     icon: "fa-sync",
     min: -10,
     max: 10,
     value: 1
-  },
-  // clear: {
-  //   icon: "fa-bomb",
-  //   checked: true
-  // }
-  // saveImage: {
-  //   icon: "fa-image"
-  // },
-  // download: {
-  //   icon: "fa-download"
-  // },
-  // record: {
-  //   icon: "fa-circle"
-  // }
+  }
 };
 
 function hexToRGB(hexColor) {
@@ -122,13 +94,6 @@ function hexToRGB(hexColor) {
     b: hexColor & 0xff
   };
 }
-
-const updateOpacity = (i, volume) => {
-  opacity =
-    volume ||
-    document.getElementsByClassName(`controller__slider-opacity-${1}`)[0]
-      .value / 100;
-};
 
 const appendImage = (canvas, target, downloadButton) => {
   // set canvasImg image src to data
@@ -145,17 +110,15 @@ const handleMicrophone = (button, main, controlBoard, settings) => {
     button.style.color = "red";
     button.classList.remove("controller__button-start");
     button.classList.add("controller__button-pause");
-    button.innerHTML = "Listening <i class='fa fa-volume-up'></i>";
+    button.innerHTML = "Listening  <i class='fa fa-volume-up'></i>";
     button.classList.toggle("blink", listening);
-    // Create Recorder
-    // recorder = new CanvasRecorder(canvas);
     startAudioVisual(main, controlBoard, settings);
   } else {
     listening = false;
-    // button.style.color = "#ccc";
-    // button.classList.remove("controller__button-pause");
-    // button.classList.add("controller__button-start");
-    // button.innerHTML = "Start <i class='fa fa-play'></i>";
+    button.style.color = "#ccc";
+    button.classList.remove("controller__button-pause");
+    button.classList.add("controller__button-start");
+    button.innerHTML = "Start  <i class='fa fa-play'></i>";
     button.classList.toggle("blink", listening);
   }
 };
@@ -189,18 +152,24 @@ const handleRecording = (button, recorder) => {
   }
 };
 
-/* Set the width of the side navigation to 250px and the left margin of the page content to 250px */
-function openNav() {
-  document.getElementById("mySidenav").style.width = "250px";
-  // document.getElementById("main").style.marginLeft = "250px";
-  document.getElementsByClassName("snapshot")[0].style.marginLeft = "250px";
-}
 
-/* Set the width of the side navigation to 0 and the left margin of the page content to 0 */
-function closeNav() {
-  document.getElementById("mySidenav").style.width = "0";
-  document.getElementById("main").style.marginLeft = "0";
-  document.getElementsByClassName("snapshot")[0].style.marginLeft = "0";
+function loadDrawingFromParams(parent, settings) {
+  const search_params = new URLSearchParams(window.location.search);
+  let index = 0;
+  const levels = search_params.values();
+  for (let value of levels) {
+    const drawings = value.toString().split("&");
+    drawings.map(prop => {
+
+      const keyValue = prop.split("=");
+      if (settings[keyValue[0]]) {
+        settings[keyValue[0]].value = keyValue[1];
+      }
+    });
+    console.log("urlSettings", settings);
+    createButtons(parent, settings, index);
+    index++;
+  }
 }
 
 // Start
@@ -211,9 +180,9 @@ window.onload = () => {
   const plusButton = document.getElementsByClassName(
     "controller__button-add"
   )[0];
-  // const recordButton = document.getElementsByClassName(
-  //   "controller__button-record"
-  // )[0];
+  const recordButton = document.getElementsByClassName(
+    "controller__button-record"
+  )[0];
   // const saveImageButton = document.getElementsByClassName(
   //   "controller__button-saveImage"
   // )[0];
@@ -229,25 +198,32 @@ window.onload = () => {
     document.getElementById("controlboard");
 
   const main = document.getElementById("main");
+  const canvas = addCanvas(main, controlBoard, settings);
+  // Create Recorder
+  const recorder = new CanvasRecorder(canvas);
 
   // Add drag and drop feature for draw settings
   dragula([controlBoard], {
     revertOnSpill: true,
-    removeOnSpill: false,
+    removeOnSpill: true,
     copySortSource: false,
-    moves: function (el, container, handle) {
-      return handle.classList.contains('container-buttons');
+    moves: function(el, container, handle) {
+      return handle.classList.contains("container-buttons");
     },
     direction: "vertical"
   });
+
+  if (window.location.search.includes("level")) {
+    loadDrawingFromParams(controlBoard, settings);
+  }
 
   // Grab buttons and assign functions onClick
   startButton.addEventListener("click", () => {
     handleMicrophone(startButton, main, controlBoard, settings);
   });
-  // recordButton.addEventListener("click", () =>
-  //   handleRecording(recordButton, recorder)
-  // );
+  recordButton.addEventListener("click", () =>
+    handleRecording(recordButton, recorder)
+  );
   // saveImageButton.addEventListener("click", () =>
   //   appendImage(canvas, snapshot, downloadButton)
   // );
@@ -259,7 +235,5 @@ window.onload = () => {
         document.getElementsByClassName("container-buttons")
       ).length + 1;
     createButtons(controlBoard, settings, i);
-    // addCanvas(main, controlBoard, settings);
-    // recorder = new CanvasRecorder(canvas);
   });
 };

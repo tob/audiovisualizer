@@ -10,82 +10,6 @@ function inRange(x, min = 0, max) {
   return (x - min) * (x - max) <= 0;
 }
 
-// Centered triangles
-const increment = (width, volume, speed) => {
-  if (volume > speed) {
-    return Math.abs(Math.pow(volume, 2) - 10) / (width - 10) / 4;
-  }
-  // smooth the accelerations
-  return 0.5;
-};
-
-const getTrianglePoints = ({ x, y, volume, width, speed, offset }) => {
-  width += increment(x, volume, speed);
-
-  if (offset) {
-    width += offset;
-    width = width > 0 ? width : 0;
-  }
-
-  const verticalDown = y + width;
-
-  const topX = x;
-  const topY = y - width;
-  const leftX = x - width;
-  const leftY = verticalDown;
-  const rightX = x + width;
-  const rightY = verticalDown;
-
-  return {
-    topX,
-    topY,
-    leftX,
-    leftY,
-    rightX,
-    rightY
-  };
-};
-
-const drawTriangle = ({
-  ctx,
-  x,
-  y,
-  volume,
-  width,
-  speed,
-  offset,
-  style,
-  stroke
-}) => {
-  // console.log('start triangle')
-  const { topX, topY, leftX, leftY, rightX, rightY } = getTrianglePoints({
-    x,
-    y,
-    volume,
-    width,
-    speed,
-    offset
-  });
-  ctx.save();
-
-  ctx.fillStyle = style;
-  // the triangle
-  ctx.beginPath();
-  // top corner
-  ctx.moveTo(topX, topY);
-  //left corner
-  ctx.lineTo(leftX, leftY);
-  //right corner
-  ctx.lineTo(rightX, rightY);
-
-  ctx.closePath();
-  if (stroke) {
-    ctx.stroke();
-  }
-  ctx.fill();
-  ctx.restore();
-};
-
 function drawStar(ctx, x, y, spikes, outerRadius, innerRadius) {
   let cx = x;
   let cy = y;
@@ -134,19 +58,8 @@ function fork(x, y, volume) {
   canvasContext.fill();
 }
 
-const drawCircle = ({ ctx, x, y, radius, volume }) => {
-  // ctx.arc(
-  //   circlePos(1, adjustedLength, i).width / 2,
-  //   circlePos(1, adjustedLength, i).height / 2,
-  //   (adjustedLength / 10) * size,
-  //   0,
-  //   2 * Math.PI
-  // );
-};
-
 // draw spiral
 function circlePos(radius, volume, i) {
-  const diameter = (radius + volume) * size;
   return {
     width: radius * Math.cos((i * (Math.PI * 2)) / 255),
     height: radius * Math.sin((i * (Math.PI * 2)) / 255)
