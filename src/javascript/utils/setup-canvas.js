@@ -166,7 +166,6 @@ function loadDrawingFromParams(parent, settings) {
         settings[keyValue[0]].value = keyValue[1];
       }
     });
-    console.log("urlSettings", settings);
     createButtons(parent, settings, index);
     index++;
   }
