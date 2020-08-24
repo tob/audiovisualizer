@@ -209,6 +209,7 @@ function startAudioVisual() {
 
               let customColor = `rgb(
           ${colorWell.r + volume},
+          
           ${colorWell.g + volume},
           ${colorWell.b + volume},
           ${opacity / 100})`;
@@ -216,7 +217,7 @@ function startAudioVisual() {
               drawPattern({
                 ctx: canvasContext,
                 canvas: canvas,
-                radius: (volume / 5) * size,
+                radius: (canvas.width/100)*size + volume,
                 width: (volume / 5) * size,
                 volume,
                 i,

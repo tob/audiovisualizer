@@ -17,8 +17,8 @@ const settings = {
       "spiral",
       "diagonal",
       "grid",
-      "cone1",
-      "cone2",
+      "wave",
+      "verticalWave",
       "circle",
       "cursor",
       "random"

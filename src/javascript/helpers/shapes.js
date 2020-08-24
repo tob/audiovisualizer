@@ -61,8 +61,8 @@ function fork(x, y, volume) {
 // draw spiral
 function circlePos(radius, volume, i) {
   return {
-    width: radius * Math.cos((i * (Math.PI * 2)) / 255),
-    height: radius * Math.sin((i * (Math.PI * 2)) / 255)
+    width: (radius + i * (Math.PI * 2)) * Math.cos((i * (Math.PI * 2)) / 50),
+    height: (radius + i * (Math.PI * 2)) * Math.sin((i * (Math.PI * 2)) / 50)
   };
 }
 
@@ -115,20 +115,27 @@ function drawPattern({
 }) {
   const modes = {
     circle: {
-      x: radius * Math.cos((i * Math.PI) / 255) + canvas.width / 2,
-      y: radius * Math.sin((i * Math.PI) / 255) + canvas.height / 2
+      x:
+        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / 255) +
+        canvas.width / 2,
+      y:
+        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / 255) +
+        canvas.height / 2
     },
     spiral: {
       x: circlePos(radius, volume, i).width + canvas.width / 2,
       y: circlePos(radius, volume, i).height + canvas.height / 2
     },
-    cone1: {
+    wave: {
       x: (canvas.width / 255) * i,
-      y: radius * Math.sin((360 / 255) * i * Math.PI) + canvas.height / 2
+      y:
+        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / 255) +
+        canvas.height / 2
     },
-    cone2: {
+    verticalWave: {
       x:
-        radius * Math.cos((360 / 255) * i * Math.PI) + (canvas.width / 255) * i,
+        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / 255) +
+        canvas.width / 2,
       y: (canvas.height / 255) * i
     },
     line: {
@@ -157,7 +164,7 @@ function drawPattern({
         (canvas.height / 15) * Math.floor(i / 15) -
         (volume * size) / 2 +
         canvas.height / 15 / 2
-    },
+    }
   };
   const xPos = modes[mode].x;
   const yPos = modes[mode].y;
@@ -167,7 +174,7 @@ function drawPattern({
     x: xPos,
     y: yPos,
     drawShape: () => shape(xPos, yPos),
-    degree: twist && (360 / 255) * (volume / 255),
+    degree: twist && (360 / 255) * (volume / 255)
   });
 }
 
