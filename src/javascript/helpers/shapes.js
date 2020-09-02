@@ -59,7 +59,17 @@ function fork(x, y, volume) {
 }
 
 // draw spiral
-function circlePos(radius, volume, i) {
+function circlePos(radius, i) {
+  // var x = Math.cos(ang) * distance;
+  // var y = Math.sin(ang) * distance;
+
+  return {
+    width: radius * Math.cos(((360 / 60) * (i - 15) * Math.PI) / 180),
+    height: radius * Math.sin(((360 / 60) * (i - 15) * Math.PI) / 180)
+  };
+}
+
+function spiralPos(radius, volume, i) {
   return {
     width: (radius + i * (Math.PI * 2)) * Math.cos((i * (Math.PI * 2)) / 50),
     height: (radius + i * (Math.PI * 2)) * Math.sin((i * (Math.PI * 2)) / 50)
@@ -103,16 +113,130 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
   }
 }
 
+function findTime() {
+  let time = new Date();
+  let hour = time.getHours();
+  let min = time.getMinutes();
+  let sec = time.getSeconds();
+
+  // hour = hour%12;
+  // hour = (hour*Math.PI/6)+(min*Math.PI/(6*60))+(sec*Math.PI/(360*60));
+  // min = (min*Math.PI/30)+(sec*Math.PI/(30*60));
+  // sec = (sec*Math.PI/30);
+  //
+  hour = hour < 10 ? "0" + hour : hour;
+  min = min < 10 ? "0" + min : min;
+  sec = sec < 10 ? "0" + sec : sec;
+
+  return {
+    hour,
+    min,
+    sec
+  };
+}
+
+function findTimeofI(i, radius, arrayLength) {
+  const { sec, min, hour } = findTime();
+  let time = sec;
+  let timeUnits = 60;
+  let timeRadius = radius*i/50;
+  if (i > arrayLength/3) {
+    time = min;
+    timeRadius = timeRadius/1.5
+  }
+
+  if (i > (arrayLength/3)*2) {
+    time = hour
+    timeRadius = timeRadius/2.5
+  }
+
+  timeUnits = time === hour ? 12 : 60;
+
+  return {
+    time,
+    timeUnits,
+    timeRadius
+  };
+}
+
+function getClockHandsPosition(time, units, radius) {
+  return {
+    width: radius * Math.cos(((360 / units) * (time - 15) * Math.PI) / 180),
+    height: radius * Math.sin(((360 / units) * (time - 15) * Math.PI) / 180)
+  };
+}
+
+
+function smoothLine(ctx, canvas, arrayFreq) {
+  ctx.beginPath();
+
+  let xPos = 0;
+  let yPos = canvas.height;
+
+  // move to the first point
+  ctx.moveTo(xPos, yPos);
+
+  for (let i = 0; i < arrayFreq.length; i++) {
+    let barHeight = arrayFreq[i];
+    yPos = canvas.height / 2;
+
+    // if (i % 5 === 0) {
+    //   if (i % 2 === 0) {
+    //     var xc = xPos + (canvas.width / arrayFreq.length + 1);
+    //     var yc = canvas.height / 2 - barHeight;
+    //     ctx.quadraticCurveTo(xPos, yPos, xc, yc);
+    //   } else {
+    //     var xc = xPos + (canvas.width / arrayFreq.length + 1);
+    //     var yc = canvas.height / 2 + barHeight;
+    //     ctx.quadraticCurveTo(xPos, yPos, xc, yc);
+    //   }
+    // }
+
+    xPos += canvas.width / arrayFreq.length + 1;
+  }
+  // curve through the last two points
+  ctx.quadraticCurveTo(xPos, canvas.height / 2, canvas.width, canvas.height);
+
+  ctx.fillStyle = "white";
+  ctx.fill();
+  ctx.strokeStyle = "green";
+  ctx.stroke();
+  ctx.closePath();
+
+  // console.log('path', arrayFreq)
+}
+
+function drawBars(arrayFreq, canvasContext, canvas) {
+  let xPos = 0;
+  for (let i = 0; i < arrayFreq.length; i++) {
+    let barHeight = arrayFreq[i];
+
+    let r = barHeight + 25 * (i / arrayFreq.length);
+    let g = 250 * (i / arrayFreq.length);
+    let b = 50;
+    canvasContext.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+    canvasContext.fillRect(
+      xPos,
+      canvas.height - barHeight,
+      canvas.width / arrayFreq.length,
+      barHeight
+    );
+    xPos += canvas.width / arrayFreq.length + 1;
+  }
+}
 function drawPattern({
   ctx,
   canvas,
   radius,
   volume,
+  size,
   i,
   shape,
   mode = "circle",
-  twist
+  twist,
+  arrayLength
 }) {
+  const { time, timeUnits, timeRadius } = findTimeofI(i, radius, arrayLength);
   const modes = {
     circle: {
       x:
@@ -123,8 +247,8 @@ function drawPattern({
         canvas.height / 2
     },
     spiral: {
-      x: circlePos(radius, volume, i).width + canvas.width / 2,
-      y: circlePos(radius, volume, i).height + canvas.height / 2
+      x: spiralPos(radius, volume, i).width + canvas.width / 2,
+      y: spiralPos(radius, volume, i).height + canvas.height / 2
     },
     wave: {
       x: (canvas.width / 255) * i,
@@ -157,6 +281,14 @@ function drawPattern({
     cursor: {
       x: cursorX,
       y: cursorY
+    },
+    clock: {
+      x:
+        getClockHandsPosition(time, timeUnits, timeRadius).width +
+        canvas.width / 2,
+      y:
+        getClockHandsPosition(time, timeUnits, timeRadius).height +
+        canvas.height / 2
     },
     random: {
       x: Math.floor(Math.random() * canvas.width) + 1,

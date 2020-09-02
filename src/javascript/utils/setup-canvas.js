@@ -21,7 +21,8 @@ const settings = {
       "verticalWave",
       "circle",
       "cursor",
-      "random"
+      "random",
+      "clock"
     ],
     value: "line"
   },
