@@ -162,22 +162,6 @@ function startAudioVisual() {
 
         let { angles } = state;
 
-        // save settings to url
-        let urlParameters = Object.entries(data)
-          .map(e => e.join("="))
-          .join("&");
-        // console.log("URL params", urlParameters);
-        state.data.search_params.set(`level-${index}`, urlParameters);
-        // window.location.search = state.data.search_params.toString();
-        if (window.history.pushState) {
-          const newURL = new URL(window.location.href);
-          newURL.search = state.data.search_params.toString();
-
-          if (window.location.search !== newURL.search) {
-            window.history.pushState({ path: newURL.href }, "", newURL.href);
-          }
-        }
-
         canvasContext.globalCompositeOperation = effect;
 
         if (colorWell !== state.prevColorWell) {

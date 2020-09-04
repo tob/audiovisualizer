@@ -178,6 +178,9 @@ window.onload = () => {
   const startButton = document.getElementsByClassName(
     "controller__button-start"
   )[0];
+  const shortenButton = document.getElementsByClassName(
+    "controller__button-shorten"
+  )[0];
   const plusButton = document.getElementsByClassName(
     "controller__button-add"
   )[0];
@@ -222,6 +225,11 @@ window.onload = () => {
   startButton.addEventListener("click", () => {
     handleMicrophone(startButton, main, controlBoard, settings);
   });
+
+  shortenButton.addEventListener("click", () => {
+    shortenUrl();
+    console.log('click shorten happened')
+  })
   recordButton.addEventListener("click", () =>
     handleRecording(recordButton, recorder)
   );
