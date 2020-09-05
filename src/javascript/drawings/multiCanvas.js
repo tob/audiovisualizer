@@ -27,14 +27,6 @@ const updateControllersValues = setting => {
   };
 
   const canvas = document.getElementsByClassName(`canvas-1`)[0];
-  // // canvas selector
-  // document.getElementsByClassName(
-  //   `canvas-${
-  //     document.getElementsByClassName(`controller__select-canvas-${index}`)[0]
-  //       .value
-  //   }`
-  // )[0];
-
   const canvasContext = canvas.getContext("2d");
 
   // Make a function to do this
@@ -178,8 +170,7 @@ function startAudioVisual() {
             // For each frequency draw something
             for (let i = frequencyMin; i < frequencyMax; i++) {
               volume =
-                Math.floor(frequencyArray[i]) -
-                (Math.floor(frequencyArray[i]) % 5);
+                Math.floor(frequencyArray[i])
 
               let customColor = `rgb(
               ${colorWell.r + volume},
@@ -196,7 +187,7 @@ function startAudioVisual() {
                 i,
                 mode: pattern,
                 twist,
-                arrayLength: frequencyArray.length,
+                arrayLength: frequencyMax - frequencyMin,
                 shape: (x, y) =>
                   drawShape({
                     x: x,

@@ -119,14 +119,9 @@ function findTime() {
   let min = time.getMinutes();
   let sec = time.getSeconds();
 
-  // hour = hour%12;
-  // hour = (hour*Math.PI/6)+(min*Math.PI/(6*60))+(sec*Math.PI/(360*60));
-  // min = (min*Math.PI/30)+(sec*Math.PI/(30*60));
-  // sec = (sec*Math.PI/30);
-  //
-  hour = hour < 10 ? "0" + hour : hour;
-  min = min < 10 ? "0" + min : min;
-  sec = sec < 10 ? "0" + sec : sec;
+  hour = hour + min/60;
+  min = min + sec/60;
+  sec = sec;
 
   return {
     hour,
@@ -139,18 +134,19 @@ function findTimeofI(i, radius, arrayLength) {
   const { sec, min, hour } = findTime();
   let time = sec;
   let timeUnits = 60;
-  let timeRadius = radius*i/50;
-  if (i > arrayLength/3) {
+  let timeRadius = radius*(i/10);
+  if (i > arrayLength/4) {
+    const newIndex = i - arrayLength/4
     time = min;
-    timeRadius = timeRadius/1.5
+    timeRadius = radius*(newIndex/15)
   }
 
-  if (i > (arrayLength/3)*2) {
+  if (i > arrayLength/2) {
+    const newIndextwo = i - arrayLength/2
     time = hour
-    timeRadius = timeRadius/2.5
+    timeRadius = radius*(newIndextwo/20)
+    timeUnits = 12
   }
-
-  timeUnits = time === hour ? 12 : 60;
 
   return {
     time,
@@ -165,7 +161,6 @@ function getClockHandsPosition(time, units, radius) {
     height: radius * Math.sin(((360 / units) * (time - 15) * Math.PI) / 180)
   };
 }
-
 
 function smoothLine(ctx, canvas, arrayFreq) {
   ctx.beginPath();
