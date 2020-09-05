@@ -227,8 +227,8 @@ window.onload = () => {
   });
 
   shortenButton.addEventListener("click", () => {
+    listening && handleMicrophone(startButton, main, controlBoard, settings);
     shortenUrl();
-    console.log('click shorten happened')
   })
   recordButton.addEventListener("click", () =>
     handleRecording(recordButton, recorder)
