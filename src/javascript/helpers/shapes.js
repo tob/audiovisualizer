@@ -119,8 +119,8 @@ function findTime() {
   let min = time.getMinutes();
   let sec = time.getSeconds();
 
-  hour = hour + min/60;
-  min = min + sec/60;
+  hour = hour + min / 60;
+  min = min + sec / 60;
   sec = sec;
 
   return {
@@ -134,18 +134,18 @@ function findTimeofI(i, radius, arrayLength) {
   const { sec, min, hour } = findTime();
   let time = sec;
   let timeUnits = 60;
-  let timeRadius = radius*(i/10);
-  if (i > arrayLength/4) {
-    const newIndex = i - arrayLength/4
+  let timeRadius = radius * (i / 10);
+  if (i > arrayLength / 4) {
+    const newIndex = i - arrayLength / 4;
     time = min;
-    timeRadius = radius*(newIndex/15)
+    timeRadius = radius * (newIndex / 15);
   }
 
-  if (i > arrayLength/2) {
-    const newIndextwo = i - arrayLength/2
-    time = hour
-    timeRadius = radius*(newIndextwo/20)
-    timeUnits = 12
+  if (i > arrayLength / 2) {
+    const newIndextwo = i - arrayLength / 2;
+    time = hour;
+    timeRadius = radius * (newIndextwo / 20);
+    timeUnits = 12;
   }
 
   return {
@@ -219,11 +219,13 @@ function drawBars(arrayFreq, canvasContext, canvas) {
     xPos += canvas.width / arrayFreq.length + 1;
   }
 }
+
 function drawPattern({
   ctx,
   canvas,
   radius,
   volume,
+  width,
   size,
   i,
   shape,
@@ -232,6 +234,7 @@ function drawPattern({
   arrayLength
 }) {
   const { time, timeUnits, timeRadius } = findTimeofI(i, radius, arrayLength);
+  const squares = Math.sqrt(arrayLength) > 0 ? Math.sqrt(arrayLength) : 1;
   const modes = {
     circle: {
       x:
@@ -266,8 +269,9 @@ function drawPattern({
       y: canvas.height - (canvas.height / 255) * i
     },
     grid: {
-      x: getXpos(15, canvas, i) + canvas.width / 15 / 2,
-      y: (canvas.height / 15) * Math.floor(i / 15) - canvas.height / 15 / 2
+      x: getXpos(squares, canvas, i) + width,
+      y:
+        (canvas.height / squares) * Math.floor(i / squares) + canvas.height / squares
     },
     center: {
       x: canvas.width / 2,

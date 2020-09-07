@@ -35,7 +35,7 @@ const updateControllersValues = setting => {
   const frequencyMin = ranges[range].min;
   const frequencyMax = ranges[range].max;
   const pattern = setting.children[1].children[1].children[0].value;
-  const shape = setting.children[2].children[1].children[0].value;
+  let shape = setting.children[2].children[1].children[0].value;
   const size = setting.children[3].children[1].children[0].value;
   const stroke = setting.children[4].children[1].children[0].checked;
   const color = setting.children[5].children[1].children[0].value;
@@ -43,7 +43,6 @@ const updateControllersValues = setting => {
   let opacity = setting.children[6].children[1].children[0].value;
   const twist = setting.children[8].children[1].children[0].checked;
   const rotationSpeed = setting.children[9].children[1].children[0].value;
-
   return {
     frequencyMin,
     frequencyMax,
@@ -156,11 +155,14 @@ function startAudioVisual() {
 
         canvasContext.globalCompositeOperation = effect;
 
+        // update color of settings bar if necessary
         if (colorWell !== state.prevColorWell) {
           state.prevColorWell = colorWell;
           setting.style.backgroundColor = `rgb(${colorWell.r},${colorWell.g},${colorWell.b}, 100)`;
         }
 
+
+        // rotate the full canvas
         rotate({
           ctx: canvasContext,
           x: canvas.width / 2,
@@ -169,8 +171,7 @@ function startAudioVisual() {
           drawShape: () => {
             // For each frequency draw something
             for (let i = frequencyMin; i < frequencyMax; i++) {
-              volume =
-                Math.floor(frequencyArray[i])
+              volume = Math.floor(frequencyArray[i]);
 
               let customColor = `rgb(
               ${colorWell.r + volume},
@@ -186,6 +187,7 @@ function startAudioVisual() {
                 volume,
                 i,
                 mode: pattern,
+                width: (volume / 5) * size,
                 twist,
                 arrayLength: frequencyMax - frequencyMin,
                 shape: (x, y) =>
