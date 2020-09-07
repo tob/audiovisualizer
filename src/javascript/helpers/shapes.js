@@ -59,10 +59,20 @@ function fork(x, y, volume) {
 }
 
 // draw spiral
-function circlePos(radius, volume, i) {
+function circlePos(radius, i) {
+  // var x = Math.cos(ang) * distance;
+  // var y = Math.sin(ang) * distance;
+
   return {
-    width: radius * Math.cos((i * (Math.PI * 2)) / 255),
-    height: radius * Math.sin((i * (Math.PI * 2)) / 255)
+    width: radius * Math.cos(((360 / 60) * (i - 15) * Math.PI) / 180),
+    height: radius * Math.sin(((360 / 60) * (i - 15) * Math.PI) / 180)
+  };
+}
+
+function spiralPos(radius, volume, i) {
+  return {
+    width: (radius + i * (Math.PI * 2)) * Math.cos((i * (Math.PI * 2)) / 50),
+    height: (radius + i * (Math.PI * 2)) * Math.sin((i * (Math.PI * 2)) / 50)
   };
 }
 
@@ -103,32 +113,151 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
   }
 }
 
+function findTime() {
+  let time = new Date();
+  let hour = time.getHours();
+  let min = time.getMinutes();
+  let sec = time.getSeconds();
+
+  hour = hour + min / 60;
+  min = min + sec / 60;
+  sec = sec;
+
+  return {
+    hour,
+    min,
+    sec
+  };
+}
+
+function findTimeofI(i, radius, arrayLength) {
+  const { sec, min, hour } = findTime();
+  let time = sec;
+  let timeUnits = 60;
+  let timeRadius = radius * (i / 10);
+  if (i > arrayLength / 4) {
+    const newIndex = i - arrayLength / 4;
+    time = min;
+    timeRadius = radius * (newIndex / 15);
+  }
+
+  if (i > arrayLength / 2) {
+    const newIndextwo = i - arrayLength / 2;
+    time = hour;
+    timeRadius = radius * (newIndextwo / 20);
+    timeUnits = 12;
+  }
+
+  return {
+    time,
+    timeUnits,
+    timeRadius
+  };
+}
+
+function getClockHandsPosition(time, units, radius) {
+  return {
+    width: radius * Math.cos(((360 / units) * (time - 15) * Math.PI) / 180),
+    height: radius * Math.sin(((360 / units) * (time - 15) * Math.PI) / 180)
+  };
+}
+
+function smoothLine(ctx, canvas, arrayFreq) {
+  ctx.beginPath();
+
+  let xPos = 0;
+  let yPos = canvas.height;
+
+  // move to the first point
+  ctx.moveTo(xPos, yPos);
+
+  for (let i = 0; i < arrayFreq.length; i++) {
+    let barHeight = arrayFreq[i];
+    yPos = canvas.height / 2;
+
+    // if (i % 5 === 0) {
+    //   if (i % 2 === 0) {
+    //     var xc = xPos + (canvas.width / arrayFreq.length + 1);
+    //     var yc = canvas.height / 2 - barHeight;
+    //     ctx.quadraticCurveTo(xPos, yPos, xc, yc);
+    //   } else {
+    //     var xc = xPos + (canvas.width / arrayFreq.length + 1);
+    //     var yc = canvas.height / 2 + barHeight;
+    //     ctx.quadraticCurveTo(xPos, yPos, xc, yc);
+    //   }
+    // }
+
+    xPos += canvas.width / arrayFreq.length + 1;
+  }
+  // curve through the last two points
+  ctx.quadraticCurveTo(xPos, canvas.height / 2, canvas.width, canvas.height);
+
+  ctx.fillStyle = "white";
+  ctx.fill();
+  ctx.strokeStyle = "green";
+  ctx.stroke();
+  ctx.closePath();
+
+  // console.log('path', arrayFreq)
+}
+
+function drawBars(arrayFreq, canvasContext, canvas) {
+  let xPos = 0;
+  for (let i = 0; i < arrayFreq.length; i++) {
+    let barHeight = arrayFreq[i];
+
+    let r = barHeight + 25 * (i / arrayFreq.length);
+    let g = 250 * (i / arrayFreq.length);
+    let b = 50;
+    canvasContext.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+    canvasContext.fillRect(
+      xPos,
+      canvas.height - barHeight,
+      canvas.width / arrayFreq.length,
+      barHeight
+    );
+    xPos += canvas.width / arrayFreq.length + 1;
+  }
+}
+
 function drawPattern({
   ctx,
   canvas,
   radius,
   volume,
+  width,
+  size,
   i,
   shape,
   mode = "circle",
-  twist
+  twist,
+  arrayLength
 }) {
+  const { time, timeUnits, timeRadius } = findTimeofI(i, radius, arrayLength);
+  const squares = Math.sqrt(arrayLength) > 0 ? Math.sqrt(arrayLength) : 1;
   const modes = {
     circle: {
-      x: radius * Math.cos((i * Math.PI) / 255) + canvas.width / 2,
-      y: radius * Math.sin((i * Math.PI) / 255) + canvas.height / 2
+      x:
+        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / 255) +
+        canvas.width / 2,
+      y:
+        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / 255) +
+        canvas.height / 2
     },
     spiral: {
-      x: circlePos(radius, volume, i).width + canvas.width / 2,
-      y: circlePos(radius, volume, i).height + canvas.height / 2
+      x: spiralPos(radius, volume, i).width + canvas.width / 2,
+      y: spiralPos(radius, volume, i).height + canvas.height / 2
     },
-    cone1: {
+    wave: {
       x: (canvas.width / 255) * i,
-      y: radius * Math.sin((360 / 255) * i * Math.PI) + canvas.height / 2
+      y:
+        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / 255) +
+        canvas.height / 2
     },
-    cone2: {
+    verticalWave: {
       x:
-        radius * Math.cos((360 / 255) * i * Math.PI) + (canvas.width / 255) * i,
+        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / 255) +
+        canvas.width / 2,
       y: (canvas.height / 255) * i
     },
     line: {
@@ -140,8 +269,9 @@ function drawPattern({
       y: canvas.height - (canvas.height / 255) * i
     },
     grid: {
-      x: getXpos(15, canvas, i) + canvas.width / 15 / 2,
-      y: (canvas.height / 15) * Math.floor(i / 15) - canvas.height / 15 / 2
+      x: getXpos(squares, canvas, i) + width,
+      y:
+        (canvas.height / squares) * Math.floor(i / squares) + canvas.height / squares
     },
     center: {
       x: canvas.width / 2,
@@ -151,13 +281,21 @@ function drawPattern({
       x: cursorX,
       y: cursorY
     },
+    clock: {
+      x:
+        getClockHandsPosition(time, timeUnits, timeRadius).width +
+        canvas.width / 2,
+      y:
+        getClockHandsPosition(time, timeUnits, timeRadius).height +
+        canvas.height / 2
+    },
     random: {
       x: Math.floor(Math.random() * canvas.width) + 1,
       y:
         (canvas.height / 15) * Math.floor(i / 15) -
         (volume * size) / 2 +
         canvas.height / 15 / 2
-    },
+    }
   };
   const xPos = modes[mode].x;
   const yPos = modes[mode].y;
@@ -167,7 +305,7 @@ function drawPattern({
     x: xPos,
     y: yPos,
     drawShape: () => shape(xPos, yPos),
-    degree: twist && (360 / 255) * (volume / 255),
+    degree: twist && (360 / 255) * (volume / 255)
   });
 }
 

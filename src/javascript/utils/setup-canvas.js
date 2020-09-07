@@ -17,11 +17,12 @@ const settings = {
       "spiral",
       "diagonal",
       "grid",
-      "cone1",
-      "cone2",
+      "wave",
+      "verticalWave",
       "circle",
       "cursor",
-      "random"
+      "random",
+      "clock"
     ],
     value: "line"
   },
@@ -177,6 +178,9 @@ window.onload = () => {
   const startButton = document.getElementsByClassName(
     "controller__button-start"
   )[0];
+  const shortenButton = document.getElementsByClassName(
+    "controller__button-shorten"
+  )[0];
   const plusButton = document.getElementsByClassName(
     "controller__button-add"
   )[0];
@@ -221,6 +225,11 @@ window.onload = () => {
   startButton.addEventListener("click", () => {
     handleMicrophone(startButton, main, controlBoard, settings);
   });
+
+  shortenButton.addEventListener("click", () => {
+    listening && handleMicrophone(startButton, main, controlBoard, settings);
+    shortenUrl();
+  })
   recordButton.addEventListener("click", () =>
     handleRecording(recordButton, recorder)
   );

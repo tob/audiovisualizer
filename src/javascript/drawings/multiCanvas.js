@@ -27,40 +27,22 @@ const updateControllersValues = setting => {
   };
 
   const canvas = document.getElementsByClassName(`canvas-1`)[0];
-  // // canvas selector
-  // document.getElementsByClassName(
-  //   `canvas-${
-  //     document.getElementsByClassName(`controller__select-canvas-${index}`)[0]
-  //       .value
-  //   }`
-  // )[0];
-
   const canvasContext = canvas.getContext("2d");
 
+  // Make a function to do this
   const effect = setting.children[7].children[1].children[0].value;
-
   const range = setting.children[0].children[1].children[0].value;
   const frequencyMin = ranges[range].min;
   const frequencyMax = ranges[range].max;
-
   const pattern = setting.children[1].children[1].children[0].value;
-
-  const shape = setting.children[2].children[1].children[0].value;
-
+  let shape = setting.children[2].children[1].children[0].value;
   const size = setting.children[3].children[1].children[0].value;
-
   const stroke = setting.children[4].children[1].children[0].checked;
-
   const color = setting.children[5].children[1].children[0].value;
-
   let colorWell = hexToRGB(color.replace("#", "0x"));
-
   let opacity = setting.children[6].children[1].children[0].value;
-
   const twist = setting.children[8].children[1].children[0].checked;
-
   const rotationSpeed = setting.children[9].children[1].children[0].value;
-
   return {
     frequencyMin,
     frequencyMax,
@@ -92,7 +74,7 @@ function startAudioVisual() {
     const audioStream = audioContent.createMediaStreamSource(stream);
     const analyser = audioContent.createAnalyser();
     audioStream.connect(analyser);
-    analyser.fftSize = 1024;
+    analyser.fftSize = 512;
 
     const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
     const state = {
@@ -115,11 +97,10 @@ function startAudioVisual() {
         document.getElementsByClassName("container-buttons")
       );
 
-      // Clear Canvas
+      // Clear the canvas if option checked
       const clearCanvas = document.getElementsByClassName(
         `controller__clear`
       )[0].checked;
-
       if (clearCanvas) {
         const canvases = Array.prototype.slice.apply(
           document.getElementsByTagName("canvas")
@@ -172,29 +153,16 @@ function startAudioVisual() {
 
         let { angles } = state;
 
-        let urlParameters = Object.entries(data)
-          .map(e => e.join("="))
-          .join("&");
-        // console.log("URL params", urlParameters);
-        state.data.search_params.set(`level-${index}`, urlParameters);
-        // window.location.search = state.data.search_params.toString();
-
-        if (window.history.pushState) {
-          const newURL = new URL(window.location.href);
-          newURL.search = state.data.search_params.toString();
-
-          if (window.location.search !== newURL.search) {
-            window.history.pushState({ path: newURL.href }, "", newURL.href);
-          }
-        }
-
         canvasContext.globalCompositeOperation = effect;
 
+        // update color of settings bar if necessary
         if (colorWell !== state.prevColorWell) {
           state.prevColorWell = colorWell;
           setting.style.backgroundColor = `rgb(${colorWell.r},${colorWell.g},${colorWell.b}, 100)`;
         }
 
+
+        // rotate the full canvas
         rotate({
           ctx: canvasContext,
           x: canvas.width / 2,
@@ -203,25 +171,25 @@ function startAudioVisual() {
           drawShape: () => {
             // For each frequency draw something
             for (let i = frequencyMin; i < frequencyMax; i++) {
-              volume =
-                Math.floor(frequencyArray[i]) -
-                (Math.floor(frequencyArray[i]) % 5);
+              volume = Math.floor(frequencyArray[i]);
 
               let customColor = `rgb(
-          ${colorWell.r + volume},
-          ${colorWell.g + volume},
-          ${colorWell.b + volume},
-          ${opacity / 100})`;
+              ${colorWell.r + volume},
+              ${colorWell.g + volume},
+              ${colorWell.b + volume},
+              ${opacity / 100})`;
 
               drawPattern({
                 ctx: canvasContext,
                 canvas: canvas,
-                radius: (volume / 5) * size,
-                width: (volume / 5) * size,
+                radius: (canvas.width / 100) * size + volume,
+                size: size,
                 volume,
                 i,
                 mode: pattern,
+                width: (volume / 5) * size,
                 twist,
+                arrayLength: frequencyMax - frequencyMin,
                 shape: (x, y) =>
                   drawShape({
                     x: x,
