@@ -1,5 +1,6 @@
 # audiovisualizer
 Experiments with audio and visualizations
+demo: https://tob.github.io/audiovisualizer/
 
 Audiovisuals based on microphone input. 
 Tested only on Chrome.
