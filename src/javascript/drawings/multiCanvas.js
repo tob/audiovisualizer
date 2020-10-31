@@ -76,7 +76,21 @@ function startAudioVisual() {
     audioStream.connect(analyser);
     analyser.fftSize = 512;
 
-    const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
+    const unitArray = new Uint8Array(analyser.frequencyBinCount).filter((freq, index) => index < 200);
+    const lowBassFreq = unitArray.filter((freq, index) => index < unitArray.length/5)
+    const bassFreq = unitArray.filter((freq, index) => index < unitArray.length/4)
+    const tenorFreq = unitArray.filter((freq, index) => index < unitArray.length/3)
+    const altoFreq = unitArray.filter((freq, index) => index < unitArray.length/2)
+    const sopranoFreq = unitArray.filter((freq, index) => index < unitArray.length)
+
+    const frequencyArray = new Uint8Array(unitArray.length)
+    frequencyArray.set(lowBassFreq)
+    frequencyArray.set(bassFreq, lowBassFreq.length)
+    frequencyArray.set(tenorFreq, bassFreq.length)
+    frequencyArray.set(altoFreq, tenorFreq.length)
+    frequencyArray.set(tenorFreq, sopranoFreq.length)
+    console.log("unit ARR-", unitArray);
+    console.log("freq ARR-", frequencyArray);
     const state = {
       angles: {},
       prevColorWell: null,
@@ -160,7 +174,6 @@ function startAudioVisual() {
           state.prevColorWell = colorWell;
           setting.style.backgroundColor = `rgb(${colorWell.r},${colorWell.g},${colorWell.b}, 100)`;
         }
-
 
         // rotate the full canvas
         rotate({
