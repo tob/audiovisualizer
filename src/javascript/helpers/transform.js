@@ -1,4 +1,4 @@
-const rotate = ({ ctx, x, y, drawShape, degree }) => {
+const rotate = ({ ctx, x, y, draw, degree }) => {
   if (degree >= 360 || degree <= -360) {
     return;
   }
@@ -12,11 +12,11 @@ const rotate = ({ ctx, x, y, drawShape, degree }) => {
 
     ctx.rotate(degree);
     ctx.translate(-x, -y);
-    drawShape();
+    draw();
 
     ctx.restore();
   } else {
-    drawShape();
+    draw();
   }
 };
 

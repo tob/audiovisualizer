@@ -1,4 +1,4 @@
-const updateControllersValues = setting => {
+const updateControllersValues = layer => {
   const ranges = {
     "low bass": {
       min: 0,
@@ -29,20 +29,20 @@ const updateControllersValues = setting => {
   const canvas = document.getElementsByClassName(`canvas-1`)[0];
   const canvasContext = canvas.getContext("2d");
 
-  // Make a function to do this
-  const effect = setting.children[7].children[1].children[0].value;
-  const range = setting.children[0].children[1].children[0].value;
+  // Make a function to do this by using classnames selectors
+  const effect = layer.children[7].children[1].children[0].value;
+  const range = layer.children[0].children[1].children[0].value;
   const frequencyMin = ranges[range].min;
   const frequencyMax = ranges[range].max;
-  const pattern = setting.children[1].children[1].children[0].value;
-  let shape = setting.children[2].children[1].children[0].value;
-  const size = setting.children[3].children[1].children[0].value;
-  const stroke = setting.children[4].children[1].children[0].checked;
-  const color = setting.children[5].children[1].children[0].value;
+  const pattern = layer.children[1].children[1].children[0].value;
+  let shape = layer.children[2].children[1].children[0].value;
+  const size = layer.children[3].children[1].children[0].value;
+  const stroke = layer.children[4].children[1].children[0].checked;
+  const color = layer.children[5].children[1].children[0].value;
   let colorWell = hexToRGB(color.replace("#", "0x"));
-  let opacity = setting.children[6].children[1].children[0].value;
-  const twist = setting.children[8].children[1].children[0].checked;
-  const rotationSpeed = setting.children[9].children[1].children[0].value;
+  let opacity = layer.children[6].children[1].children[0].value;
+  const twist = layer.children[8].children[1].children[0].checked;
+  const rotationSpeed = layer.children[9].children[1].children[0].value;
   return {
     frequencyMin,
     frequencyMax,
@@ -76,21 +76,21 @@ function startAudioVisual() {
     audioStream.connect(analyser);
     analyser.fftSize = 512;
 
-    const unitArray = new Uint8Array(analyser.frequencyBinCount).filter((freq, index) => index < 200);
-    const lowBassFreq = unitArray.filter((freq, index) => index < unitArray.length/5)
-    const bassFreq = unitArray.filter((freq, index) => index < unitArray.length/4)
-    const tenorFreq = unitArray.filter((freq, index) => index < unitArray.length/3)
-    const altoFreq = unitArray.filter((freq, index) => index < unitArray.length/2)
-    const sopranoFreq = unitArray.filter((freq, index) => index < unitArray.length)
+    // filter out frequencies that hardly get used
+    const unitArray = new Uint8Array(analyser.frequencyBinCount).filter((freq, index) => index < 255);
 
+    // creating a new typed array for performance reasons
     const frequencyArray = new Uint8Array(unitArray.length)
-    frequencyArray.set(lowBassFreq)
-    frequencyArray.set(bassFreq, lowBassFreq.length)
-    frequencyArray.set(tenorFreq, bassFreq.length)
-    frequencyArray.set(altoFreq, tenorFreq.length)
-    frequencyArray.set(tenorFreq, sopranoFreq.length)
-    console.log("unit ARR-", unitArray);
-    console.log("freq ARR-", frequencyArray);
+
+    // slice source input in frequencies
+    // fill the typed array
+    const module = unitArray.length/5
+    frequencyArray.set(unitArray.slice(0, module))
+    frequencyArray.set(unitArray.slice(module, module*2), module)
+    frequencyArray.set(unitArray.slice(module*2, module*3), module*2)
+    frequencyArray.set(unitArray.slice(module*3,module*4), module*3)
+    frequencyArray.set(unitArray.slice(module*4, unitArray.length), module*4)
+
     const state = {
       angles: {},
       prevColorWell: null,
@@ -107,7 +107,7 @@ function startAudioVisual() {
       requestAnimationFrame(doDraw);
       analyser.getByteFrequencyData(frequencyArray);
 
-      const settings = Array.prototype.slice.apply(
+      const layers = Array.prototype.slice.apply(
         document.getElementsByClassName("container-buttons")
       );
 
@@ -119,35 +119,18 @@ function startAudioVisual() {
         const canvases = Array.prototype.slice.apply(
           document.getElementsByTagName("canvas")
         );
-        //
-        // // Clear All Canvas before mapping settings again to draw.
-        // // this prevent settings deleting each other.
-        // settings.map((setting, i) => {
-        //   i++;
-        //   let canvas = document.getElementsByClassName(
-        //     `canvas-${
-        //       document.getElementsByClassName(`controller__select-canvas-${i}`)[0]
-        //         .value
-        //     }`
-        //   )[0];
-        //   let ctx = canvas.getContext("2d");
-        //   const clear = document.getElementsByClassName(
-        //     `controller__slider-clear-${i}`
-        //   )[0].checked;
-        //   clear && ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // });
-        //
+
         canvases.map(canvas => {
           let ctx = canvas.getContext("2d");
           ctx.clearRect(0, 0, canvas.width, canvas.height);
         });
       }
 
-      // For each setting do a drawing
-      settings.map((setting, index) => {
+      // For each layer do a drawing
+      layers.map((layer, index) => {
         index++;
 
-        let data = updateControllersValues(setting, index);
+        let data = updateControllersValues(layer, index);
 
         let {
           frequencyMin,
@@ -169,10 +152,10 @@ function startAudioVisual() {
 
         canvasContext.globalCompositeOperation = effect;
 
-        // update color of settings bar if necessary
+        // update color of layer bar if necessary
         if (colorWell !== state.prevColorWell) {
           state.prevColorWell = colorWell;
-          setting.style.backgroundColor = `rgb(${colorWell.r},${colorWell.g},${colorWell.b}, 100)`;
+          layer.style.backgroundColor = `rgb(${colorWell.r},${colorWell.g},${colorWell.b}, 100)`;
         }
 
         // rotate the full canvas
@@ -181,8 +164,8 @@ function startAudioVisual() {
           x: canvas.width / 2,
           y: canvas.height / 2,
           degree: rotationSpeed / 1 === 0 ? 0 : angles[`canvas${index}`],
-          drawShape: () => {
-            // For each frequency draw something
+          draw: () => {
+            // For each frequency in range draw something
             for (let i = frequencyMin; i < frequencyMax; i++) {
               volume = Math.floor(frequencyArray[i]);
 
