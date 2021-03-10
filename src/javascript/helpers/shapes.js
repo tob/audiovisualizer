@@ -1,5 +1,5 @@
-var cursorX;
-var cursorY;
+let cursorX;
+let cursorY;
 document.onmousemove = function(e) {
   cursorX = e.pageX;
   cursorY = e.pageY;
@@ -238,10 +238,10 @@ function drawPattern({
   const modes = {
     circle: {
       x:
-        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / 255) +
+        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / arrayLength) +
         canvas.width / 2,
       y:
-        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / 255) +
+        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / arrayLength) +
         canvas.height / 2
     },
     spiral: {
@@ -249,24 +249,24 @@ function drawPattern({
       y: spiralPos(radius, volume, i).height + canvas.height / 2
     },
     wave: {
-      x: (canvas.width / 255) * i,
+      x: (canvas.width / arrayLength) * i,
       y:
-        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / 255) +
+        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / arrayLength) +
         canvas.height / 2
     },
     verticalWave: {
       x:
-        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / 255) +
+        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / arrayLength) +
         canvas.width / 2,
-      y: (canvas.height / 255) * i
+      y: (canvas.height / arrayLength) * i
     },
     line: {
-      x: (canvas.width / 255) * i,
+      x: (canvas.width / arrayLength) * i,
       y: canvas.height / 2
     },
     diagonal: {
-      x: (canvas.width / 255) * i,
-      y: canvas.height - (canvas.height / 255) * i
+      x: (canvas.width / arrayLength) * i,
+      y: canvas.height - (canvas.height / arrayLength) * i
     },
     grid: {
       x: getXpos(squares, canvas, i) + width,
@@ -304,7 +304,7 @@ function drawPattern({
     ctx,
     x: xPos,
     y: yPos,
-    drawShape: () => shape(xPos, yPos),
+    draw: () => shape(xPos, yPos),
     degree: twist && (360 / 255) * (volume / 255)
   });
 }
