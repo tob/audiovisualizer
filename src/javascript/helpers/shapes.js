@@ -111,6 +111,12 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
     ctx.fillStyle = style;
     ctx.fill();
   }
+
+  if (true) {
+    ctx.clip();
+    const video = document.querySelector("#someone");
+    ctx.drawImage(video, 0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
 }
 
 function findTime() {
