@@ -1,3 +1,5 @@
+import { startAudioVisual } from "../drawings/multiCanvas.js";
+import {addCanvas, createButtons } from "../helpers/drawSettings.js"
 let size = 1,
   listening = false,
   WIDTH = window.innerWidth,
@@ -7,7 +9,7 @@ const settings = {
   range: {
     icon: "fa-assistive-listening-systems",
     list: ["low bass", "bass", "tenor", "alto", "soprano", "all"],
-    value: "all"
+    value: "all",
   },
   pattern: {
     icon: "fa-route",
@@ -22,34 +24,34 @@ const settings = {
       "circle",
       "cursor",
       "random",
-      "clock"
+      "clock",
     ],
-    value: "line"
+    value: "line",
   },
   shape: {
     icon: "fa-shapes",
-    list: ["triangle", "square", "circle", "star", "ninja"],
-    value: "square"
+    list: ["triangle", "square", "circle", "star", "ninja", "fork", "video"],
+    value: "square",
   },
   size: {
     icon: "fa-search-plus",
     min: 0,
     max: 15,
-    value: 7
+    value: 7,
   },
   stroke: {
     icon: "fa-pen",
-    checked: true
+    checked: true,
   },
   color: {
     icon: "fa-palette",
-    value: "#ff0f22"
+    value: "#ff0f22",
   },
   opacity: {
     icon: "fa-eye",
     min: 0,
     max: 100,
-    value: 70
+    value: 70,
   },
   effect: {
     icon: "fa-chess-board",
@@ -72,33 +74,33 @@ const settings = {
       "destination-in",
       "source-out",
       "source-in",
-      "source-atop"
+      "source-atop",
     ],
-    value: "source-over"
+    value: "source-over",
   },
   twist: {
     icon: "fa-biohazard",
-    checked: true
+    checked: true,
   },
   rotationSpeed: {
     icon: "fa-sync",
     min: -10,
     max: 10,
-    value: 1
-  }
+    value: 1,
+  },
 };
 
 function hexToRGB(hexColor) {
   return {
     r: (hexColor >> 16) & 0xff,
     g: (hexColor >> 8) & 0xff,
-    b: hexColor & 0xff
+    b: hexColor & 0xff,
   };
 }
 
 const appendImage = (canvas, target, downloadButton) => {
   // set canvasImg image src to data
-  canvas.toBlob(function(blob) {
+  canvas.toBlob(function (blob) {
     target.src = URL.createObjectURL(blob);
     downloadButton.href = URL.createObjectURL(blob);
     downloadButton.download = `${Date.now()}-audiovisual.png`;
@@ -153,15 +155,13 @@ const handleRecording = (button, recorder) => {
   }
 };
 
-
 function loadDrawingFromParams(parent, settings) {
   const search_params = new URLSearchParams(window.location.search);
   let index = 0;
   const levels = search_params.values();
   for (let value of levels) {
     const drawings = value.toString().split("&");
-    drawings.map(prop => {
-
+    drawings.map((prop) => {
       const keyValue = prop.split("=");
       if (settings[keyValue[0]]) {
         settings[keyValue[0]].value = keyValue[1];
@@ -211,10 +211,10 @@ window.onload = () => {
     revertOnSpill: true,
     removeOnSpill: true,
     copySortSource: false,
-    moves: function(el, container, handle) {
+    moves: function (el, container, handle) {
       return handle.classList.contains("container-buttons");
     },
-    direction: "vertical"
+    direction: "vertical",
   });
 
   if (window.location.search.includes("level")) {
@@ -229,7 +229,7 @@ window.onload = () => {
   shortenButton.addEventListener("click", () => {
     listening && handleMicrophone(startButton, main, controlBoard, settings);
     shortenUrl();
-  })
+  });
   recordButton.addEventListener("click", () =>
     handleRecording(recordButton, recorder)
   );
@@ -246,3 +246,5 @@ window.onload = () => {
     createButtons(controlBoard, settings, i);
   });
 };
+
+export { size, listening, WIDTH, HEIGHT, appendImage, hexToRGB };

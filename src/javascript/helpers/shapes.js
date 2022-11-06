@@ -1,3 +1,5 @@
+import { rotate } from "../helpers/transform.js";
+
 let cursorX;
 let cursorY;
 document.onmousemove = function(e) {
@@ -96,7 +98,11 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
       break;
     case "ninja":
       drawStar(ctx, x, y, 4, width, width / 2 + i);
-
+    // case "video": 
+    // ctx.clip();
+    // const video = document.querySelector("#someone");
+    // console.log('video', width, x,y)
+    // ctx.drawImage(video, x, y, 500, 500);
       break;
   }
 
@@ -110,12 +116,6 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
   if (style) {
     ctx.fillStyle = style;
     ctx.fill();
-  }
-
-  if (true) {
-    ctx.clip();
-    const video = document.querySelector("#someone");
-    ctx.drawImage(video, 0, 0, ctx.canvas.width, ctx.canvas.height);
   }
 }
 
@@ -328,3 +328,13 @@ const getXpos = (colNumber, canvas, i) => {
 
   return position;
 };
+
+export {
+  drawBars,
+  drawPattern,
+  smoothLine,
+  drawShape,
+  inRange,
+  circlePos,
+  fork
+}

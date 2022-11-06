@@ -1,39 +1,58 @@
-const updateControllersValues = layer => {
-  const ranges = {
-    "low bass": {
-      min: 0,
-      max: 50
-    },
-    bass: {
-      min: 50,
-      max: 100
-    },
-    tenor: {
-      min: 100,
-      max: 150
-    },
-    alto: {
-      min: 150,
-      max: 200
-    },
-    soprano: {
-      min: 200,
-      max: 255
-    },
-    all: {
-      min: 0,
-      max: 255
-    }
-  };
+import { rotate } from "../helpers/transform.js";
+import { listening,hexToRGB } from "../utils/setup-canvas.js";
+import { drawPattern, drawShape } from "../helpers/shapes.js";
 
+
+const RANGES = {
+  "low bass": {
+    min: 0,
+    max: 50,
+  },
+  bass: {
+    min: 50,
+    max: 100,
+  },
+  tenor: {
+    min: 100,
+    max: 150,
+  },
+  alto: {
+    min: 150,
+    max: 200,
+  },
+  soprano: {
+    min: 200,
+    max: 255,
+  },
+  all: {
+    min: 0,
+    max: 255,
+  },
+};
+
+function clearCanvas() {
+  const clearCanvas = document.querySelector(`.controller__clear`).checked;
+  if (!clearCanvas) return;
+
+  const canvases = Array.prototype.slice.apply(
+    document.getElementsByTagName("canvas")
+  );
+
+  canvases.map((canvas) => {
+    let ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+}
+
+const updateControllersValues = (layer) => {
   const canvas = document.getElementsByClassName(`canvas-1`)[0];
   const canvasContext = canvas.getContext("2d");
 
   // Make a function to do this by using classnames selectors
   const effect = layer.children[7].children[1].children[0].value;
   const range = layer.children[0].children[1].children[0].value;
-  const frequencyMin = ranges[range].min;
-  const frequencyMax = ranges[range].max;
+  const frequencyMin = RANGES[range].min;
+  const frequencyMax = RANGES[range].max;
   const pattern = layer.children[1].children[1].children[0].value;
   let shape = layer.children[2].children[1].children[0].value;
   const size = layer.children[3].children[1].children[0].value;
@@ -58,47 +77,51 @@ const updateControllersValues = layer => {
     pattern,
     color,
     shape,
-    range
+    range,
   };
 };
+
+function getAudioInput(stream) {
+  window.persistAudioStream = stream;
+  const audioContent = new AudioContext();
+  const audioStream = audioContent.createMediaStreamSource(stream);
+  const analyser = audioContent.createAnalyser();
+  audioStream.connect(analyser);
+  analyser.fftSize = 512;
+
+  // filter out frequencies that hardly get used
+  const unitArray = new Uint8Array(analyser.frequencyBinCount).filter(
+    (freq, index) => index < 255
+  );
+
+  // creating a new typed array for performance reasons
+  const frequencyArray = new Uint8Array(unitArray.length);
+
+  // slice source input in frequencies
+  // fill the typed array
+  const module = unitArray.length / 5;
+  frequencyArray.set(unitArray.slice(0, module));
+  frequencyArray.set(unitArray.slice(module, module * 2), module);
+  frequencyArray.set(unitArray.slice(module * 2, module * 3), module * 2);
+  frequencyArray.set(unitArray.slice(module * 3, module * 4), module * 3);
+  frequencyArray.set(unitArray.slice(module * 4, unitArray.length), module * 4);
+
+  return { analyser, frequencyArray };
+}
 
 function startAudioVisual() {
   "use strict";
 
-  const soundAllowed = function(stream) {
-    //Audio stops listening in FF without // window.persistAudioStream = stream;
-    //https://bugzilla.mozilla.org/show_bug.cgi?id=965483
-    //https://support.mozilla.org/en-US/questions/984179
-    window.persistAudioStream = stream;
-    const audioContent = new AudioContext();
-    const audioStream = audioContent.createMediaStreamSource(stream);
-    const analyser = audioContent.createAnalyser();
-    audioStream.connect(analyser);
-    analyser.fftSize = 512;
-
-    // filter out frequencies that hardly get used
-    const unitArray = new Uint8Array(analyser.frequencyBinCount).filter((freq, index) => index < 255);
-
-    // creating a new typed array for performance reasons
-    const frequencyArray = new Uint8Array(unitArray.length)
-
-    // slice source input in frequencies
-    // fill the typed array
-    const module = unitArray.length/5
-    frequencyArray.set(unitArray.slice(0, module))
-    frequencyArray.set(unitArray.slice(module, module*2), module)
-    frequencyArray.set(unitArray.slice(module*2, module*3), module*2)
-    frequencyArray.set(unitArray.slice(module*3,module*4), module*3)
-    frequencyArray.set(unitArray.slice(module*4, unitArray.length), module*4)
-
+  const soundAllowed = function (stream) {
+    const { analyser, frequencyArray } = getAudioInput(stream);
     const state = {
       angles: {},
       prevColorWell: null,
-      data: { search_params: new URLSearchParams(window.location.search) }
+      data: { search_params: new URLSearchParams(window.location.search) },
     };
     let volume;
 
-    var doDraw = function() {
+    function doDraw() {
       if (!listening) {
         console.log("STOP DRAW");
         return;
@@ -112,25 +135,11 @@ function startAudioVisual() {
       );
 
       // Clear the canvas if option checked
-      const clearCanvas = document.getElementsByClassName(
-        `controller__clear`
-      )[0].checked;
-      if (clearCanvas) {
-        const canvases = Array.prototype.slice.apply(
-          document.getElementsByTagName("canvas")
-        );
-
-        canvases.map(canvas => {
-          let ctx = canvas.getContext("2d");
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
-      }
+      clearCanvas();
 
       // For each layer do a drawing
       layers.map((layer, index) => {
         index++;
-
-        let data = updateControllersValues(layer, index);
 
         let {
           frequencyMin,
@@ -145,8 +154,8 @@ function startAudioVisual() {
           canvas,
           canvasContext,
           pattern,
-          shape
-        } = data;
+          shape,
+        } = updateControllersValues(layer, index);
 
         let { angles } = state;
 
@@ -195,11 +204,11 @@ function startAudioVisual() {
                     mode: shape,
                     i,
                     style: customColor,
-                    stroke: stroke
-                  })
+                    stroke: stroke,
+                  }),
               });
             }
-          }
+          },
         });
         if (angles[`canvas${index}`] >= 360) {
           angles[`canvas${index}`] = 0;
@@ -211,12 +220,12 @@ function startAudioVisual() {
           angles[`canvas${index}`] = 0.1;
         }
       });
-    };
+    }
 
     doDraw();
   };
 
-  const soundNotAllowed = function(error) {
+  const soundNotAllowed = function (error) {
     console.log(error);
   };
 
@@ -226,4 +235,10 @@ function startAudioVisual() {
 														navigator.mozGetUserMedia    ||
 														null;*/
   navigator.getUserMedia({ audio: true }, soundAllowed, soundNotAllowed);
+}
+
+
+export {
+  startAudioVisual,
+
 }

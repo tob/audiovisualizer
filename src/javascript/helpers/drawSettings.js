@@ -1,4 +1,4 @@
-const getType = setting => {
+const getType = (setting) => {
   if (setting.max) {
     return "number";
   }
@@ -53,7 +53,7 @@ const createButtons = (parent, settings, i) => {
       ? document.createElement("select")
       : document.createElement("input");
 
-    input.type = type;
+    input.setAttribute('type', type);
     input.className = `controller__slider-${setting}-${i}`;
     input.value = value;
 
@@ -74,7 +74,7 @@ const createButtons = (parent, settings, i) => {
       case "select":
         input.className = `controller__select-${setting}-${i}`;
         // create option value for each option and append inside selector
-        list.map(option => {
+        list.map((option) => {
           let element = document.createElement("option");
           element.value = option;
           element.innerText = option;
@@ -99,3 +99,5 @@ const addCanvas = (main) => {
   main.appendChild(ctx);
   return ctx;
 };
+
+export { addCanvas, createButtons };
