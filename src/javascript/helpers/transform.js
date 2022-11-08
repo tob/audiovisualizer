@@ -12,11 +12,11 @@ function rotate({ ctx, x, y, draw, degree }) {
 
     ctx.rotate(degree);
     ctx.translate(-x, -y);
-    draw();
+    draw(x,y);
 
     ctx.restore();
   } else {
-    draw();
+    draw(x,y);
   }
 }
 

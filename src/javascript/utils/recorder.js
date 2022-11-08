@@ -2,7 +2,7 @@
 // To record canvas efficiently using MediaRecorder
 // https://webrtc.github.io/samples/src/content/capture/canvas-record/
 
-function CanvasRecorder(canvas, video_bits_per_sec) {
+export default function CanvasRecorder(canvas, video_bits_per_sec) {
 	this.start = startRecording;
 	this.stop = stopRecording;
 	this.save = download;
