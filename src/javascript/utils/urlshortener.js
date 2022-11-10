@@ -1,4 +1,5 @@
-const shortenUrl = () => {
+import { updateControllersValues } from "../drawings/startDrawing.js";
+export const shortenUrl = () => {
   let shortUrl = "";
   // select all the layers with settings
   const settings = Array.prototype.slice.apply(
@@ -14,7 +15,7 @@ const shortenUrl = () => {
     let data = updateControllersValues(setting, index);
 
     let urlParameters = Object.entries(data)
-      .map(e => e.join("="))
+      .map((e) => e.join("="))
       .join("&");
 
     searchParams = urlParameters;
@@ -27,32 +28,29 @@ const shortenUrl = () => {
   async function postData(url = "", data = {}) {
     // Default options are marked with *
     const response = await fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      headers: {
-        "Content-Type": "application/json"
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(data) // body data type must match "Content-Type" header
+      method: "POST",
     });
     return response.json(); // parses JSON response into native JavaScript objects
   }
 
-  postData("https://rel.ink/api/links/", { url: newURL.href }).then(data => {
-    const { hashid } = data;
-    const shortUrl = `https://rel.ink/${hashid}`;
+  postData(`https://api.shrtco.de/v2/shorten?url=${newURL.href}`).then(
+    (data) => {
+      const { result } = data;
+      const shortUrl = `${result.short_link}`;
 
-    navigator.clipboard.writeText(shortUrl).then(
-      function() {
-        confirm(`Url shortened and copied in your clipboard
+      navigator.clipboard.writeText(shortUrl).then(
+        function () {
+          confirm(`Url shortened and copied in your clipboard
       	${shortUrl}
       	Send it via chat to share your visualization
       	`);
-      },
-      function(err) {
-        console.error("Async: Could not copy text: ", err);
-      }
-    );
-  });
+        },
+        function (err) {
+          console.error("Async: Could not copy text: ", err);
+        }
+      );
+    }
+  );
 
   return shortUrl;
 };

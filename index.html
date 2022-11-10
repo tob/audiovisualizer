@@ -21,13 +21,8 @@
     <!-- Add draggable library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
 
-    <script src="src/javascript/utils/setup-canvas.js"></script>
-    <script src="src/javascript/utils/recorder.js"></script>
-    <script src="src/javascript/utils/urlshortener.js"></script>
-    <script src="src/javascript/drawings/multiCanvas.js"></script>
-    <script src="src/javascript/helpers/drawSettings.js"></script>
-    <script src="src/javascript/helpers/transform.js"></script>
-    <script src="src/javascript/helpers/shapes.js"></script>
+    <script type="module" src="src/javascript/index.js"></script>
+    <script type="module" src="src/javascript/utils/urlshortener.js"></script> 
   </head>
   <body class="body">
     <div class="header">
@@ -37,11 +32,11 @@
           >Start <i class="fa fa-play"></i>
         </a>
         <a class="controller__button controller__button-shorten"
-        >shorten <i class="fa fa-share"></i>
+          >shorten <i class="fa fa-share"></i>
         </a>
         <a class="controller__button controller__button-add"
-          >+++<i class="fa fa-plus"></i>
-        </a><a class="controller__button controller__button-record"
+          >+++<i class="fa fa-plus"></i> </a
+        ><a class="controller__button controller__button-record"
           >Record<i class="fa-video"></i>
         </a>
         <!--      <a class="controller__button controller__button-saveImage"-->
@@ -53,15 +48,15 @@
         <!--      <a class=" controller__button controller__button-record"-->
         <!--      ><i class="fa fa-circle"></i> Record</a-->
 
-      <span class="controller__button">
-        <i class="fa fa-hat-wizard" aria-hidden="true"></i>
-        <label class="controller__switch"
-          ><input
-            type="checkbox"
-            class="controller__clear"
-            value="undefined"/><span class="controller__toggle"></span
-        ></label>
-      </span>
+        <span class="controller__button">
+          <i class="fa fa-hat-wizard" aria-hidden="true"></i>
+          <label class="controller__switch"
+            ><input
+              type="checkbox"
+              class="controller__clear"
+              value="undefined" /><span class="controller__toggle"></span
+          ></label>
+        </span>
       </div>
     </div>
     <div id="controlboard"></div>
@@ -76,9 +71,12 @@
     <!--    </div>-->
 
     <div>
-<!--      <video id="newEyes" controls autoplay muted loop>-->
-<!--        <source src="./src/assets/newEyes.mp4" type="video/mp4" />-->
-<!--      </video>-->
+      <video id="video" autoplay="true" class="picCapture"></video>
+      <video id="someone" controls autoplay muted src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm"></video>
+<!-- <div id="gradient"></div> -->
+      <!-- <video style="display: none;" id="someone" controls autoplay muted loop>
+        <source src="./src/assets/videoplayback.mp4" type="video/mp4" />
+      </video> -->
     </div>
   </body>
 </html>

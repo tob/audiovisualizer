@@ -1,6 +1,8 @@
+import { rotate } from "../utils/transform.js";
+
 let cursorX;
 let cursorY;
-document.onmousemove = function(e) {
+document.onmousemove = function (e) {
   cursorX = e.pageX;
   cursorY = e.pageY;
 };
@@ -65,14 +67,14 @@ function circlePos(radius, i) {
 
   return {
     width: radius * Math.cos(((360 / 60) * (i - 15) * Math.PI) / 180),
-    height: radius * Math.sin(((360 / 60) * (i - 15) * Math.PI) / 180)
+    height: radius * Math.sin(((360 / 60) * (i - 15) * Math.PI) / 180),
   };
 }
 
 function spiralPos(radius, volume, i) {
   return {
     width: (radius + i * (Math.PI * 2)) * Math.cos((i * (Math.PI * 2)) / 50),
-    height: (radius + i * (Math.PI * 2)) * Math.sin((i * (Math.PI * 2)) / 50)
+    height: (radius + i * (Math.PI * 2)) * Math.sin((i * (Math.PI * 2)) / 50),
   };
 }
 
@@ -96,12 +98,11 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
       break;
     case "ninja":
       drawStar(ctx, x, y, 4, width, width / 2 + i);
-
       break;
   }
 
-  ctx.closePath();
-
+  // ctx.closePath();
+  ctx.clip();
   if (stroke) {
     ctx.strokeStyle = stroke;
     ctx.stroke();
@@ -111,6 +112,9 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
     ctx.fillStyle = style;
     ctx.fill();
   }
+
+  const video = document.querySelector("#someone");
+  ctx.drawImage(video, x - width, y - width, width*2,width*2);
 }
 
 function findTime() {
@@ -126,7 +130,7 @@ function findTime() {
   return {
     hour,
     min,
-    sec
+    sec,
   };
 }
 
@@ -151,14 +155,14 @@ function findTimeofI(i, radius, arrayLength) {
   return {
     time,
     timeUnits,
-    timeRadius
+    timeRadius,
   };
 }
 
 function getClockHandsPosition(time, units, radius) {
   return {
     width: radius * Math.cos(((360 / units) * (time - 15) * Math.PI) / 180),
-    height: radius * Math.sin(((360 / units) * (time - 15) * Math.PI) / 180)
+    height: radius * Math.sin(((360 / units) * (time - 15) * Math.PI) / 180),
   };
 }
 
@@ -231,55 +235,56 @@ function drawPattern({
   shape,
   mode = "circle",
   twist,
-  arrayLength
+  arrayLength,
 }) {
   const { time, timeUnits, timeRadius } = findTimeofI(i, radius, arrayLength);
-  const squares = Math.sqrt(arrayLength) > 0 ? Math.sqrt(arrayLength) : 1;
+  const squares =
+    Math.sqrt(arrayLength) > 0 ? Math.round(Math.sqrt(arrayLength)) : 1;
   const modes = {
     circle: {
       x:
-        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / arrayLength) +
+        (radius + canvas.width / 20) *
+          Math.cos((i * Math.PI * 2) / arrayLength) +
         canvas.width / 2,
       y:
-        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / arrayLength) +
-        canvas.height / 2
+        (radius + canvas.width / 20) *
+          Math.sin((i * Math.PI * 2) / arrayLength) +
+        canvas.height / 2,
     },
     spiral: {
       x: spiralPos(radius, volume, i).width + canvas.width / 2,
-      y: spiralPos(radius, volume, i).height + canvas.height / 2
+      y: spiralPos(radius, volume, i).height + canvas.height / 2,
     },
     wave: {
       x: (canvas.width / arrayLength) * i,
       y:
-        (radius + canvas.width / 20) * Math.sin((i * Math.PI * 2) / arrayLength) +
-        canvas.height / 2
+        (radius + canvas.width / 20) *
+          Math.sin((i * Math.PI * 2) / arrayLength) +
+        canvas.height / 2,
     },
     verticalWave: {
       x:
-        (radius + canvas.width / 20) * Math.cos((i * Math.PI * 2) / arrayLength) +
+        (radius + canvas.width / 20) *
+          Math.cos((i * Math.PI * 2) / arrayLength) +
         canvas.width / 2,
-      y: (canvas.height / arrayLength) * i
+      y: (canvas.height / arrayLength) * i,
     },
     line: {
       x: (canvas.width / arrayLength) * i,
-      y: canvas.height / 2
+      y: canvas.height / 2,
     },
     diagonal: {
       x: (canvas.width / arrayLength) * i,
-      y: canvas.height - (canvas.height / arrayLength) * i
+      y: canvas.height - (canvas.height / arrayLength) * i,
     },
-    grid: {
-      x: getXpos(squares, canvas, i) + width,
-      y:
-        (canvas.height / squares) * Math.floor(i / squares) + canvas.height / squares
-    },
+    grid: getGridpositions(squares, canvas, i),
     center: {
       x: canvas.width / 2,
-      y: canvas.height / 2
+      y: canvas.height / 2,
     },
     cursor: {
       x: cursorX,
-      y: cursorY
+      y: cursorY,
     },
     clock: {
       x:
@@ -287,16 +292,10 @@ function drawPattern({
         canvas.width / 2,
       y:
         getClockHandsPosition(time, timeUnits, timeRadius).height +
-        canvas.height / 2
+        canvas.height / 2,
     },
-    random: {
-      x: Math.floor(Math.random() * canvas.width) + 1,
-      y:
-        (canvas.height / 15) * Math.floor(i / 15) -
-        (volume * size) / 2 +
-        canvas.height / 15 / 2
-    }
   };
+
   const xPos = modes[mode].x;
   const yPos = modes[mode].y;
 
@@ -304,21 +303,32 @@ function drawPattern({
     ctx,
     x: xPos,
     y: yPos,
-    draw: () => shape(xPos, yPos),
-    degree: twist && (360 / 255) * (volume / 255)
+    draw: shape,
+    degree: twist && (360 / 255) * (volume / 255),
   });
 }
 
-const getXpos = (colNumber, canvas, i) => {
-  let position = canvas.width / 2;
+const getGridpositions = (colNumber, canvas, i) => {
+  const gridCellWidth = canvas.width / colNumber;
+  const gridCellHeight = canvas.height / colNumber;
+  // multiplying the index by cellWidth to find position
+  // using the % to find correct place in each row
+  // adding half of cell to center element
+  const positionx = gridCellWidth * (i % colNumber) + gridCellWidth / 2;
 
-  if (Math.floor(i / colNumber) > 0) {
-    position = (canvas.width / colNumber) * (i % colNumber);
-  }
+  const positiony = gridCellHeight * Math.round(i / colNumber) + gridCellHeight;
+  return {
+    x: positionx,
+    y: positiony,
+  };
+};
 
-  if (i < colNumber) {
-    position = (canvas.width / colNumber) * i;
-  }
-
-  return position;
+export {
+  drawBars,
+  drawPattern,
+  smoothLine,
+  drawShape,
+  inRange,
+  circlePos,
+  fork,
 };

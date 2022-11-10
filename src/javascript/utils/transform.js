@@ -1,4 +1,4 @@
-const rotate = ({ ctx, x, y, draw, degree }) => {
+function rotate({ ctx, x, y, draw, degree }) {
   if (degree >= 360 || degree <= -360) {
     return;
   }
@@ -12,15 +12,15 @@ const rotate = ({ ctx, x, y, draw, degree }) => {
 
     ctx.rotate(degree);
     ctx.translate(-x, -y);
-    draw();
+    draw(x,y);
 
     ctx.restore();
   } else {
-    draw();
+    draw(x,y);
   }
-};
+}
 
-const updateDirection = ({ x, y, sensibility, volume, speed }) => {
+function updateDirection({ x, y, sensibility, volume, speed }) {
   let top =
     (isFinite(Math.abs((volume * speed) / sensibility)) &&
       Math.abs((volume * speed) / sensibility)) ||
@@ -48,6 +48,8 @@ const updateDirection = ({ x, y, sensibility, volume, speed }) => {
 
   return {
     top: dy === 1 ? top : -top,
-    left: dx === 1 ? left : -left
+    left: dx === 1 ? left : -left,
   };
-};
+}
+
+export { updateDirection, rotate };
