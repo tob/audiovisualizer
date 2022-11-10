@@ -1,6 +1,6 @@
 const normalizeValue = (value) => (1 / 255) * value; // getting a value between 0 and 1 to use later 255 is the max value for audio
 function getPercentage(length, value) {
-return length/100 * value
+return 100/length * value
 }
 
 function getIndexFromValue(length, value) {

@@ -1,34 +1,9 @@
 import { rotate } from "../helpers/transform.js";
-import { listening, hexToRGB, settings } from "../utils/setup-canvas.js";
+import { settings, RANGES } from "../utils/layer-settings.js";
 import { drawPattern, drawShape } from "../helpers/shapes.js";
 import { getAverageValue } from "../helpers/math.js";
-
-const RANGES = {
-  "low bass": {
-    min: 0,
-    max: 50,
-  },
-  bass: {
-    min: 50,
-    max: 100,
-  },
-  tenor: {
-    min: 100,
-    max: 150,
-  },
-  alto: {
-    min: 150,
-    max: 200,
-  },
-  soprano: {
-    min: 200,
-    max: 255,
-  },
-  all: {
-    min: 0,
-    max: 255,
-  },
-};
+import { hexToRGB } from "../utils/colors.js";
+import { getAudioInput } from "../utils/microphone.js";
 
 function clearCanvas() {
   const clearCanvas = document.querySelector(`.controller__clear`).checked;
@@ -63,11 +38,11 @@ const updateControllersValues = (layer) => {
   const stroke = layer.children[4].children[1].children[0].checked;
   const twist = layer.children[8].children[1].children[0].checked;
 
-  const frequencyMin = RANGES[range].min;
-  const frequencyMax = RANGES[range].max;
+  const rangeStart = RANGES[range].min;
+  const rangeEnd = RANGES[range].max;
   return {
-    frequencyMin,
-    frequencyMax,
+    rangeStart,
+    rangeEnd,
     rotationSpeed,
     size,
     colorWell,
@@ -83,32 +58,6 @@ const updateControllersValues = (layer) => {
     range,
   };
 };
-
-function getAudioInput(stream) {
-  window.persistAudioStream = stream;
-  const audioContent = new AudioContext();
-  const audioStream = audioContent.createMediaStreamSource(stream);
-  const analyser = audioContent.createAnalyser();
-  audioStream.connect(analyser);
-  analyser.fftSize = 64;
-
-  // filter out frequencies that hardly get used
-  const unitArray = new Uint8Array(analyser.frequencyBinCount);
-
-  // creating a new typed array for performance reasons
-  const frequencyArray = new Uint8Array(unitArray.length);
-
-  // slice source input in frequencies
-  // fill the typed array
-  const module = unitArray.length / 5;
-  frequencyArray.set(unitArray.slice(0, module));
-  frequencyArray.set(unitArray.slice(module, module * 2), module);
-  frequencyArray.set(unitArray.slice(module * 2, module * 3), module * 2);
-  frequencyArray.set(unitArray.slice(module * 3, module * 4), module * 3);
-  frequencyArray.set(unitArray.slice(module * 4, unitArray.length), module * 4);
-
-  return { analyser, frequencyArray: frequencyArray.reverse() };
-}
 
 function startAudioVisual() {
   "use strict";
@@ -129,11 +78,11 @@ function startAudioVisual() {
     let volume;
 
     function doDraw() {
-      if (!listening) {
+      if (!window.listening) {
         console.log("STOP DRAW");
         return;
       }
-      const fps = 12;
+      const fps = 24;
       setTimeout(() => {
         requestAnimationFrame(doDraw);
       }, 1000 / fps);
@@ -151,8 +100,8 @@ function startAudioVisual() {
       layers.map((layer, index) => {
         index++;
         let {
-          frequencyMin,
-          frequencyMax,
+          rangeStart,
+          rangeEnd,
           rotationSpeed,
           size,
           colorWell,
@@ -179,24 +128,23 @@ function startAudioVisual() {
             (value) => value !== "random"
           );
 
-          state[`canvas${index}`] = {
-            ...canvasState,
-            currentPattern:
-              filteredPattern[
-                Math.floor(Math.random() * filteredPattern.length)
-              ],
-            prevPattern: pattern,
-          };
-        } else if (pattern !== "random" && state.prevPattern !== "random") {
+          (state[`canvas${index}`].currentPattern =
+            filteredPattern[
+              Math.floor(Math.random() * filteredPattern.length)
+            ]),
+            (state[`canvas${index}`].prevPattern = pattern);
+        } else if (
+          pattern !== "random"
+        ) {
           state[`canvas${index}`] = {
             ...canvasState,
             prevPattern: pattern,
             currentPattern: pattern,
             prevAverage: averageVolume,
-          } 
-        } 
+          };
+        }
         // update color of layer bar if necessary
-        if (colorWell !== canvasState.prevColorWell) {
+        if (colorWell !== canvasState?.prevColorWell) {
           state[`canvas${index}`].prevColorWell = colorWell;
 
           layer.style.backgroundColor = `rgb(${colorWell.r},${colorWell.g},${colorWell.b}, 100)`;
@@ -210,8 +158,15 @@ function startAudioVisual() {
           degree: rotationSpeed / 1 === 0 ? 0 : state[`canvas${index}`].angles,
           draw: () => {
             // For each frequency in range draw something
-            for (let i = frequencyMin; i < frequencyMax; i++) {
-              volume = Math.floor(frequencyArray[i]);
+            const startIndex = Math.round(rangeStart * frequencyArray.length);
+            const stopIndex = Math.round(rangeEnd * frequencyArray.length);
+            for (
+              let i = { position: startIndex, counter: 0 };
+              i.counter < stopIndex && i.counter <= frequencyArray.length;
+              i.counter++
+            ) {
+              volume = Math.floor(frequencyArray[i.position]);
+              i.position++;
 
               let customColor = `rgb(
               ${colorWell.r + volume},
@@ -225,11 +180,11 @@ function startAudioVisual() {
                 radius: (canvas.width / 100) * size + volume,
                 size: size,
                 volume,
-                i,
+                i: i.counter,
                 mode: state[`canvas${index}`].currentPattern,
                 width: (volume / 5) * size,
                 twist,
-                arrayLength: frequencyMax - frequencyMin,
+                arrayLength: stopIndex - startIndex,
                 shape: (x, y) =>
                   drawShape({
                     x: x,
@@ -237,7 +192,7 @@ function startAudioVisual() {
                     ctx: canvasContext,
                     width: (volume / 5) * size,
                     mode: shape,
-                    i,
+                    i: i.counter,
                     style: customColor,
                     stroke: stroke,
                   }),
@@ -245,12 +200,13 @@ function startAudioVisual() {
             }
           },
         });
-        if (canvasState.angles >= 360) {
+        if (canvasState?.angles >= 360) {
           state[`canvas${index}`].angles = 0;
         }
 
-        if (canvasState.angles > 0) {
-          state[`canvas${index}`].angles += (state[`canvas${index}`].prevAverage * rotationSpeed) / 1000;
+        if (canvasState?.angles > 0) {
+          state[`canvas${index}`].angles +=
+            (state[`canvas${index}`].prevAverage * rotationSpeed) / 10000;
         } else {
           state[`canvas${index}`].angles = 0.1;
         }
