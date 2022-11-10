@@ -1,10 +1,11 @@
-import handleMicrophone from "./microphone.js";
-import { connectMidi } from "./midi-controller.js";
-import connectWebCam from "./webcam.js";
-import { addCanvas, createButtons } from "../helpers/drawSettings.js";
-import { CanvasRecorder } from "../utils/recorder.js";
-import { handleRecording } from "../utils/recorder.js";
-import { settings } from "./layer-settings.js";
+import handleMicrophone from "./utils/microphone.js";
+import { connectMidi } from "./utils/midi-controller.js";
+import connectWebCam from "./utils/webcam.js";
+import { addCanvas, createButtons } from "./drawings/drawSettings.js";
+import { CanvasRecorder } from "./utils/recorder.js";
+import { handleRecording } from "./utils/recorder.js";
+import { settings } from "./utils/layer-settings.js";
+import {shortenUrl} from "./utils/urlshortener.js"
 
 let size = 1,
   WIDTH = window.innerWidth,

@@ -1,4 +1,4 @@
-import { getIndexFromValue, getPercentage } from "../helpers/math.js";
+import { getIndexFromValue, getPercentage } from "./math.js";
 export function connectMidi() {
     navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
   

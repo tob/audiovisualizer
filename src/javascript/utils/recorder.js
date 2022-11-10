@@ -128,5 +128,3 @@ export function handleRecording(button, recorder) {
     button.style.color = "Red";
   }
 }
-
-export default {CanvasRecorder, handleRecording}

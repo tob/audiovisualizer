@@ -1,4 +1,4 @@
-import { startAudioVisual } from "../drawings/multiCanvas.js";
+import { startAudioVisual } from "../drawings/startDrawing.js";
 export default function handleMicrophone(
   button,
   main,

@@ -1,7 +1,7 @@
-import { rotate } from "../helpers/transform.js";
+import { rotate } from "../utils/transform.js";
 import { settings, RANGES } from "../utils/layer-settings.js";
-import { drawPattern, drawShape } from "../helpers/shapes.js";
-import { getAverageValue } from "../helpers/math.js";
+import { drawPattern, drawShape } from "./shapes.js";
+import { getAverageValue } from "../utils/math.js";
 import { hexToRGB } from "../utils/colors.js";
 import { getAudioInput } from "../utils/microphone.js";
 
@@ -19,7 +19,7 @@ function clearCanvas() {
   });
 }
 
-const updateControllersValues = (layer) => {
+export const updateControllersValues = (layer) => {
   const canvas = document.getElementsByClassName(`canvas-1`)[0];
   const canvasContext = canvas.getContext("2d");
 
