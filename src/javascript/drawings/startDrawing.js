@@ -146,14 +146,13 @@ function startAudioVisual() {
                 i: i.counter,
                 mode: state[`canvas${index}`].currentPattern,
                 width: (volume / 5) * size,
-                twist,
                 arrayLength: stopIndex - startIndex,
               });
-
+            
               rotate({
                 x: posX,
                 y: posY,
-                degree: twist && (360 / 255) * (volume / 255),
+                degree: twist && (canvasState.angles + i.counter), // kaleidoscope effect << !!!!!
                 ctx: canvasContext,
                 draw: () => {
                   drawShape({

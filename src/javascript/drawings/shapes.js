@@ -226,7 +226,6 @@ function getPatternXy({
   size,
   i,
   mode = "circle",
-  twist,
   arrayLength,
 }) {
   const { time, timeUnits, timeRadius } = findTimeofI(i, radius, arrayLength);
