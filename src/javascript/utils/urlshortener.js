@@ -1,4 +1,4 @@
-import { updateControllersValues } from "../drawings/startDrawing.js";
+import { updateControllersValues } from "../utils/layer-settings.js";
 export const shortenUrl = () => {
   let shortUrl = "";
   // select all the layers with settings

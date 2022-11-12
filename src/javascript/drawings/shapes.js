@@ -78,14 +78,13 @@ function spiralPos(radius, volume, i) {
   };
 }
 
-function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
+function drawShape({ ctx, x, y, width, style, stroke, fill, mode, i }) {
   ctx.beginPath();
   ctx.fillStyle = style;
   ctx.strokeStyle = stroke;
   switch (mode) {
     case "square":
-      ctx.fillRect(x - width / 2, y - width / 2, width, width);
-      stroke && ctx.strokeRect(x - width / 2, y - width / 2, width, width);
+      ctx.rect(x - width / 2, y - width / 2, width, width);
       break;
     case "circle":
       ctx.arc(x, y, width, 0, 2 * Math.PI);
@@ -101,20 +100,15 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
       break;
   }
 
-  // ctx.closePath();
   ctx.clip();
-  if (stroke) {
-    ctx.strokeStyle = stroke;
-    ctx.stroke();
-  }
 
-  if (style) {
-    ctx.fillStyle = style;
-    ctx.fill();
-  }
+  const { video } = applyStyle({
+    ctx,
+    stroke,
+    fill,
+  });
 
-  const video = document.querySelector("#someone");
-  ctx.drawImage(video, x - width, y - width, width*2,width*2);
+  ctx.drawImage(video, x - width, y - width, width * 2, width * 2);
 }
 
 function findTime() {
@@ -224,15 +218,13 @@ function drawBars(arrayFreq, canvasContext, canvas) {
   }
 }
 
-function drawPattern({
-  ctx,
+function getPatternXy({
   canvas,
   radius,
   volume,
   width,
   size,
   i,
-  shape,
   mode = "circle",
   twist,
   arrayLength,
@@ -299,13 +291,10 @@ function drawPattern({
   const xPos = modes[mode].x;
   const yPos = modes[mode].y;
 
-  rotate({
-    ctx,
+  return {
     x: xPos,
     y: yPos,
-    draw: shape,
-    degree: twist && (360 / 255) * (volume / 255),
-  });
+  };
 }
 
 const getGridpositions = (colNumber, canvas, i) => {
@@ -323,9 +312,25 @@ const getGridpositions = (colNumber, canvas, i) => {
   };
 };
 
+function applyStyle({ ctx, stroke, fill }) {
+  if (stroke) {
+    ctx.strokeStyle = stroke;
+    ctx.stroke();
+  }
+
+  if (fill) {
+    ctx.fillStyle = fill;
+    ctx.fill();
+  }
+
+  const video = document.querySelector("#someone");
+  return { video };
+}
+
 export {
+  applyStyle,
   drawBars,
-  drawPattern,
+  getPatternXy,
   smoothLine,
   drawShape,
   inRange,

@@ -1,8 +1,7 @@
-import { rotate } from "../utils/transform.js";
-import { settings, RANGES } from "../utils/layer-settings.js";
-import { drawPattern, drawShape } from "./shapes.js";
+import { rotate, updateAngles } from "../utils/transform.js";
+import { settings, updateControllersValues } from "../utils/layer-settings.js";
+import { getPatternXy, drawShape, applyStyle } from "./shapes.js";
 import { getAverageValue } from "../utils/math.js";
-import { hexToRGB } from "../utils/colors.js";
 import { getAudioInput } from "../utils/microphone.js";
 
 function clearCanvas() {
@@ -19,46 +18,6 @@ function clearCanvas() {
   });
 }
 
-export const updateControllersValues = (layer) => {
-  const canvas = document.getElementsByClassName(`canvas-1`)[0];
-  const canvasContext = canvas.getContext("2d");
-
-  // Make a function to do this by using classnames selectors
-  const color = layer.children[5].children[1].children[0].value;
-  const colorWell = hexToRGB(color.replace("#", "0x"));
-  const effect = layer.children[7].children[1].children[0].value;
-
-  const opacity = layer.children[6].children[1].children[0].value;
-
-  const pattern = layer.children[1].children[1].children[0].value;
-  const range = layer.children[0].children[1].children[0].value;
-  const rotationSpeed = layer.children[9].children[1].children[0].value;
-  const shape = layer.children[2].children[1].children[0].value;
-  const size = layer.children[3].children[1].children[0].value;
-  const stroke = layer.children[4].children[1].children[0].checked;
-  const twist = layer.children[8].children[1].children[0].checked;
-
-  const rangeStart = RANGES[range].min;
-  const rangeEnd = RANGES[range].max;
-  return {
-    rangeStart,
-    rangeEnd,
-    rotationSpeed,
-    size,
-    colorWell,
-    opacity,
-    twist,
-    stroke,
-    effect,
-    canvasContext,
-    canvas,
-    pattern,
-    color,
-    shape,
-    range,
-  };
-};
-
 function startAudioVisual() {
   "use strict";
 
@@ -67,6 +26,13 @@ function startAudioVisual() {
     const state = {
       canvas1: {
         angles: 0,
+        prevColorWell: null,
+        prevAverage: 0,
+        prevPattern: "center",
+        currentPattern: "center",
+      },
+      canvas2: {
+        angles: 360,
         prevColorWell: null,
         prevAverage: 0,
         prevPattern: "center",
@@ -82,7 +48,7 @@ function startAudioVisual() {
         console.log("STOP DRAW");
         return;
       }
-      const fps = 24;
+      const fps = 16;
       setTimeout(() => {
         requestAnimationFrame(doDraw);
       }, 1000 / fps);
@@ -117,7 +83,6 @@ function startAudioVisual() {
 
         const canvasState = state[`canvas${index}`];
         canvasContext.globalCompositeOperation = effect;
-
         const averageVolume = getAverageValue(frequencyArray);
         if (
           (pattern === "random" &&
@@ -133,9 +98,7 @@ function startAudioVisual() {
               Math.floor(Math.random() * filteredPattern.length)
             ]),
             (state[`canvas${index}`].prevPattern = pattern);
-        } else if (
-          pattern !== "random"
-        ) {
+        } else if (pattern !== "random") {
           state[`canvas${index}`] = {
             ...canvasState,
             prevPattern: pattern,
@@ -149,6 +112,12 @@ function startAudioVisual() {
 
           layer.style.backgroundColor = `rgb(${colorWell.r},${colorWell.g},${colorWell.b}, 100)`;
         }
+
+        let customColor = `rgb(
+          ${colorWell.r + volume},
+          ${colorWell.g + volume},
+          ${colorWell.b + volume},
+          ${opacity / 100})`;
 
         // rotate the full canvas
         rotate({
@@ -168,16 +137,10 @@ function startAudioVisual() {
               volume = Math.floor(frequencyArray[i.position]);
               i.position++;
 
-              let customColor = `rgb(
-              ${colorWell.r + volume},
-              ${colorWell.g + volume},
-              ${colorWell.b + volume},
-              ${opacity / 100})`;
-
-              drawPattern({
-                ctx: canvasContext,
+              const { x: posX, y: posY } = getPatternXy({
+                pattern,
                 canvas: canvas,
-                radius: (canvas.width / 100) * size + volume,
+                radius: canvas.width / 100 + volume,
                 size: size,
                 volume,
                 i: i.counter,
@@ -185,31 +148,37 @@ function startAudioVisual() {
                 width: (volume / 5) * size,
                 twist,
                 arrayLength: stopIndex - startIndex,
-                shape: (x, y) =>
+              });
+
+              rotate({
+                x: posX,
+                y: posY,
+                degree: twist && (360 / 255) * (volume / 255),
+                ctx: canvasContext,
+                draw: () => {
                   drawShape({
-                    x: x,
-                    y: y,
+                    x: posX,
+                    y: posY,
                     ctx: canvasContext,
                     width: (volume / 5) * size,
                     mode: shape,
                     i: i.counter,
-                    style: customColor,
                     stroke: stroke,
-                  }),
+                    fill: customColor
+                  });       
+                },
               });
             }
           },
         });
-        if (canvasState?.angles >= 360) {
-          state[`canvas${index}`].angles = 0;
-        }
 
-        if (canvasState?.angles > 0) {
-          state[`canvas${index}`].angles +=
-            (state[`canvas${index}`].prevAverage * rotationSpeed) / 10000;
-        } else {
-          state[`canvas${index}`].angles = 0.1;
-        }
+        const newAngles = updateAngles({
+          angles: canvasState.angles,
+          prevAverage: state[`canvas${index}`].prevAverage,
+          rotationSpeed,
+        });
+
+        state[`canvas${index}`].angles = newAngles;
       });
     }
 

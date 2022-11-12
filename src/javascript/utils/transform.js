@@ -12,12 +12,19 @@ function rotate({ ctx, x, y, draw, degree }) {
 
     ctx.rotate(degree);
     ctx.translate(-x, -y);
-    draw(x,y);
+    draw(x, y);
 
     ctx.restore();
   } else {
-    draw(x,y);
+    draw(x, y);
   }
+}
+
+function updateAngles({ angles, prevAverage, rotationSpeed }) {
+  if (angles >= 360) {
+    return 0;
+  }
+  return angles + (prevAverage * rotationSpeed) / 10000;
 }
 
 function updateDirection({ x, y, sensibility, volume, speed }) {
@@ -52,4 +59,4 @@ function updateDirection({ x, y, sensibility, volume, speed }) {
   };
 }
 
-export { updateDirection, rotate };
+export { updateDirection, rotate, updateAngles };

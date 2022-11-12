@@ -1,3 +1,5 @@
+import { hexToRGB } from "../utils/colors.js";
+
 export const settings = {
   range: {
     icon: "fa-assistive-listening-systems",
@@ -109,3 +111,43 @@ export const RANGES = {
     max: 1,
   },
 };
+
+export const updateControllersValues = (layer) => {
+    const canvas = document.getElementsByClassName(`canvas-1`)[0];
+    const canvasContext = canvas.getContext("2d");
+  
+    // Make a function to do this by using classnames selectors
+    const color = layer.children[5].children[1].children[0].value;
+    const colorWell = hexToRGB(color.replace("#", "0x"));
+    const effect = layer.children[7].children[1].children[0].value;
+  
+    const opacity = layer.children[6].children[1].children[0].value;
+  
+    const pattern = layer.children[1].children[1].children[0].value;
+    const range = layer.children[0].children[1].children[0].value;
+    const rotationSpeed = layer.children[9].children[1].children[0].value;
+    const shape = layer.children[2].children[1].children[0].value;
+    const size = layer.children[3].children[1].children[0].value;
+    const stroke = layer.children[4].children[1].children[0].checked;
+    const twist = layer.children[8].children[1].children[0].checked;
+  
+    const rangeStart = RANGES[range].min;
+    const rangeEnd = RANGES[range].max;
+    return {
+      rangeStart,
+      rangeEnd,
+      rotationSpeed,
+      size,
+      colorWell,
+      opacity,
+      twist,
+      stroke,
+      effect,
+      canvasContext,
+      canvas,
+      pattern,
+      color,
+      shape,
+      range,
+    };
+  };
