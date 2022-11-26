@@ -16,7 +16,7 @@ export function CanvasRecorder(canvas, video_bits_per_sec) {
     return;
   }
 
-  const video = document.createElement("video");
+  const video = document.createElement("recording");
   video.style.display = "none";
 
   function startRecording() {

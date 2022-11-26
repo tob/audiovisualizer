@@ -19,10 +19,10 @@
     ></script>
 
     <!-- Add draggable library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
+    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
 
     <script type="module" src="src/javascript/index.js"></script>
-    <script type="module" src="src/javascript/utils/urlshortener.js"></script> 
+    <script type="module" src="src/javascript/utils/urlshortener.js"></script>
   </head>
   <body class="body">
     <div class="header">
@@ -63,17 +63,23 @@
 
     <div id="main"></div>
 
-    <!--    <div class="assets-container">-->
-    <!--      <img id="background" src="src/assets/desertdog.jpg" />-->
-    <!--    </div>-->
+    <div class="assets-container">
+      <img id="image" src="assets/brass/002.jpg" />
+    </div>
     <!--    <div>-->
     <!--      <img class="snapshot" src="src/assets/desertdog.jpg" />-->
     <!--    </div>-->
 
     <div>
-      <video id="video" autoplay="true" class="picCapture"></video>
-      <video id="someone" controls autoplay muted src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm"></video>
-<!-- <div id="gradient"></div> -->
+      <!-- <video id="webcam" autoplay="true" class="picCapture"></video> -->
+      <video
+        id="someone"
+        controls
+        autoplay
+        muted
+        src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm"
+      ></video>
+      <!-- <div id="gradient"></div> -->
       <!-- <video style="display: none;" id="someone" controls autoplay muted loop>
         <source src="./src/assets/videoplayback.mp4" type="video/mp4" />
       </video> -->

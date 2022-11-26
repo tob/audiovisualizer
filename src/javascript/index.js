@@ -11,7 +11,7 @@ let size = 1,
   WIDTH = window.innerWidth,
   HEIGHT = window.innerHeight;
 
-function appendImage(canvas, target, downloadButton) {
+function appendSnapshotImage(canvas, target, downloadButton) {
   // set canvasImg image src to data
   canvas.toBlob(function (blob) {
     target.src = URL.createObjectURL(blob);
@@ -38,10 +38,25 @@ function loadDrawingFromParams(parent, settings) {
   }
 }
 
+Array.prototype.random = function () {
+  return this[Math.floor((Math.random()*this.length))];
+}
+
+export const images = [...Array(48).keys()]
+
+function appendImage(index, container) {
+  const imageTag = document.createElement('img')
+  imageTag.src = 'assets/brass/00' + index + '.jpg'
+  imageTag.id = 'image-'+index
+  container.appendChild(imageTag)
+}
+
 // Start
 window.onload = () => {
   connectMidi();
   connectWebCam();
+  const imageWrapper = document.querySelector('.assets-container')
+  images.map((img) => appendImage(img, imageWrapper))
   const startButton = document.getElementsByClassName(
     "controller__button-start"
   )[0];

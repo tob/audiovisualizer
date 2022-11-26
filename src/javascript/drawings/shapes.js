@@ -1,4 +1,5 @@
-import { rotate } from "../utils/transform.js";
+import { images } from "../index.js";
+import { getPercentage } from "../utils/math.js";
 
 let cursorX;
 let cursorY;
@@ -78,7 +79,7 @@ function spiralPos(radius, volume, i) {
   };
 }
 
-function drawShape({ ctx, x, y, width, style, stroke, fill, mode, i }) {
+function drawShape({ ctx, x, y, width, style, stroke, fill, mode, i, asset }) {
   ctx.beginPath();
   ctx.fillStyle = style;
   ctx.strokeStyle = stroke;
@@ -106,9 +107,10 @@ function drawShape({ ctx, x, y, width, style, stroke, fill, mode, i }) {
     ctx,
     stroke,
     fill,
+    asset,
   });
 
-  ctx.drawImage(video, x - width, y - width, width * 2, width * 2);
+  asset && ctx.drawImage(video, x - width, y - width, width * 2, width * 2);
 }
 
 function findTime() {
@@ -227,6 +229,7 @@ function getPatternXy({
   i,
   mode = "circle",
   arrayLength,
+  asset,
 }) {
   const { time, timeUnits, timeRadius } = findTimeofI(i, radius, arrayLength);
   const squares =
@@ -263,6 +266,10 @@ function getPatternXy({
     line: {
       x: (canvas.width / arrayLength) * i,
       y: canvas.height / 2,
+    },
+    verticalLine: {
+      x: (canvas.width / arrayLength) * arrayLength * getPercentage(images.length, asset),
+      y: (canvas.height / arrayLength) * i,
     },
     diagonal: {
       x: (canvas.width / arrayLength) * i,
@@ -311,7 +318,7 @@ const getGridpositions = (colNumber, canvas, i) => {
   };
 };
 
-function applyStyle({ ctx, stroke, fill }) {
+function applyStyle({ ctx, stroke, fill, asset }) {
   if (stroke) {
     ctx.strokeStyle = stroke;
     ctx.stroke();
@@ -322,6 +329,8 @@ function applyStyle({ ctx, stroke, fill }) {
     ctx.fill();
   }
 
+  const selector = "#image-" + asset;
+  // const video = document.querySelector(selector);
   const video = document.querySelector("#someone");
   return { video };
 }

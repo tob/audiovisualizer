@@ -15,30 +15,24 @@ const getType = (setting) => {
 };
 
 const createButtons = (parent, settings, i) => {
+
+  // Create draggable layer container
   const containerButtons = document.createElement("div");
   containerButtons.className = "container-buttons";
   containerButtons.draggable = true;
-  // containerButtons.style.order = i;
-  // const containerTitle = document.createElement("h4");
-  // containerTitle.innerText = `level - ${i}`;
-  // containerTitle.className = "container-buttons__title";
   parent.appendChild(containerButtons);
-  // containerButtons.appendChild(containerTitle);
 
   // Control visualization
   for (let setting in settings) {
     const { list, value, min, max, icon, checked } = settings[setting];
+ 
     const type = getType(settings[setting]);
 
-    const button = document.createElement("span");
-    button.className = icon
-      ? `controller__button controller__button-${icon}`
-      : "controller__button";
-    containerButtons.appendChild(button);
+    console.log(type)
 
-    // const titleButton = document.createElement("p");
-    // titleButton.innerText = setting;
-    // button.appendChild(titleButton);
+    const button = document.createElement("span");
+    button.className = `controller__button controller__button-${icon}`;
+    containerButtons.appendChild(button);
 
     const settingIcon = document.createElement("i");
     settingIcon.className = `fa ${icon}`;

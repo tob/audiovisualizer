@@ -1,4 +1,5 @@
-import { startAudioVisual } from "../drawings/startDrawing.js";
+// import { startAudioVisual } from "../drawings/startDrawing.js";
+import { startAudioVisual } from "../../videoAudiolizer/index.js";
 export default function handleMicrophone(
   button,
   main,
@@ -42,6 +43,5 @@ export function getAudioInput(stream) {
 
   // creating a new typed array for performance reasons
   const frequencyArray = new Uint8Array(unitArray.length);
-
   return { analyser, frequencyArray: frequencyArray.reverse() };
 }

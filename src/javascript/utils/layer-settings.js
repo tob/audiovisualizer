@@ -11,6 +11,7 @@ export const settings = {
     list: [
       "center",
       "line",
+      "verticalLine",
       "spiral",
       "diagonal",
       "grid",
@@ -116,6 +117,14 @@ export const updateControllersValues = (layer) => {
     const canvas = document.getElementsByClassName(`canvas-1`)[0];
     const canvasContext = canvas.getContext("2d");
   
+
+    // Start of refactor of this part
+    const result = {}
+    for (const [key, value] of Object.entries(settings)) {
+     result[key] = document.getElementsByClassName(value.icon)
+    }
+
+    
     // Make a function to do this by using classnames selectors
     const color = layer.children[5].children[1].children[0].value;
     const colorWell = hexToRGB(color.replace("#", "0x"));

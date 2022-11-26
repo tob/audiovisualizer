@@ -1,8 +1,12 @@
-import { rotate, updateAngles } from "../utils/transform.js";
-import { settings, updateControllersValues } from "../utils/layer-settings.js";
-import { getPatternXy, drawShape, applyStyle } from "./shapes.js";
-import { getAverageValue } from "../utils/math.js";
-import { getAudioInput } from "../utils/microphone.js";
+import { rotate, updateAngles } from "../javascript/utils/transform.js";
+import {
+  settings,
+  updateControllersValues,
+} from "../javascript/utils/layer-settings.js";
+import { getPatternXy, drawShape } from "../javascript/drawings/shapes.js";
+import { getAverageValue } from "../javascript/utils/math.js";
+import { getAudioInput } from "../javascript/utils/microphone.js";
+import { images } from "../javascript/index.js";
 
 function clearCanvas() {
   const clearCanvas = document.querySelector(`.controller__clear`).checked;
@@ -25,20 +29,13 @@ function startAudioVisual() {
     const { analyser, frequencyArray } = getAudioInput(stream);
     const state = {
       canvas1: {
+        asset: 1,
         angles: 0,
         prevColorWell: null,
         prevAverage: 0,
         prevPattern: "center",
         currentPattern: "center",
       },
-      canvas2: {
-        angles: 360,
-        prevColorWell: null,
-        prevAverage: 0,
-        prevPattern: "center",
-        currentPattern: "center",
-      },
-
       data: { search_params: new URLSearchParams(window.location.search) },
     };
     let volume;
@@ -55,6 +52,7 @@ function startAudioVisual() {
       // requestAnimationFrame(doDraw);
       analyser.getByteFrequencyData(frequencyArray);
 
+      // create an array from the html elements with classname container-buttons
       const layers = Array.prototype.slice.apply(
         document.getElementsByClassName("container-buttons")
       );
@@ -82,24 +80,31 @@ function startAudioVisual() {
         } = updateControllersValues(layer, index);
 
         const canvasState = state[`canvas${index}`];
+        const newAsset =
+          canvasState.asset !== images.length ? canvasState.asset + 1 : 1;
+        state[`canvas${index}`].asset = newAsset;
         canvasContext.globalCompositeOperation = effect;
         const averageVolume = getAverageValue(frequencyArray);
-        const triggerRandom = (pattern === "random" &&
-        averageVolume - canvasState.prevAverage >= 5) ||
-      (pattern === "random" && canvasState.prevPattern !== "random")
-        
-        if (
-          triggerRandom
-        ) {
+
+        const triggerRandom =
+          (pattern === "random" &&
+            averageVolume - canvasState.prevAverage >= 5) ||
+          (pattern === "random" && canvasState.prevPattern !== "random");
+
+        if (triggerRandom) {
           const filteredPattern = settings.pattern.list.filter(
             (value) => value !== "random"
           );
 
-          (state[`canvas${index}`].currentPattern =
-            filteredPattern[
-              Math.floor(Math.random() * filteredPattern.length)
-            ]),
-            (state[`canvas${index}`].prevPattern = pattern);
+          state[`canvas${index}`] = {
+            ...canvasState,
+            currentPattern:
+              filteredPattern[
+                Math.floor(Math.random() * filteredPattern.length)
+              ],
+            prevPattern: pattern,
+            asset: newAsset,
+          };
         } else if (pattern !== "random") {
           state[`canvas${index}`] = {
             ...canvasState,
@@ -121,7 +126,6 @@ function startAudioVisual() {
           ${colorWell.b + volume},
           ${opacity / 100})`;
 
-        
         // rotate the full canvas
         rotate({
           ctx: canvasContext,
@@ -150,12 +154,13 @@ function startAudioVisual() {
                 mode: state[`canvas${index}`].currentPattern,
                 width: (volume / 5) * size,
                 arrayLength: stopIndex - startIndex,
+                asset: newAsset,
               });
-            
+
               rotate({
                 x: posX,
                 y: posY,
-                degree: twist && (canvasState.angles + i.counter), // kaleidoscope effect << !!!!!
+                degree: twist && canvasState.angles + i.counter, // kaleidoscope effect << !!!!!
                 ctx: canvasContext,
                 draw: () => {
                   drawShape({
@@ -166,8 +171,9 @@ function startAudioVisual() {
                     mode: shape,
                     i: i.counter,
                     stroke: stroke,
-                    fill: customColor
-                  });       
+                    fill: customColor,
+                    asset: canvasState.asset,
+                  });
                 },
               });
             }

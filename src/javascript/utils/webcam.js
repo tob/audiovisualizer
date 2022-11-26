@@ -1,5 +1,6 @@
 export default function connectWebCam() {
-  var video = document.querySelector("#someone");
+  return
+  var video = document.querySelector("#webcam");
 
   if (navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices
