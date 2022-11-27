@@ -232,6 +232,7 @@ function getPatternXy({
   asset,
 }) {
   const { time, timeUnits, timeRadius } = findTimeofI(i, radius, arrayLength);
+
   const squares =
     Math.sqrt(arrayLength) > 0 ? Math.round(Math.sqrt(arrayLength)) : 1;
   const modes = {
@@ -268,7 +269,7 @@ function getPatternXy({
       y: canvas.height / 2,
     },
     verticalLine: {
-      x: (canvas.width / arrayLength) * arrayLength * getPercentage(images.length, asset),
+      x: (canvas.width * getPercentage(images.length, asset)) / 100 - width,
       y: (canvas.height / arrayLength) * i,
     },
     diagonal: {
@@ -329,10 +330,13 @@ function applyStyle({ ctx, stroke, fill, asset }) {
     ctx.fill();
   }
 
-  const selector = "#image-" + asset;
-  // const video = document.querySelector(selector);
-  const video = document.querySelector("#someone");
-  return { video };
+  // if (asset) {
+    const selector = "#image-" + asset;
+    return { video: document.querySelector(selector) };
+  // }
+
+  // const video = document.querySelector("#webcam");
+  // return { video };
 }
 
 export {

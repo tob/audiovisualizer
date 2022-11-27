@@ -61,24 +61,28 @@
     </div>
     <div id="controlboard"></div>
 
-    <div id="main"></div>
+    <div id="container">
+      <div id="main"></div>
+      <video id="webcam" autoplay="true" class="picCapture"></video>
 
-    <div class="assets-container">
-      <img id="image" src="assets/brass/002.jpg" />
+      <video
+      id="video"
+      controls
+      autoplay
+      muted
+      src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm"
+    ></video>
+      <div class="assets-container">
+        <img id="image" src="assets/brass/002.jpg" />
+      </div>
     </div>
+    
     <!--    <div>-->
     <!--      <img class="snapshot" src="src/assets/desertdog.jpg" />-->
     <!--    </div>-->
 
     <div>
-      <!-- <video id="webcam" autoplay="true" class="picCapture"></video> -->
-      <video
-        id="someone"
-        controls
-        autoplay
-        muted
-        src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm"
-      ></video>
+      
       <!-- <div id="gradient"></div> -->
       <!-- <video style="display: none;" id="someone" controls autoplay muted loop>
         <source src="./src/assets/videoplayback.mp4" type="video/mp4" />

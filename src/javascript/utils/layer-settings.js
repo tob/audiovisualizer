@@ -1,10 +1,17 @@
 import { hexToRGB } from "../utils/colors.js";
+import { getType } from "../drawings/drawSettings.js";
 
 export const settings = {
   range: {
     icon: "fa-assistive-listening-systems",
     list: ["low bass", "bass", "tenor", "alto", "soprano", "all"],
     value: "all",
+  },
+  slices: {
+    icon: "fa-route",
+    min: 0,
+    max: 50,
+    value: 1,
   },
   pattern: {
     icon: "fa-route",
@@ -113,50 +120,53 @@ export const RANGES = {
   },
 };
 
-export const updateControllersValues = (layer) => {
-    const canvas = document.getElementsByClassName(`canvas-1`)[0];
-    const canvasContext = canvas.getContext("2d");
-  
+export const updateControllersValues = (layer, index) => {
+  const result = {};
+  for (const [key, value] of Object.entries(settings)) {
+    const type = getType(settings[key]);
 
-    // Start of refactor of this part
-    const result = {}
-    for (const [key, value] of Object.entries(settings)) {
-     result[key] = document.getElementsByClassName(value.icon)
+    switch (type) {
+      case "color":
+        result["colorWell"] = hexToRGB(
+          document
+            .getElementsByClassName(`controller__slider-${key}-${index}`)[0]
+            .value.replace("#", "0x")
+        );
+
+        break;
+      case "number":
+        result[key] = document.getElementsByClassName(
+          `controller__slider-${key}-${index}`
+        )[0].value;
+
+        break;
+      case "select":
+        result[key] = document.getElementsByClassName(
+          `controller__select-${key}-${index}`
+        )[0].value;
+        break;
+      case "checkbox":
+        result[key] = document.getElementsByClassName(
+          `controller__slider-${key}-${index}`
+        )[0].checked;
+        break;
+      default:
+        break;
     }
+  }
 
-    
-    // Make a function to do this by using classnames selectors
-    const color = layer.children[5].children[1].children[0].value;
-    const colorWell = hexToRGB(color.replace("#", "0x"));
-    const effect = layer.children[7].children[1].children[0].value;
-  
-    const opacity = layer.children[6].children[1].children[0].value;
-  
-    const pattern = layer.children[1].children[1].children[0].value;
-    const range = layer.children[0].children[1].children[0].value;
-    const rotationSpeed = layer.children[9].children[1].children[0].value;
-    const shape = layer.children[2].children[1].children[0].value;
-    const size = layer.children[3].children[1].children[0].value;
-    const stroke = layer.children[4].children[1].children[0].checked;
-    const twist = layer.children[8].children[1].children[0].checked;
-  
-    const rangeStart = RANGES[range].min;
-    const rangeEnd = RANGES[range].max;
-    return {
-      rangeStart,
-      rangeEnd,
-      rotationSpeed,
-      size,
-      colorWell,
-      opacity,
-      twist,
-      stroke,
-      effect,
-      canvasContext,
-      canvas,
-      pattern,
-      color,
-      shape,
-      range,
-    };
+  const rangeStart = RANGES[result.range].min;
+  const rangeEnd = RANGES[result.range].max;
+
+  // hardcoded 1 instead of {index} because using always the same canvas
+  const canvas = document.getElementsByClassName(`canvas-1`)[0]; 
+  const canvasContext = canvas.getContext("2d");
+
+  return {
+    rangeStart,
+    rangeEnd,
+    canvas,
+    canvasContext,
+    ...result,
   };
+};

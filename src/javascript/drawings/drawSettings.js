@@ -1,4 +1,4 @@
-const getType = (setting) => {
+export const getType = (setting) => {
   if (setting.max) {
     return "number";
   }

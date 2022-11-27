@@ -4,9 +4,24 @@ import {
   updateControllersValues,
 } from "../javascript/utils/layer-settings.js";
 import { getPatternXy, drawShape } from "../javascript/drawings/shapes.js";
-import { getAverageValue } from "../javascript/utils/math.js";
+import { getAverageValue, getPercentage } from "../javascript/utils/math.js";
 import { getAudioInput } from "../javascript/utils/microphone.js";
 import { images } from "../javascript/index.js";
+
+function reduceArrayToAverages(array, slices) {
+  const rangeSize = Math.round(array.length / slices); // 16
+  const newArray = [];
+
+  for (let index = 0; index <= slices; index++) {
+    const averageSlice =
+      array
+        .slice(index * rangeSize, index * rangeSize + rangeSize)
+        .reduce((prev, next) => prev + next, 0) / rangeSize;
+    newArray[index] = Math.floor(averageSlice);
+  }
+
+  return newArray;
+}
 
 function clearCanvas() {
   const clearCanvas = document.querySelector(`.controller__clear`).checked;
@@ -29,6 +44,14 @@ function startAudioVisual() {
     const { analyser, frequencyArray } = getAudioInput(stream);
     const state = {
       canvas1: {
+        asset: 1,
+        angles: 0,
+        prevColorWell: null,
+        prevAverage: 0,
+        prevPattern: "center",
+        currentPattern: "center",
+      },
+      canvas2: {
         asset: 1,
         angles: 0,
         prevColorWell: null,
@@ -77,14 +100,18 @@ function startAudioVisual() {
           canvasContext,
           pattern,
           shape,
+          slices,
         } = updateControllersValues(layer, index);
 
         const canvasState = state[`canvas${index}`];
         const newAsset =
-          canvasState.asset !== images.length ? canvasState.asset + 1 : 1;
-        state[`canvas${index}`].asset = newAsset;
+          canvasState.asset === images.length -1 ? 0 : canvasState.asset + 1;
         canvasContext.globalCompositeOperation = effect;
         const averageVolume = getAverageValue(frequencyArray);
+
+        if (averageVolume > 50) {
+          state[`canvas${index}`].asset = newAsset;
+        }
 
         const triggerRandom =
           (pattern === "random" &&
@@ -135,48 +162,46 @@ function startAudioVisual() {
           draw: () => {
             // For each frequency in range draw something
             const startIndex = Math.round(rangeStart * frequencyArray.length);
-            const stopIndex = Math.round(rangeEnd * frequencyArray.length);
-            for (
-              let i = { position: startIndex, counter: 0 };
-              i.counter < stopIndex && i.counter <= frequencyArray.length;
-              i.counter++
-            ) {
-              volume = Math.floor(frequencyArray[i.position]);
-              i.position++;
+            const stopIndex = Math.round(rangeEnd * frequencyArray.length) - 1;
+            const filteredFrequencies = reduceArrayToAverages(
+              frequencyArray.slice(startIndex, stopIndex),
+              slices
+            );
 
+            filteredFrequencies.map((volume, idx) => {
               const { x: posX, y: posY } = getPatternXy({
                 pattern,
                 canvas: canvas,
                 radius: canvas.width / 100 + volume,
                 size: size,
                 volume,
-                i: i.counter,
+                i: idx,
                 mode: state[`canvas${index}`].currentPattern,
                 width: (volume / 5) * size,
-                arrayLength: stopIndex - startIndex,
+                arrayLength: filteredFrequencies.length,
                 asset: newAsset,
               });
 
               rotate({
                 x: posX,
                 y: posY,
-                degree: twist && canvasState.angles + i.counter, // kaleidoscope effect << !!!!!
+                degree: twist && canvasState.angles + idx, // kaleidoscope effect << !!!!!
                 ctx: canvasContext,
                 draw: () => {
                   drawShape({
                     x: posX,
                     y: posY,
                     ctx: canvasContext,
-                    width: (volume / 5) * size,
+                    width: (300 + volume * size) / slices,
                     mode: shape,
-                    i: i.counter,
+                    i: idx,
                     stroke: stroke,
                     fill: customColor,
                     asset: canvasState.asset,
                   });
                 },
               });
-            }
+            });
           },
         });
 

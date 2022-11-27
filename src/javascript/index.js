@@ -42,7 +42,7 @@ Array.prototype.random = function () {
   return this[Math.floor((Math.random()*this.length))];
 }
 
-export const images = [...Array(48).keys()]
+export const images = [...Array(11).keys()]
 
 function appendImage(index, container) {
   const imageTag = document.createElement('img')

@@ -15,7 +15,6 @@ export default function handleMicrophone(
     button.innerHTML = "Listening  <i class='fa fa-volume-up'></i>";
     button.classList.toggle("blink", window.listening);
     startAudioVisual(main, controlBoard, settings);
-    document.querySelector("#someone").className = ".hidden";
   } else {
     window.listening = false;
     button.style.color = "#ccc";
@@ -23,7 +22,6 @@ export default function handleMicrophone(
     button.classList.add("controller__button-start");
     button.innerHTML = "Start  <i class='fa fa-play'></i>";
     button.classList.toggle("blink", window.listening);
-    document.querySelector("#someone").className = "";
   }
 }
 
@@ -43,5 +41,5 @@ export function getAudioInput(stream) {
 
   // creating a new typed array for performance reasons
   const frequencyArray = new Uint8Array(unitArray.length);
-  return { analyser, frequencyArray: frequencyArray.reverse() };
+  return { analyser, frequencyArray: frequencyArray };
 }
