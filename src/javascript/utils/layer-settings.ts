@@ -1,5 +1,6 @@
-import { hexToRGB } from "../utils/colors.js";
-import { getType } from "../drawings/drawSettings.js";
+import { hexToRGB } from "../utils/colors";
+import { getType } from "../drawings/drawSettings";
+import { getCanvasElement, getInputElement, getSelectElement } from "./dom-helpers";
 
 export const settings = {
   range: {
@@ -121,35 +122,37 @@ export const RANGES = {
 };
 
 export const updateControllersValues = (layer, index) => {
-  const result = {};
+  const result: any = {};
   for (const [key, value] of Object.entries(settings)) {
     const type = getType(settings[key]);
 
     switch (type) {
       case "color":
         result["colorWell"] = hexToRGB(
-          document
-            .getElementsByClassName(`controller__slider-${key}-${index}`)[0]
-            .value.replace("#", "0x")
+          getInputElement(
+            `.controller__slider-${key}-${index}`
+          ).value.replace("#", "0x")
         );
-
         break;
+
       case "number":
-        result[key] = document.getElementsByClassName(
-          `controller__slider-${key}-${index}`
-        )[0].value;
+        result[key] = getInputElement(
+          `.controller__slider-${key}-${index}`
+        ).value;
+        break;
 
-        break;
       case "select":
-        result[key] = document.getElementsByClassName(
-          `controller__select-${key}-${index}`
-        )[0].value;
+        result[key] = getSelectElement(
+          `.controller__select-${key}-${index}`
+        ).value;
         break;
+
       case "checkbox":
-        result[key] = document.getElementsByClassName(
-          `controller__slider-${key}-${index}`
-        )[0].checked;
+        result[key] = getInputElement(
+          `.controller__slider-${key}-${index}`
+        ).checked;
         break;
+
       default:
         break;
     }
@@ -159,8 +162,9 @@ export const updateControllersValues = (layer, index) => {
   const rangeEnd = RANGES[result.range].max;
 
   // hardcoded 1 instead of {index} because using always the same canvas
-  const canvas = document.getElementsByClassName(`canvas-1`)[0]; 
+  const canvas = getCanvasElement(`.canvas-1`);
   const canvasContext = canvas.getContext("2d");
+  
 
   return {
     rangeStart,

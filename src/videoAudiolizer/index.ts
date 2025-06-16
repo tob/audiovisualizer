@@ -1,11 +1,46 @@
-import { rotate, updateAngles } from "../utils/transform.js";
-import { settings, updateControllersValues } from "../utils/layer-settings.js";
-import { getPatternXy, drawShape, applyStyle } from "./shapes.js";
-import { getAverageValue } from "../utils/math.js";
-import { getAudioInput } from "../utils/microphone.js";
+import { rotate, updateAngles } from "../javascript/utils/transform";
+import {
+  settings,
+  updateControllersValues,
+} from "../javascript/utils/layer-settings";
+import { getPatternXy, drawShape } from "../javascript/drawings/shapes";
+import { getAverageValue, getPercentage } from "../javascript/utils/math";
+import { getAudioInput } from "../javascript/utils/microphone";
+import { images } from "../javascript";
+
+declare global {
+  interface Window {
+    listening: boolean;
+  }
+}
+
+declare global {
+  interface HTMLVideoElement {
+    captureStream(): MediaStream;
+  }
+}
+
+function reduceArrayToAverages(array, slices) {
+  const rangeSize = Math.round(array.length / slices); // 16
+  const newArray = [];
+
+  for (let index = 0; index <= slices; index++) {
+    const averageSlice =
+      array
+        .slice(index * rangeSize, index * rangeSize + rangeSize)
+        .reduce((prev, next) => prev + next, 0) / rangeSize;
+    newArray[index] = Math.floor(averageSlice);
+  }
+
+  return newArray;
+}
 
 function clearCanvas() {
-  const clearCanvas = document.querySelector(`.controller__clear`).checked;
+  const checkbox = document.querySelector(".controller__clear");
+
+  if (checkbox instanceof HTMLInputElement) {
+    const clearCanvas = checkbox.checked;
+  }
   if (!clearCanvas) return;
 
   const canvases = Array.prototype.slice.apply(
@@ -21,10 +56,27 @@ function clearCanvas() {
 function startAudioVisual() {
   "use strict";
 
-  const soundAllowed = function (stream) {
+  // // get stream from video or audio source
+  // ✅ Patch the type
+  console.log("Calling startAudioVisual()");
+  console.log("Persisted stream:", window.persistAudioStream);
+
+  const el = document.querySelector("#video");
+
+  // ✅ Use instanceof to narrow the type
+  if (!(el instanceof HTMLVideoElement)) {
+    throw new Error("Expected #video to be a <video> element");
+  }
+
+  // ✅ Now captureStream is known to exist
+  const stream = el.captureStream();
+
+  const soundAllowed = function (stream: MediaStream) {
+    // (stream) to get input from microphone
     const { analyser, frequencyArray } = getAudioInput(stream);
     const state = {
       canvas1: {
+        asset: 1,
         angles: 0,
         prevColorWell: null,
         prevAverage: 0,
@@ -32,13 +84,13 @@ function startAudioVisual() {
         currentPattern: "center",
       },
       canvas2: {
-        angles: 360,
+        asset: 1,
+        angles: 0,
         prevColorWell: null,
         prevAverage: 0,
         prevPattern: "center",
         currentPattern: "center",
       },
-
       data: { search_params: new URLSearchParams(window.location.search) },
     };
     let volume;
@@ -55,6 +107,7 @@ function startAudioVisual() {
       // requestAnimationFrame(doDraw);
       analyser.getByteFrequencyData(frequencyArray);
 
+      // create an array from the html elements with classname container-buttons
       const layers = Array.prototype.slice.apply(
         document.getElementsByClassName("container-buttons")
       );
@@ -79,27 +132,38 @@ function startAudioVisual() {
           canvasContext,
           pattern,
           shape,
-        } = updateControllersValues(layer, index);
+          slices,
+        }: any = updateControllersValues(layer, index);
 
         const canvasState = state[`canvas${index}`];
+        const newAsset =
+          canvasState.asset === images.length - 1 ? 0 : canvasState.asset + 1;
         canvasContext.globalCompositeOperation = effect;
         const averageVolume = getAverageValue(frequencyArray);
-        const triggerRandom = (pattern === "random" &&
-        averageVolume - canvasState.prevAverage >= 5) ||
-      (pattern === "random" && canvasState.prevPattern !== "random")
-        
-        if (
-          triggerRandom
-        ) {
+
+        if (averageVolume > 50) {
+          state[`canvas${index}`].asset = newAsset;
+        }
+
+        const triggerRandom =
+          (pattern === "random" &&
+            averageVolume - canvasState.prevAverage >= 5) ||
+          (pattern === "random" && canvasState.prevPattern !== "random");
+
+        if (triggerRandom) {
           const filteredPattern = settings.pattern.list.filter(
             (value) => value !== "random"
           );
 
-          (state[`canvas${index}`].currentPattern =
-            filteredPattern[
-              Math.floor(Math.random() * filteredPattern.length)
-            ]),
-            (state[`canvas${index}`].prevPattern = pattern);
+          state[`canvas${index}`] = {
+            ...canvasState,
+            currentPattern:
+              filteredPattern[
+                Math.floor(Math.random() * filteredPattern.length)
+              ],
+            prevPattern: pattern,
+            asset: newAsset,
+          };
         } else if (pattern !== "random") {
           state[`canvas${index}`] = {
             ...canvasState,
@@ -121,7 +185,6 @@ function startAudioVisual() {
           ${colorWell.b + volume},
           ${opacity / 100})`;
 
-        
         // rotate the full canvas
         rotate({
           ctx: canvasContext,
@@ -131,46 +194,46 @@ function startAudioVisual() {
           draw: () => {
             // For each frequency in range draw something
             const startIndex = Math.round(rangeStart * frequencyArray.length);
-            const stopIndex = Math.round(rangeEnd * frequencyArray.length);
-            for (
-              let i = { position: startIndex, counter: 0 };
-              i.counter < stopIndex && i.counter <= frequencyArray.length;
-              i.counter++
-            ) {
-              volume = Math.floor(frequencyArray[i.position]);
-              i.position++;
+            const stopIndex = Math.round(rangeEnd * frequencyArray.length) - 1;
+            const filteredFrequencies = reduceArrayToAverages(
+              frequencyArray.slice(startIndex, stopIndex),
+              slices
+            );
 
+            filteredFrequencies.map((volume, idx) => {
               const { x: posX, y: posY } = getPatternXy({
-                pattern,
+                // pattern,
                 canvas: canvas,
                 radius: canvas.width / 100 + volume,
                 size: size,
                 volume,
-                i: i.counter,
+                i: idx,
                 mode: state[`canvas${index}`].currentPattern,
                 width: (volume / 5) * size,
-                arrayLength: stopIndex - startIndex,
+                arrayLength: filteredFrequencies.length,
+                asset: newAsset,
               });
-            
+
               rotate({
                 x: posX,
                 y: posY,
-                degree: twist && (canvasState.angles + i.counter), // kaleidoscope effect << !!!!!
+                degree: twist && canvasState.angles + idx, // kaleidoscope effect << !!!!!
                 ctx: canvasContext,
                 draw: () => {
                   drawShape({
                     x: posX,
                     y: posY,
                     ctx: canvasContext,
-                    width: (volume / 5) * size,
+                    width: (300 + volume * size) / slices,
                     mode: shape,
-                    i: i.counter,
+                    i: idx,
                     stroke: stroke,
-                    fill: customColor
-                  });       
+                    fill: customColor,
+                    asset: canvasState.asset,
+                  } as any);
                 },
               });
-            }
+            });
           },
         });
 
@@ -196,7 +259,16 @@ function startAudioVisual() {
 														navigator.webkitGetUserMedia ||
 														navigator.mozGetUserMedia    ||
 														null;*/
-  navigator.getUserMedia({ audio: true }, soundAllowed, soundNotAllowed);
+  // navigator.getUserMedia({ audio: true }, soundAllowed, soundNotAllowed);
+  navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .then((stream) => {
+      soundAllowed(stream);
+    })
+    .catch((err) => {
+      console.error("Error accessing media devices.", err);
+      soundNotAllowed;
+    });
 }
 
 export { startAudioVisual };

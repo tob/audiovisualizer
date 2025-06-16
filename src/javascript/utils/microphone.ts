@@ -1,12 +1,15 @@
-// import { startAudioVisual } from "../drawings/startDrawing.js";
-import { startAudioVisual } from "../../videoAudiolizer/index.js";
-export default function handleMicrophone(
-  button,
-  main,
-  controlBoard,
-  settings,
-  listening
-) {
+// import { startAudioVisual } from "../drawings/startDrawing";
+import { startAudioVisual } from "../../videoAudiolizer/index";
+
+export {};
+
+declare global {
+  interface Window {
+    persistAudioStream?: MediaStream;
+  }
+}
+
+export default function handleMicrophone(button) {
   if (button.classList.contains("controller__button-start")) {
     window.listening = true;
     button.style.color = "red";
@@ -14,7 +17,7 @@ export default function handleMicrophone(
     button.classList.add("controller__button-pause");
     button.innerHTML = "Listening  <i class='fa fa-volume-up'></i>";
     button.classList.toggle("blink", window.listening);
-    startAudioVisual(main, controlBoard, settings);
+    startAudioVisual();
   } else {
     window.listening = false;
     button.style.color = "#ccc";

@@ -1,5 +1,6 @@
-import { images } from "../index.js";
-import { getPercentage } from "../utils/math.js";
+import { images } from "../";
+import { getVideoElement } from "../utils/dom-helpers";
+import { getPercentage } from "../utils/math";
 
 let cursorX;
 let cursorY;
@@ -34,32 +35,32 @@ function drawStar(ctx, x, y, spikes, outerRadius, innerRadius) {
 }
 
 // FORK
-function fork(x, y, volume) {
-  canvasContext.lineWidth = 5;
-  canvasContext.strokeStyle = "silver";
-  canvasContext.fillStyle = "silver";
-  for (let i = 0; i < 4; i++) {
-    canvasContext.beginPath();
-    canvasContext.moveTo(2 * i * 10, volume);
-    canvasContext.bezierCurveTo(
-      20 + i * 10,
-      150 + i * 10,
-      20 + i * 10,
-      50 + i * 10,
-      100,
-      100
-    );
-    canvasContext.stroke();
-  }
+// function fork(x, y, volume) {
+//   canvasContext.lineWidth = 5;
+//   canvasContext.strokeStyle = "silver";
+//   canvasContext.fillStyle = "silver";
+//   for (let i = 0; i < 4; i++) {
+//     canvasContext.beginPath();
+//     canvasContext.moveTo(2 * i * 10, volume);
+//     canvasContext.bezierCurveTo(
+//       20 + i * 10,
+//       150 + i * 10,
+//       20 + i * 10,
+//       50 + i * 10,
+//       100,
+//       100
+//     );
+//     canvasContext.stroke();
+//   }
 
-  canvasContext.beginPath();
-  canvasContext.moveTo(x, y);
-  canvasContext.lineTo(x * 3, y * 2);
-  canvasContext.lineTo(x * 3 + 20, y * 2);
-  canvasContext.closePath();
-  canvasContext.stroke();
-  canvasContext.fill();
-}
+//   canvasContext.beginPath();
+//   canvasContext.moveTo(x, y);
+//   canvasContext.lineTo(x * 3, y * 2);
+//   canvasContext.lineTo(x * 3 + 20, y * 2);
+//   canvasContext.closePath();
+//   canvasContext.stroke();
+//   canvasContext.fill();
+// }
 
 // draw spiral
 function circlePos(radius, i) {
@@ -331,12 +332,12 @@ function applyStyle({ ctx, stroke, fill, asset }) {
   }
 
   // if (asset) {
-    const selector = "#image-" + asset;
-    return { video: document.querySelector(selector) };
+  // const selector = "#image-" + asset;
+  // return { video: getVideoElement(selector) };
   // }
 
-  // const video = document.querySelector("#webcam");
-  // return { video };
+  const video = document.querySelector("#webcam");
+  return { video };
 }
 
 export {
@@ -347,5 +348,5 @@ export {
   drawShape,
   inRange,
   circlePos,
-  fork,
+  // fork,
 };

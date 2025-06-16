@@ -1,5 +1,7 @@
-import { getIndexFromValue, getPercentage } from "./math.js";
-import { hexToRGB } from "./colors.js";
+import { getIndexFromValue, getPercentage } from "./math";
+import { hexToRGB, rgbToHex } from "./colors";
+import { getInputElement, getSelectElement } from "./dom-helpers";
+import { settings } from "./layer-settings";
 export function connectMidi() {
   navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
 
@@ -13,12 +15,12 @@ export function connectMidi() {
     const control = midiMessage.data[1];
     const value = midiMessage.data[2];
     if (!control) return;
-    const colorWell = document.querySelector(".controller__slider-color-1");
+    const colorWell = getInputElement(".controller__slider-color-1");
     const color = hexToRGB(colorWell.value.replace("#", "0x"));
     let newHex = colorWell.value;
     switch (control) {
       case 3:
-        const rangeControl = document.querySelector(
+        const rangeControl = getSelectElement(
           ".controller__select-range-1"
         );
         const ranges = settings.range.list;
@@ -28,7 +30,7 @@ export function connectMidi() {
         // size.value = value / 10;
         break;
       case 4:
-        const patternControl = document.querySelector(
+        const patternControl = getSelectElement(
           ".controller__select-pattern-1"
         );
         const patterns = settings.pattern.list;
@@ -36,7 +38,7 @@ export function connectMidi() {
           patterns[getIndexFromValue(patterns.length - 1, value)];
         break;
       case 5:
-        const shape = document.querySelector(".controller__select-shape-1");
+        const shape = getSelectElement(".controller__select-shape-1");
         const shapes = settings.shape.list;
         shape.value = shapes[getIndexFromValue(shapes.length - 1, value)];
         break;

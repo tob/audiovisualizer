@@ -1,30 +1,13 @@
-import { rotate, updateAngles } from "../javascript/utils/transform.js";
-import {
-  settings,
-  updateControllersValues,
-} from "../javascript/utils/layer-settings.js";
-import { getPatternXy, drawShape } from "../javascript/drawings/shapes.js";
-import { getAverageValue, getPercentage } from "../javascript/utils/math.js";
-import { getAudioInput } from "../javascript/utils/microphone.js";
-import { images } from "../javascript/index.js";
-
-function reduceArrayToAverages(array, slices) {
-  const rangeSize = Math.round(array.length / slices); // 16
-  const newArray = [];
-
-  for (let index = 0; index <= slices; index++) {
-    const averageSlice =
-      array
-        .slice(index * rangeSize, index * rangeSize + rangeSize)
-        .reduce((prev, next) => prev + next, 0) / rangeSize;
-    newArray[index] = Math.floor(averageSlice);
-  }
-
-  return newArray;
-}
+import { rotate, updateAngles } from "../utils/transform";
+import { settings, updateControllersValues } from "../utils/layer-settings";
+import { getPatternXy, drawShape, applyStyle } from "./shapes";
+import { getAverageValue } from "../utils/math";
+import { getAudioInput } from "../utils/microphone";
+import { getInputElement } from "../utils/dom-helpers";
 
 function clearCanvas() {
-  const clearCanvas = document.querySelector(`.controller__clear`).checked;
+  const el = getInputElement(`.controller__clear`);
+  const clearCanvas = el?.checked ?? false;
   if (!clearCanvas) return;
 
   const canvases = Array.prototype.slice.apply(
@@ -44,7 +27,6 @@ function startAudioVisual() {
     const { analyser, frequencyArray } = getAudioInput(stream);
     const state = {
       canvas1: {
-        asset: 1,
         angles: 0,
         prevColorWell: null,
         prevAverage: 0,
@@ -52,13 +34,13 @@ function startAudioVisual() {
         currentPattern: "center",
       },
       canvas2: {
-        asset: 1,
-        angles: 0,
+        angles: 360,
         prevColorWell: null,
         prevAverage: 0,
         prevPattern: "center",
         currentPattern: "center",
       },
+
       data: { search_params: new URLSearchParams(window.location.search) },
     };
     let volume;
@@ -75,7 +57,6 @@ function startAudioVisual() {
       // requestAnimationFrame(doDraw);
       analyser.getByteFrequencyData(frequencyArray);
 
-      // create an array from the html elements with classname container-buttons
       const layers = Array.prototype.slice.apply(
         document.getElementsByClassName("container-buttons")
       );
@@ -100,19 +81,11 @@ function startAudioVisual() {
           canvasContext,
           pattern,
           shape,
-          slices,
-        } = updateControllersValues(layer, index);
+        }: any = updateControllersValues(layer, index);
 
         const canvasState = state[`canvas${index}`];
-        const newAsset =
-          canvasState.asset === images.length -1 ? 0 : canvasState.asset + 1;
         canvasContext.globalCompositeOperation = effect;
         const averageVolume = getAverageValue(frequencyArray);
-
-        if (averageVolume > 50) {
-          state[`canvas${index}`].asset = newAsset;
-        }
-
         const triggerRandom =
           (pattern === "random" &&
             averageVolume - canvasState.prevAverage >= 5) ||
@@ -123,15 +96,11 @@ function startAudioVisual() {
             (value) => value !== "random"
           );
 
-          state[`canvas${index}`] = {
-            ...canvasState,
-            currentPattern:
-              filteredPattern[
-                Math.floor(Math.random() * filteredPattern.length)
-              ],
-            prevPattern: pattern,
-            asset: newAsset,
-          };
+          (state[`canvas${index}`].currentPattern =
+            filteredPattern[
+              Math.floor(Math.random() * filteredPattern.length)
+            ]),
+            (state[`canvas${index}`].prevPattern = pattern);
         } else if (pattern !== "random") {
           state[`canvas${index}`] = {
             ...canvasState,
@@ -162,46 +131,46 @@ function startAudioVisual() {
           draw: () => {
             // For each frequency in range draw something
             const startIndex = Math.round(rangeStart * frequencyArray.length);
-            const stopIndex = Math.round(rangeEnd * frequencyArray.length) - 1;
-            const filteredFrequencies = reduceArrayToAverages(
-              frequencyArray.slice(startIndex, stopIndex),
-              slices
-            );
+            const stopIndex = Math.round(rangeEnd * frequencyArray.length);
+            for (
+              let i = { position: startIndex, counter: 0 };
+              i.counter < stopIndex && i.counter <= frequencyArray.length;
+              i.counter++
+            ) {
+              volume = Math.floor(frequencyArray[i.position]);
+              i.position++;
 
-            filteredFrequencies.map((volume, idx) => {
               const { x: posX, y: posY } = getPatternXy({
-                pattern,
                 canvas: canvas,
                 radius: canvas.width / 100 + volume,
                 size: size,
                 volume,
-                i: idx,
+                i: i.counter,
                 mode: state[`canvas${index}`].currentPattern,
                 width: (volume / 5) * size,
-                arrayLength: filteredFrequencies.length,
-                asset: newAsset,
+                arrayLength: stopIndex - startIndex,
+                asset: "", // TO-DO check what is this
               });
 
               rotate({
                 x: posX,
                 y: posY,
-                degree: twist && canvasState.angles + idx, // kaleidoscope effect << !!!!!
+                degree: twist && canvasState.angles + i.counter, // kaleidoscope effect << !!!!!
                 ctx: canvasContext,
                 draw: () => {
                   drawShape({
                     x: posX,
                     y: posY,
                     ctx: canvasContext,
-                    width: (300 + volume * size) / slices,
+                    width: (volume / 5) * size,
                     mode: shape,
-                    i: idx,
+                    i: i.counter,
                     stroke: stroke,
                     fill: customColor,
-                    asset: canvasState.asset,
-                  });
+                  } as any);
                 },
               });
-            });
+            }
           },
         });
 
@@ -227,7 +196,10 @@ function startAudioVisual() {
 														navigator.webkitGetUserMedia ||
 														navigator.mozGetUserMedia    ||
 														null;*/
-  navigator.getUserMedia({ audio: true }, soundAllowed, soundNotAllowed);
+  navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .then(soundAllowed)
+    .catch(soundNotAllowed);
 }
 
 export { startAudioVisual };

@@ -3,9 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>AudioVisualizer</title>
-    <link rel="stylesheet" href="src/styles/index.css" type="text/css" />
-    <link rel="stylesheet" href="src/styles/controlBoard.css" type="text/css" />
-    <link rel="stylesheet" href="src/styles/controller.css" type="text/css" />
 
     <!-- Add Font from fonts.googlepis -->
     <link
@@ -18,11 +15,9 @@
       crossorigin="anonymous"
     ></script>
 
-    <!-- Add draggable library -->
-    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
 
-    <script type="module" src="src/javascript/index.js"></script>
-    <script type="module" src="src/javascript/utils/urlshortener.js"></script>
+
+    <script type="module" src="bundle.js" defer></script>
   </head>
   <body class="body">
     <div class="header">
@@ -65,24 +60,26 @@
       <div id="main"></div>
       <video id="webcam" autoplay="true" class="picCapture"></video>
 
-      <video
+      <video id="video" controls autoplay src="assets/ellen.mp4"></video>
+
+      <!-- <video
       id="video"
       controls
       autoplay
-      muted
+      
       src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm"
-    ></video>
+    ></video> -->
       <div class="assets-container">
         <img id="image" src="assets/brass/002.jpg" />
       </div>
     </div>
-    
+
     <!--    <div>-->
     <!--      <img class="snapshot" src="src/assets/desertdog.jpg" />-->
     <!--    </div>-->
+    <video id="recording" autoplay muted playsinline></video>
 
     <div>
-      
       <!-- <div id="gradient"></div> -->
       <!-- <video style="display: none;" id="someone" controls autoplay muted loop>
         <source src="./src/assets/videoplayback.mp4" type="video/mp4" />

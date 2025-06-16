@@ -15,7 +15,6 @@ export const getType = (setting) => {
 };
 
 const createButtons = (parent, settings, i) => {
-
   // Create draggable layer container
   const containerButtons = document.createElement("div");
   containerButtons.className = "container-buttons";
@@ -25,10 +24,10 @@ const createButtons = (parent, settings, i) => {
   // Control visualization
   for (let setting in settings) {
     const { list, value, min, max, icon, checked } = settings[setting];
- 
+
     const type = getType(settings[setting]);
 
-    console.log(type)
+    console.log(type);
 
     const button = document.createElement("span");
     button.className = `controller__button controller__button-${icon}`;
@@ -47,36 +46,41 @@ const createButtons = (parent, settings, i) => {
       ? document.createElement("select")
       : document.createElement("input");
 
-    input.setAttribute('type', type);
+    input.setAttribute("type", type);
     input.className = `controller__slider-${setting}-${i}`;
     input.value = value;
 
     containerInput.appendChild(input);
 
     switch (type) {
-      case "number":
-        input.min = min;
-        input.max = max || i;
-        input.innerText = value;
+      case "number": {
+        const numberInput = input as HTMLInputElement;
+        numberInput.min = min;
+        numberInput.max = max || i;
+        numberInput.innerText = value;
         break;
-      case "checkbox":
+      }
+      case "checkbox": {
+        const checkboxInput = input as HTMLInputElement;
         const toggle = document.createElement("span");
         toggle.className = "controller__toggle";
         containerInput.appendChild(toggle);
-        toggle.checked = checked;
+        // You likely wanted to set checkboxInput.checked = checked; instead of toggle.checked
+        checkboxInput.checked = checked;
         break;
-      case "select":
-        input.className = `controller__select-${setting}-${i}`;
-        // create option value for each option and append inside selector
+      }
+      case "select": {
+        const selectInput = input as HTMLSelectElement;
+        selectInput.className = `controller__select-${setting}-${i}`;
         list.map((option) => {
           let element = document.createElement("option");
           element.value = option;
           element.innerText = option;
-          input.appendChild(element);
+          selectInput.appendChild(element);
         });
-
-        input.selectedIndex = list.indexOf(value);
+        selectInput.selectedIndex = list.indexOf(value);
         break;
+      }
     }
   }
 };
