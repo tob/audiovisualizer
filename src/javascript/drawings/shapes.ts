@@ -1,4 +1,6 @@
-import { rotate } from "../utils/transform.js";
+import { images } from "../";
+import { getVideoElement } from "../utils/dom-helpers";
+import { getPercentage } from "../utils/math";
 
 let cursorX;
 let cursorY;
@@ -33,32 +35,32 @@ function drawStar(ctx, x, y, spikes, outerRadius, innerRadius) {
 }
 
 // FORK
-function fork(x, y, volume) {
-  canvasContext.lineWidth = 5;
-  canvasContext.strokeStyle = "silver";
-  canvasContext.fillStyle = "silver";
-  for (let i = 0; i < 4; i++) {
-    canvasContext.beginPath();
-    canvasContext.moveTo(2 * i * 10, volume);
-    canvasContext.bezierCurveTo(
-      20 + i * 10,
-      150 + i * 10,
-      20 + i * 10,
-      50 + i * 10,
-      100,
-      100
-    );
-    canvasContext.stroke();
-  }
+// function fork(x, y, volume) {
+//   canvasContext.lineWidth = 5;
+//   canvasContext.strokeStyle = "silver";
+//   canvasContext.fillStyle = "silver";
+//   for (let i = 0; i < 4; i++) {
+//     canvasContext.beginPath();
+//     canvasContext.moveTo(2 * i * 10, volume);
+//     canvasContext.bezierCurveTo(
+//       20 + i * 10,
+//       150 + i * 10,
+//       20 + i * 10,
+//       50 + i * 10,
+//       100,
+//       100
+//     );
+//     canvasContext.stroke();
+//   }
 
-  canvasContext.beginPath();
-  canvasContext.moveTo(x, y);
-  canvasContext.lineTo(x * 3, y * 2);
-  canvasContext.lineTo(x * 3 + 20, y * 2);
-  canvasContext.closePath();
-  canvasContext.stroke();
-  canvasContext.fill();
-}
+//   canvasContext.beginPath();
+//   canvasContext.moveTo(x, y);
+//   canvasContext.lineTo(x * 3, y * 2);
+//   canvasContext.lineTo(x * 3 + 20, y * 2);
+//   canvasContext.closePath();
+//   canvasContext.stroke();
+//   canvasContext.fill();
+// }
 
 // draw spiral
 function circlePos(radius, i) {
@@ -78,14 +80,13 @@ function spiralPos(radius, volume, i) {
   };
 }
 
-function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
+function drawShape({ ctx, x, y, width, style, stroke, fill, mode, i, asset, fillMode }) {
   ctx.beginPath();
   ctx.fillStyle = style;
   ctx.strokeStyle = stroke;
   switch (mode) {
     case "square":
-      ctx.fillRect(x - width / 2, y - width / 2, width, width);
-      stroke && ctx.strokeRect(x - width / 2, y - width / 2, width, width);
+      ctx.rect(x - width / 2, y - width / 2, width, width);
       break;
     case "circle":
       ctx.arc(x, y, width, 0, 2 * Math.PI);
@@ -101,20 +102,21 @@ function drawShape({ ctx, x, y, width, style, stroke, mode, i }) {
       break;
   }
 
-  // ctx.closePath();
   ctx.clip();
-  if (stroke) {
-    ctx.strokeStyle = stroke;
-    ctx.stroke();
-  }
 
-  if (style) {
-    ctx.fillStyle = style;
-    ctx.fill();
-  }
+  const { video } = applyStyle({
+    ctx,
+    stroke,
+    fill,
+    fillMode,
+  });
 
-  const video = document.querySelector("#someone");
-  ctx.drawImage(video, x - width, y - width, width*2,width*2);
+  if (fillMode === "video" && video) {
+    // Draw video scaled to fit the bounding box of the shape
+    const videoAspect = video.videoWidth / video.videoHeight;
+    const size = width * 2;
+    ctx.drawImage(video, x - width, y - width, size, size);
+  }
 }
 
 function findTime() {
@@ -224,20 +226,19 @@ function drawBars(arrayFreq, canvasContext, canvas) {
   }
 }
 
-function drawPattern({
-  ctx,
+function getPatternXy({
   canvas,
   radius,
   volume,
   width,
   size,
   i,
-  shape,
   mode = "circle",
-  twist,
   arrayLength,
+  asset,
 }) {
   const { time, timeUnits, timeRadius } = findTimeofI(i, radius, arrayLength);
+
   const squares =
     Math.sqrt(arrayLength) > 0 ? Math.round(Math.sqrt(arrayLength)) : 1;
   const modes = {
@@ -273,6 +274,10 @@ function drawPattern({
       x: (canvas.width / arrayLength) * i,
       y: canvas.height / 2,
     },
+    verticalLine: {
+      x: (canvas.width * getPercentage(images.length, asset)) / 100 - width,
+      y: (canvas.height / arrayLength) * i,
+    },
     diagonal: {
       x: (canvas.width / arrayLength) * i,
       y: canvas.height - (canvas.height / arrayLength) * i,
@@ -299,13 +304,10 @@ function drawPattern({
   const xPos = modes[mode].x;
   const yPos = modes[mode].y;
 
-  rotate({
-    ctx,
+  return {
     x: xPos,
     y: yPos,
-    draw: shape,
-    degree: twist && (360 / 255) * (volume / 255),
-  });
+  };
 }
 
 const getGridpositions = (colNumber, canvas, i) => {
@@ -323,12 +325,28 @@ const getGridpositions = (colNumber, canvas, i) => {
   };
 };
 
+function applyStyle({ ctx, stroke, fill, fillMode }) {
+  if (stroke) {
+    ctx.strokeStyle = stroke;
+    ctx.stroke();
+  }
+
+  if (fillMode === "color" && fill) {
+    ctx.fillStyle = fill;
+    ctx.fill();
+  }
+
+  const video = document.querySelector("#webcam") as HTMLVideoElement;
+  return { video };
+}
+
 export {
+  applyStyle,
   drawBars,
-  drawPattern,
+  getPatternXy,
   smoothLine,
   drawShape,
   inRange,
   circlePos,
-  fork,
+  // fork,
 };

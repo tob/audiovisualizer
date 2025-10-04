@@ -1,17 +1,27 @@
-import handleMicrophone from "./utils/microphone.js";
-import { connectMidi } from "./utils/midi-controller.js";
-import connectWebCam from "./utils/webcam.js";
-import { addCanvas, createButtons } from "./drawings/drawSettings.js";
-import { CanvasRecorder } from "./utils/recorder.js";
-import { handleRecording } from "./utils/recorder.js";
-import { settings } from "./utils/layer-settings.js";
-import {shortenUrl} from "./utils/urlshortener.js"
+import handleMicrophone from "./utils/microphone";
+import { connectMidi } from "./utils/midi-controller";
+import connectWebCam from "./utils/webcam";
+import { addCanvas, createButtons } from "./drawings/drawSettings";
+import { CanvasRecorder } from "./utils/recorder";
+import { handleRecording } from "./utils/recorder";
+import { settings } from "./utils/layer-settings";
+import { shortenUrl } from "./utils/urlshortener";
+import dragula from "dragula";
+import "../styles/index.css";
+import "../styles/controller.css";
+import "../styles/controlBoard.css";
+
+declare global {
+  interface Array<T> {
+    random(): T;
+  }
+}
 
 let size = 1,
   WIDTH = window.innerWidth,
   HEIGHT = window.innerHeight;
 
-function appendImage(canvas, target, downloadButton) {
+function appendSnapshotImage(canvas, target, downloadButton) {
   // set canvasImg image src to data
   canvas.toBlob(function (blob) {
     target.src = URL.createObjectURL(blob);
@@ -38,10 +48,25 @@ function loadDrawingFromParams(parent, settings) {
   }
 }
 
+Array.prototype.random = function () {
+  return this[Math.floor(Math.random() * this.length)];
+};
+
+export const images = [...Array(11).keys()];
+
+function appendImage(index, container) {
+  const imageTag = document.createElement("img");
+  imageTag.src = "assets/brass/00" + index + ".jpg";
+  imageTag.id = "image-" + index;
+  container.appendChild(imageTag);
+}
+
 // Start
 window.onload = () => {
   connectMidi();
   connectWebCam();
+  const imageWrapper = document.querySelector(".assets-container");
+  images.map((img) => appendImage(img, imageWrapper));
   const startButton = document.getElementsByClassName(
     "controller__button-start"
   )[0];
@@ -69,7 +94,7 @@ window.onload = () => {
     document.getElementById("controlboard");
 
   const main = document.getElementById("main");
-  const canvas = addCanvas(main, controlBoard, settings);
+  const canvas = addCanvas(main);
   // Create Recorder
   const recorder = new CanvasRecorder(canvas);
 
@@ -90,11 +115,11 @@ window.onload = () => {
 
   // Grab buttons and assign functions onClick
   startButton.addEventListener("click", () => {
-    handleMicrophone(startButton, main, controlBoard, settings);
+    handleMicrophone(startButton);
   });
 
   shortenButton.addEventListener("click", () => {
-    window.listening && handleMicrophone(startButton, main, controlBoard, settings);
+    window.listening && handleMicrophone(startButton);
     shortenUrl();
   });
   recordButton.addEventListener("click", () =>

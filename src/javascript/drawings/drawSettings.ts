@@ -1,4 +1,4 @@
-const getType = (setting) => {
+export const getType = (setting) => {
   if (setting.max) {
     return "number";
   }
@@ -15,30 +15,29 @@ const getType = (setting) => {
 };
 
 const createButtons = (parent, settings, i) => {
+  // Create draggable layer container
   const containerButtons = document.createElement("div");
   containerButtons.className = "container-buttons";
   containerButtons.draggable = true;
-  // containerButtons.style.order = i;
-  // const containerTitle = document.createElement("h4");
-  // containerTitle.innerText = `level - ${i}`;
-  // containerTitle.className = "container-buttons__title";
+  // Store the layer ID as a data attribute so it persists after reordering
+  containerButtons.setAttribute("data-layer-id", i.toString());
+
+  // Cache for storing input element references (for performance)
+  const inputCache: any = {};
+
   parent.appendChild(containerButtons);
-  // containerButtons.appendChild(containerTitle);
 
   // Control visualization
   for (let setting in settings) {
     const { list, value, min, max, icon, checked } = settings[setting];
+
     const type = getType(settings[setting]);
 
-    const button = document.createElement("span");
-    button.className = icon
-      ? `controller__button controller__button-${icon}`
-      : "controller__button";
-    containerButtons.appendChild(button);
+    console.log(type);
 
-    // const titleButton = document.createElement("p");
-    // titleButton.innerText = setting;
-    // button.appendChild(titleButton);
+    const button = document.createElement("span");
+    button.className = `controller__button controller__button-${icon}`;
+    containerButtons.appendChild(button);
 
     const settingIcon = document.createElement("i");
     settingIcon.className = `fa ${icon}`;
@@ -53,38 +52,49 @@ const createButtons = (parent, settings, i) => {
       ? document.createElement("select")
       : document.createElement("input");
 
-    input.setAttribute('type', type);
+    input.setAttribute("type", type);
     input.className = `controller__slider-${setting}-${i}`;
     input.value = value;
+
+    // Store reference to this input element for fast access
+    inputCache[setting] = input;
 
     containerInput.appendChild(input);
 
     switch (type) {
-      case "number":
-        input.min = min;
-        input.max = max || i;
-        input.innerText = value;
+      case "number": {
+        const numberInput = input as HTMLInputElement;
+        numberInput.min = min;
+        numberInput.max = max || i;
+        numberInput.innerText = value;
         break;
-      case "checkbox":
+      }
+      case "checkbox": {
+        const checkboxInput = input as HTMLInputElement;
         const toggle = document.createElement("span");
         toggle.className = "controller__toggle";
         containerInput.appendChild(toggle);
-        toggle.checked = checked;
+        // You likely wanted to set checkboxInput.checked = checked; instead of toggle.checked
+        checkboxInput.checked = checked;
         break;
-      case "select":
-        input.className = `controller__select-${setting}-${i}`;
-        // create option value for each option and append inside selector
+      }
+      case "select": {
+        const selectInput = input as HTMLSelectElement;
+        selectInput.className = `controller__select-${setting}-${i}`;
         list.map((option) => {
           let element = document.createElement("option");
           element.value = option;
           element.innerText = option;
-          input.appendChild(element);
+          selectInput.appendChild(element);
         });
-
-        input.selectedIndex = list.indexOf(value);
+        selectInput.selectedIndex = list.indexOf(value);
         break;
+      }
     }
   }
+
+  // Store the input cache on the container element for fast retrieval
+  (containerButtons as any).__inputCache = inputCache;
 };
 
 const addCanvas = (main) => {
@@ -94,9 +104,25 @@ const addCanvas = (main) => {
       .length + 1 || 1;
   ctx.className = `canvas-${i}`;
   ctx.id = "canvas";
-  ctx.width = window.innerWidth;
-  ctx.height = window.innerHeight;
+
+  // Set canvas buffer size to match display size
+  const resizeCanvas = () => {
+    ctx.width = window.innerWidth;
+    ctx.height = window.innerHeight;
+    console.log(`Canvas created/resized: ${ctx.width}x${ctx.height}`);
+  };
+
+  // Set initial size before appending
+  resizeCanvas();
+
+  // Also resize when window changes
+  window.addEventListener('resize', resizeCanvas);
+
   main.appendChild(ctx);
+
+  // Force another resize after appending to ensure it's correct
+  setTimeout(resizeCanvas, 0);
+
   return ctx;
 };
 

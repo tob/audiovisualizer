@@ -1,8 +1,10 @@
-// CanvasRecorder.js - smusamashah
+// CanvasRecorder - smusamashah
 // To record canvas efficiently using MediaRecorder
 // https://webrtc.github.io/samples/src/content/capture/canvas-record/
 
-export function CanvasRecorder(canvas, video_bits_per_sec) {
+import { getVideoElement } from "./dom-helpers";
+
+export function CanvasRecorder(canvas, video_bits_per_sec = 2500000) {
   this.start = startRecording;
   this.stop = stopRecording;
   this.save = download;
@@ -16,7 +18,7 @@ export function CanvasRecorder(canvas, video_bits_per_sec) {
     return;
   }
 
-  const video = document.createElement("video");
+  const video = getVideoElement("#recording");
   video.style.display = "none";
 
   function startRecording() {
@@ -41,7 +43,7 @@ export function CanvasRecorder(canvas, video_bits_per_sec) {
     }
     let options = {
       mimeType: supportedType,
-      videoBitsPerSecond: video_bits_per_sec || 2500000, // 2.5Mbps
+      videoBitsPerSecond: video_bits_per_sec, // 2.5Mbps
     };
 
     recordedBlobs = [];

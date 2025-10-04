@@ -3,9 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>AudioVisualizer</title>
-    <link rel="stylesheet" href="src/styles/index.css" type="text/css" />
-    <link rel="stylesheet" href="src/styles/controlBoard.css" type="text/css" />
-    <link rel="stylesheet" href="src/styles/controller.css" type="text/css" />
 
     <!-- Add Font from fonts.googlepis -->
     <link
@@ -18,16 +15,23 @@
       crossorigin="anonymous"
     ></script>
 
-    <!-- Add draggable library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
 
-    <script type="module" src="src/javascript/index.js"></script>
-    <script type="module" src="src/javascript/utils/urlshortener.js"></script> 
+
+    <script type="module" src="bundle.js" defer></script>
   </head>
   <body class="body">
     <div class="header">
       <h1>Audiovisualizer</h1>
       <div id="controller">
+        <span class="controller__button">
+          <i class="fa fa-microphone" aria-hidden="true"></i>
+          <label class="controller__label">
+            <select class="controller__audio-source">
+              <option value="microphone">Microphone</option>
+              <option value="file">File (ellen.mp4)</option>
+            </select>
+          </label>
+        </span>
         <a class="controller__button controller__button-start"
           >Start <i class="fa fa-play"></i>
         </a>
@@ -61,19 +65,31 @@
     </div>
     <div id="controlboard"></div>
 
-    <div id="main"></div>
+    <div id="container">
+      <div id="main"></div>
+      <video id="webcam" autoplay="true" class="picCapture"></video>
 
-    <!--    <div class="assets-container">-->
-    <!--      <img id="background" src="src/assets/desertdog.jpg" />-->
-    <!--    </div>-->
+      <video id="video" controls src="assets/ellen.mp4"></video>
+
+      <!-- <video
+      id="video"
+      controls
+      autoplay
+      
+      src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm"
+    ></video> -->
+      <div class="assets-container">
+        <img id="image" src="assets/brass/002.jpg" />
+      </div>
+    </div>
+
     <!--    <div>-->
     <!--      <img class="snapshot" src="src/assets/desertdog.jpg" />-->
     <!--    </div>-->
+    <video id="recording" autoplay muted playsinline></video>
 
     <div>
-      <video id="video" autoplay="true" class="picCapture"></video>
-      <video id="someone" controls autoplay muted src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm"></video>
-<!-- <div id="gradient"></div> -->
+      <!-- <div id="gradient"></div> -->
       <!-- <video style="display: none;" id="someone" controls autoplay muted loop>
         <source src="./src/assets/videoplayback.mp4" type="video/mp4" />
       </video> -->

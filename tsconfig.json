@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "strict": false, // disables all strict checking
+    "noImplicitAny": false, // allows `any` implicitly
+    "esModuleInterop": true,
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "lib": ["DOM", "ES6"]
+  },
+  "include": ["src"]
+}
