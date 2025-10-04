@@ -28,7 +28,6 @@ display: none;
   top: 0;
   left: 0;
   z-index: -1;
-  /* Don't set width/height in CSS - let JS set canvas buffer size to match viewport */
 }
 
 .header {

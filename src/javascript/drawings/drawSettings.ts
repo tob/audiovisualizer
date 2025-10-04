@@ -7,7 +7,7 @@ export const getType = (setting) => {
     return "select";
   }
 
-  if (setting.checked) {
+  if ('checked' in setting) {
     return "checkbox";
   }
 
