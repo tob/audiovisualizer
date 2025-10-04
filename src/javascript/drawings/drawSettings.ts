@@ -19,6 +19,12 @@ const createButtons = (parent, settings, i) => {
   const containerButtons = document.createElement("div");
   containerButtons.className = "container-buttons";
   containerButtons.draggable = true;
+  // Store the layer ID as a data attribute so it persists after reordering
+  containerButtons.setAttribute("data-layer-id", i.toString());
+
+  // Cache for storing input element references (for performance)
+  const inputCache: any = {};
+
   parent.appendChild(containerButtons);
 
   // Control visualization
@@ -49,6 +55,9 @@ const createButtons = (parent, settings, i) => {
     input.setAttribute("type", type);
     input.className = `controller__slider-${setting}-${i}`;
     input.value = value;
+
+    // Store reference to this input element for fast access
+    inputCache[setting] = input;
 
     containerInput.appendChild(input);
 
@@ -83,6 +92,9 @@ const createButtons = (parent, settings, i) => {
       }
     }
   }
+
+  // Store the input cache on the container element for fast retrieval
+  (containerButtons as any).__inputCache = inputCache;
 };
 
 const addCanvas = (main) => {
@@ -97,12 +109,20 @@ const addCanvas = (main) => {
   const resizeCanvas = () => {
     ctx.width = window.innerWidth;
     ctx.height = window.innerHeight;
+    console.log(`Canvas created/resized: ${ctx.width}x${ctx.height}`);
   };
 
+  // Set initial size before appending
   resizeCanvas();
+
+  // Also resize when window changes
   window.addEventListener('resize', resizeCanvas);
 
   main.appendChild(ctx);
+
+  // Force another resize after appending to ensure it's correct
+  setTimeout(resizeCanvas, 0);
+
   return ctx;
 };
 
