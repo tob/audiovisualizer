@@ -109,12 +109,20 @@ const addCanvas = (main) => {
   const resizeCanvas = () => {
     ctx.width = window.innerWidth;
     ctx.height = window.innerHeight;
+    console.log(`Canvas created/resized: ${ctx.width}x${ctx.height}`);
   };
 
+  // Set initial size before appending
   resizeCanvas();
+
+  // Also resize when window changes
   window.addEventListener('resize', resizeCanvas);
 
   main.appendChild(ctx);
+
+  // Force another resize after appending to ensure it's correct
+  setTimeout(resizeCanvas, 0);
+
   return ctx;
 };
 

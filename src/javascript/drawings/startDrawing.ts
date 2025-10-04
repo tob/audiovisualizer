@@ -20,11 +20,25 @@ function clearCanvas() {
   });
 }
 
-function startAudioVisual() {
+// Track if visualization is already running
+let isRunning = false;
+let currentAnimationId: number | null = null;
+let currentTimeoutId: number | null = null;
+let currentObserver: MutationObserver | null = null;
+
+function startAudioVisual(mediaElement?: HTMLMediaElement) {
   "use strict";
 
-  const soundAllowed = function (stream) {
-    const { analyser, frequencyArray } = getAudioInput(stream);
+  // Don't start if already running
+  if (isRunning) {
+    console.log('Visualization already running');
+    return;
+  }
+
+  isRunning = true;
+
+  const soundAllowed = function (source: MediaStream | HTMLMediaElement) {
+    const { analyser, frequencyArray } = getAudioInput(source);
     const state = {
       canvas1: {
         angles: 0,
@@ -53,22 +67,27 @@ function startAudioVisual() {
     // Watch for layer additions/removals/reordering
     const controlBoard = document.getElementById("controlboard");
     if (controlBoard) {
-      const observer = new MutationObserver(() => {
+      // Disconnect previous observer if exists
+      if (currentObserver) {
+        currentObserver.disconnect();
+      }
+      currentObserver = new MutationObserver(() => {
         cachedLayers = Array.prototype.slice.apply(
           document.getElementsByClassName("container-buttons")
         );
       });
-      observer.observe(controlBoard, { childList: true });
+      currentObserver.observe(controlBoard, { childList: true });
     }
 
     function doDraw() {
-      if (!window.listening) {
+      if (!window.listening || !isRunning) {
         console.log("STOP DRAW");
+        isRunning = false;
         return;
       }
       const fps = 30; // Increased from 16 for smoother animations
-      setTimeout(() => {
-        requestAnimationFrame(doDraw);
+      currentTimeoutId = window.setTimeout(() => {
+        currentAnimationId = requestAnimationFrame(doDraw);
       }, 1000 / fps);
       // requestAnimationFrame(doDraw);
       analyser.getByteFrequencyData(frequencyArray);
@@ -81,9 +100,13 @@ function startAudioVisual() {
 
       // Ensure canvas buffer size matches window size (once per frame, not per layer)
       const canvas = document.querySelector('.canvas-1') as HTMLCanvasElement;
-      if (canvas && (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight)) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+      if (canvas) {
+        if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+      } else {
+        console.error('Canvas not found!');
       }
 
       // For each layer do a drawing
@@ -170,7 +193,8 @@ function startAudioVisual() {
             const stopIndex = Math.round(rangeEnd * frequencyArray.length);
 
             // Filter out bins with very low volume (noise)
-            const minVolume = 10; // Threshold to ignore near-silent bins
+            // Lower threshold for video files which may have quieter highs
+            const minVolume = 5; // Threshold to ignore near-silent bins
 
             for (
               let i = { position: startIndex, counter: 0 };
@@ -238,15 +262,41 @@ function startAudioVisual() {
     console.log(error);
   };
 
-  /*window.navigator = window.navigator || {};
-	/*navigator.getUserMedia =  navigator.getUserMedia       ||
-														navigator.webkitGetUserMedia ||
-														navigator.mozGetUserMedia    ||
-														null;*/
-  navigator.mediaDevices
-    .getUserMedia({ audio: true })
-    .then(soundAllowed)
-    .catch(soundNotAllowed);
+  // If a media element is provided, use it directly
+  if (mediaElement) {
+    soundAllowed(mediaElement);
+  } else {
+    // Otherwise, request microphone access
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then(soundAllowed)
+      .catch(soundNotAllowed);
+  }
 }
 
-export { startAudioVisual };
+function stopAudioVisual() {
+  console.log('Stopping visualization...');
+
+  // Set flags to stop loops
+  isRunning = false;
+  window.listening = false;
+
+  // Cancel pending animation frames and timeouts
+  if (currentAnimationId !== null) {
+    cancelAnimationFrame(currentAnimationId);
+    currentAnimationId = null;
+  }
+
+  if (currentTimeoutId !== null) {
+    clearTimeout(currentTimeoutId);
+    currentTimeoutId = null;
+  }
+
+  // Disconnect mutation observer
+  if (currentObserver) {
+    currentObserver.disconnect();
+    currentObserver = null;
+  }
+}
+
+export { startAudioVisual, stopAudioVisual };
