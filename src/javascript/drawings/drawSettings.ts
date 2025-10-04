@@ -92,8 +92,16 @@ const addCanvas = (main) => {
       .length + 1 || 1;
   ctx.className = `canvas-${i}`;
   ctx.id = "canvas";
-  ctx.width = window.innerWidth;
-  ctx.height = window.innerHeight;
+
+  // Set canvas buffer size to match display size
+  const resizeCanvas = () => {
+    ctx.width = window.innerWidth;
+    ctx.height = window.innerHeight;
+  };
+
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
   main.appendChild(ctx);
   return ctx;
 };

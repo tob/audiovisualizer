@@ -1,5 +1,4 @@
-// import { startAudioVisual } from "../drawings/startDrawing";
-import { startAudioVisual } from "../../videoAudiolizer/index";
+import { startAudioVisual } from "../drawings/startDrawing";
 
 export {};
 

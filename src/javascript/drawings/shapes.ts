@@ -80,7 +80,7 @@ function spiralPos(radius, volume, i) {
   };
 }
 
-function drawShape({ ctx, x, y, width, style, stroke, fill, mode, i, asset }) {
+function drawShape({ ctx, x, y, width, style, stroke, fill, mode, i, asset, fillMode }) {
   ctx.beginPath();
   ctx.fillStyle = style;
   ctx.strokeStyle = stroke;
@@ -108,10 +108,15 @@ function drawShape({ ctx, x, y, width, style, stroke, fill, mode, i, asset }) {
     ctx,
     stroke,
     fill,
-    asset,
+    fillMode,
   });
 
-  asset && ctx.drawImage(video, x - width, y - width, width * 2, width * 2);
+  if (fillMode === "video" && video) {
+    // Draw video scaled to fit the bounding box of the shape
+    const videoAspect = video.videoWidth / video.videoHeight;
+    const size = width * 2;
+    ctx.drawImage(video, x - width, y - width, size, size);
+  }
 }
 
 function findTime() {
@@ -320,23 +325,18 @@ const getGridpositions = (colNumber, canvas, i) => {
   };
 };
 
-function applyStyle({ ctx, stroke, fill, asset }) {
+function applyStyle({ ctx, stroke, fill, fillMode }) {
   if (stroke) {
     ctx.strokeStyle = stroke;
     ctx.stroke();
   }
 
-  if (fill) {
+  if (fillMode === "color" && fill) {
     ctx.fillStyle = fill;
     ctx.fill();
   }
 
-  // if (asset) {
-  // const selector = "#image-" + asset;
-  // return { video: getVideoElement(selector) };
-  // }
-
-  const video = document.querySelector("#webcam");
+  const video = document.querySelector("#webcam") as HTMLVideoElement;
   return { video };
 }
 

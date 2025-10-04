@@ -81,7 +81,14 @@ function startAudioVisual() {
           canvasContext,
           pattern,
           shape,
+          fillMode,
         }: any = updateControllersValues(layer, index);
+
+        // Ensure canvas buffer size matches window size
+        if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
 
         const canvasState = state[`canvas${index}`];
         canvasContext.globalCompositeOperation = effect;
@@ -167,6 +174,7 @@ function startAudioVisual() {
                     i: i.counter,
                     stroke: stroke,
                     fill: customColor,
+                    fillMode: fillMode,
                   } as any);
                 },
               });

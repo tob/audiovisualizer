@@ -47,6 +47,11 @@ export const settings = {
     icon: "fa-pen",
     checked: true,
   },
+  fillMode: {
+    icon: "fa-fill-drip",
+    list: ["color", "video"],
+    value: "color",
+  },
   color: {
     icon: "fa-palette",
     value: "#ff0f22",
