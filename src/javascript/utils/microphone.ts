@@ -29,19 +29,40 @@ export default function handleMicrophone(button) {
 
 export function getAudioInput(stream) {
   window.persistAudioStream = stream;
-  const audioContent = new AudioContext();
-  const audioStream = audioContent.createMediaStreamSource(stream);
-  const analyser = audioContent.createAnalyser();
-  analyser.fftSize = 64;
-  analyser.minDecibels = -80;
-  analyser.maxDecibels = 0;
-  analyser.smoothingTimeConstant = 0.85;
+  const audioContext = new AudioContext();
+  const audioStream = audioContext.createMediaStreamSource(stream);
+  const analyser = audioContext.createAnalyser();
+
+  // Better FFT size for frequency resolution (512 bins)
+  analyser.fftSize = 1024;
+
+  // Better range for music/voice (filters out very quiet noise)
+  analyser.minDecibels = -70;
+  analyser.maxDecibels = -10;
+
+  // Smoothing for more stable visuals
+  analyser.smoothingTimeConstant = 0.8;
+
   audioStream.connect(analyser);
 
-  // filter out frequencies that hardly get used
-  const unitArray = new Uint8Array(analyser.frequencyBinCount);
+  const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
 
-  // creating a new typed array for performance reasons
-  const frequencyArray = new Uint8Array(unitArray.length);
-  return { analyser, frequencyArray: frequencyArray };
+  // Get sample rate to calculate actual frequencies
+  const sampleRate = audioContext.sampleRate;
+  const nyquist = sampleRate / 2;
+
+  console.log(`Audio Analysis Setup:
+    - Sample Rate: ${sampleRate}Hz
+    - FFT Size: ${analyser.fftSize}
+    - Frequency Bins: ${analyser.frequencyBinCount}
+    - Frequency per Bin: ${nyquist / analyser.frequencyBinCount}Hz
+    - Max Frequency: ${nyquist}Hz
+  `);
+
+  return {
+    analyser,
+    frequencyArray,
+    sampleRate,
+    nyquist
+  };
 }
