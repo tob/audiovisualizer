@@ -1,5 +1,5 @@
 import { hexToRGB } from "../utils/colors";
-import { getType } from "../drawings/drawSettings";
+import { getType } from "../step2/drawings/drawSettings";
 import { getCanvasElement, getInputElement, getSelectElement } from "./dom-helpers";
 
 export const settings = {

@@ -3,7 +3,7 @@ import {
   settings,
   updateControllersValues,
 } from "../javascript/utils/layer-settings";
-import { getPatternXy, drawShape } from "../javascript/drawings/shapes";
+import { getPatternXy, drawShape } from "../javascript/step2/drawings/shapes";
 import { getAverageValue, getPercentage } from "../javascript/utils/math";
 import { getAudioInput } from "../javascript/utils/microphone";
 import { images } from "../javascript";
