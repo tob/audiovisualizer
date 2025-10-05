@@ -176,8 +176,8 @@ function initializeMainUI() {
     (startButton as HTMLElement).style.color = "red";
     startButton.classList.toggle("blink", window.listening);
 
-    // Add delay for video sources
-    if (selectedSource === 'file') {
+    // Add delay for media file sources (video/upload) to ensure proper canvas sizing
+    if (selectedSource === 'file' || selectedSource === 'upload') {
       setTimeout(() => startAudioVisual(), 100);
     } else {
       startAudioVisual();

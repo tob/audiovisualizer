@@ -1,8 +1,9 @@
 import { audioSourceManager } from '../audio/AudioSourceManager';
 import { MicrophoneSource } from '../audio/sources/MicrophoneSource';
 import { MediaElementSource } from '../audio/sources/MediaElementSource';
+import { UploadFileSource } from '../audio/sources/UploadFileSource';
 
-export type SourceType = 'microphone' | 'file';
+export type SourceType = 'microphone' | 'file' | 'upload';
 
 /**
  * Step 1: Source Selection UI
@@ -11,6 +12,7 @@ export type SourceType = 'microphone' | 'file';
 export class SourceSelector {
   private container: HTMLElement;
   private selectedSource?: SourceType;
+  private selectedFile?: File;
   private onSourceSelected?: (source: SourceType) => void;
 
   constructor(containerId: string = 'source-selector') {
@@ -59,6 +61,14 @@ export class SourceSelector {
               <span class="source-selector__label">Video File</span>
               <span class="source-selector__description">Use embedded video file (ellen.mp4)</span>
             </button>
+
+            <button class="source-selector__option source-selector__option--upload" data-source="upload" type="button">
+              <i class="fa fa-upload source-selector__icon"></i>
+              <span class="source-selector__label">Upload File</span>
+              <span class="source-selector__description">Upload your own audio or video file</span>
+              <span class="source-selector__file-name"></span>
+            </button>
+            <input type="file" class="source-selector__file-input" accept="audio/*,video/*" style="display: none;">
           </div>
 
           <button class="source-selector__continue" disabled>
@@ -77,9 +87,19 @@ export class SourceSelector {
   private attachEventListeners(): void {
     const options = this.container.querySelectorAll('.source-selector__option');
     const continueBtn = this.container.querySelector('.source-selector__continue') as HTMLButtonElement;
+    const fileInput = this.container.querySelector('.source-selector__file-input') as HTMLInputElement;
+    const fileNameDisplay = this.container.querySelector('.source-selector__file-name') as HTMLSpanElement;
 
     options.forEach(option => {
-      option.addEventListener('click', () => {
+      option.addEventListener('click', (e) => {
+        // For upload option, trigger file input instead
+        const source = option.getAttribute('data-source') as SourceType;
+        if (source === 'upload') {
+          fileInput.click();
+          e.preventDefault();
+          return;
+        }
+
         // Remove selection from all options
         options.forEach(opt => opt.classList.remove('selected'));
 
@@ -87,15 +107,45 @@ export class SourceSelector {
         option.classList.add('selected');
 
         // Store the selected source
-        this.selectedSource = option.getAttribute('data-source') as SourceType;
+        this.selectedSource = source;
 
         // Enable continue button
         continueBtn.disabled = false;
       });
     });
 
+    // Handle file selection
+    fileInput.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+
+      if (file) {
+        // Store the file
+        this.selectedFile = file;
+        this.selectedSource = 'upload';
+
+        // Update UI
+        options.forEach(opt => opt.classList.remove('selected'));
+        const uploadOption = this.container.querySelector('[data-source="upload"]');
+        uploadOption?.classList.add('selected');
+
+        // Show file name
+        fileNameDisplay.textContent = `Selected: ${file.name}`;
+        fileNameDisplay.style.display = 'block';
+
+        // Enable continue button
+        continueBtn.disabled = false;
+      }
+    });
+
     continueBtn.addEventListener('click', async () => {
       if (!this.selectedSource) return;
+
+      // Validate upload source has a file
+      if (this.selectedSource === 'upload' && !this.selectedFile) {
+        alert('Please select a file to upload');
+        return;
+      }
 
       try {
         continueBtn.disabled = true;
@@ -133,6 +183,15 @@ export class SourceSelector {
     if (!audioSourceManager.getSource('file')) {
       const videoSource = new MediaElementSource('#video');
       audioSourceManager.registerSource('file', videoSource);
+    }
+
+    if (!audioSourceManager.getSource('upload')) {
+      // For upload, we create the source with the selected file
+      if (!this.selectedFile) {
+        throw new Error('No file selected for upload');
+      }
+      const uploadSource = new UploadFileSource(this.selectedFile);
+      audioSourceManager.registerSource('upload', uploadSource);
     }
 
     // Start the selected source
