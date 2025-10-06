@@ -23,47 +23,59 @@
     <!-- Step 1: Source Selector Modal -->
     <div id="source-selector"></div>
 
-    <div class="header">
-      <h1>Audiovisualizer</h1>
-      <div id="controller">
-        <a class="controller__button controller__button-start"
-          >Start <i class="fa fa-play"></i>
-        </a>
-        <a class="controller__button controller__button-shorten"
-          >shorten <i class="fa fa-share"></i>
-        </a>
-        <a class="controller__button controller__button-add"
-          >+++<i class="fa fa-plus"></i> </a
-        ><a class="controller__button controller__button-record"
-          >Record<i class="fa-video"></i>
-        </a>
-        <!--      <a class="controller__button controller__button-saveImage"-->
-        <!--      ><i class="fa fa-image"></i> Snapshot</a-->
-        <!--      >-->
-        <!--      <a class="controller__button snapshot__download" href="#" download=""-->
-        <!--      ><i class="fa fa-download"></i> Save Img</a-->
-        <!--      >-->
-        <!--      <a class=" controller__button controller__button-record"-->
-        <!--      ><i class="fa fa-circle"></i> Record</a-->
+    <!-- Drawer Overlay -->
+    <div id="drawer-overlay" class="drawer-overlay"></div>
 
-        <span class="controller__button">
-          <i class="fa fa-hat-wizard" aria-hidden="true"></i>
-          <label class="controller__switch"
-            ><input
-              type="checkbox"
-              class="controller__clear"
-              value="undefined" /><span class="controller__toggle"></span
-          ></label>
-        </span>
+    <!-- Left Drawer Panel -->
+    <div id="settings-drawer" class="drawer">
+      <div class="drawer__header">
+        <h2 class="drawer__title">Settings</h2>
+        <button class="drawer__close" aria-label="Close settings">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="drawer__content">
+        <div id="controller">
+          <a class="controller__button controller__button-start"
+            >Start <i class="fa fa-play"></i>
+          </a>
+          <a class="controller__button controller__button-shorten"
+            >shorten <i class="fa fa-share"></i>
+          </a>
+          <a class="controller__button controller__button-add"
+            >+++<i class="fa fa-plus"></i> </a
+          ><a class="controller__button controller__button-record"
+            >Record<i class="fa-video"></i>
+          </a>
+
+          <span class="controller__button">
+            <i class="fa fa-hat-wizard" aria-hidden="true"></i>
+            <label class="controller__switch"
+              ><input
+                type="checkbox"
+                class="controller__clear"
+                value="undefined" /><span class="controller__toggle"></span
+            ></label>
+          </span>
+        </div>
+        <div id="controlboard"></div>
       </div>
     </div>
-    <div id="controlboard"></div>
+
+    <!-- Main Header -->
+    <div class="header">
+      <div class="header__left">
+        <button id="drawer-toggle" class="drawer-toggle">
+          <i class="fa fa-bars"></i>
+          <span>Settings</span>
+        </button>
+        <h1>Audiovisualizer</h1>
+      </div>
+    </div>
 
     <div id="container">
       <div id="main"></div>
       <video id="webcam" autoplay="true" class="picCapture"></video>
-
-      <video id="video" controls src="assets/ellen.mp4"></video>
 
       <!-- Container for uploaded media player -->
       <div id="uploaded-media-player"></div>
