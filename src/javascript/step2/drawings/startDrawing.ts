@@ -1,9 +1,9 @@
-import { rotate, updateAngles } from "../utils/transform";
-import { settings, updateControllersValues } from "../utils/layer-settings";
+import { rotate, updateAngles } from "../../utils/transform";
+import { settings, updateControllersValues } from "../../utils/layer-settings";
 import { getPatternXy, drawShape, applyStyle } from "./shapes";
-import { getAverageValue } from "../utils/math";
-import { getAudioInput } from "../utils/microphone";
-import { getInputElement } from "../utils/dom-helpers";
+import { getAverageValue } from "../../utils/math";
+import { audioSourceManager } from "../../audio/AudioSourceManager";
+import { getInputElement } from "../../utils/dom-helpers";
 
 function clearCanvas() {
   const el = getInputElement(`.controller__clear`);
@@ -26,7 +26,7 @@ let currentAnimationId: number | null = null;
 let currentTimeoutId: number | null = null;
 let currentObserver: MutationObserver | null = null;
 
-function startAudioVisual(mediaElement?: HTMLMediaElement) {
+function startAudioVisual() {
   "use strict";
 
   // Don't start if already running
@@ -37,8 +37,29 @@ function startAudioVisual(mediaElement?: HTMLMediaElement) {
 
   isRunning = true;
 
-  const soundAllowed = function (source: MediaStream | HTMLMediaElement) {
-    const { analyser, frequencyArray } = getAudioInput(source);
+  const soundAllowed = function () {
+    // Get analyzer from the audio source manager
+    const analyzerResult = audioSourceManager.getAnalyzerResult();
+    if (!analyzerResult) {
+      console.error('No audio analyzer available. Make sure an audio source is started first.');
+      isRunning = false;
+      return;
+    }
+
+    const { analyser, frequencyArray } = analyzerResult;
+
+    // Debug: Check canvas size at start and force resize all canvases
+    const allCanvases = document.querySelectorAll('canvas');
+    console.log(`Starting visualization - Found ${allCanvases.length} canvas(es), Window: ${window.innerWidth}x${window.innerHeight}`);
+
+    allCanvases.forEach((canvas, i) => {
+      const htmlCanvas = canvas as HTMLCanvasElement;
+      console.log(`Canvas ${i+1} before: ${htmlCanvas.width}x${htmlCanvas.height}`);
+      // Force canvas buffer size to match window
+      htmlCanvas.width = window.innerWidth;
+      htmlCanvas.height = window.innerHeight;
+      console.log(`Canvas ${i+1} after: ${htmlCanvas.width}x${htmlCanvas.height}`);
+    });
     const state = {
       canvas1: {
         angles: 0,
@@ -258,20 +279,9 @@ function startAudioVisual(mediaElement?: HTMLMediaElement) {
     doDraw();
   };
 
-  const soundNotAllowed = function (error) {
-    console.log(error);
-  };
-
-  // If a media element is provided, use it directly
-  if (mediaElement) {
-    soundAllowed(mediaElement);
-  } else {
-    // Otherwise, request microphone access
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then(soundAllowed)
-      .catch(soundNotAllowed);
-  }
+  // Audio source is already initialized by audioSourceManager
+  // Just start the visualization loop
+  soundAllowed();
 }
 
 function stopAudioVisual() {

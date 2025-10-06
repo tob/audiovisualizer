@@ -1,6 +1,6 @@
-import { images } from "../";
-import { getVideoElement } from "../utils/dom-helpers";
-import { getPercentage } from "../utils/math";
+import { images } from "../../";
+import { getVideoElement } from "../../utils/dom-helpers";
+import { getPercentage } from "../../utils/math";
 
 let cursorX;
 let cursorY;

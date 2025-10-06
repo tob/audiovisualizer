@@ -20,18 +20,12 @@
     <script type="module" src="bundle.js" defer></script>
   </head>
   <body class="body">
+    <!-- Step 1: Source Selector Modal -->
+    <div id="source-selector"></div>
+
     <div class="header">
       <h1>Audiovisualizer</h1>
       <div id="controller">
-        <span class="controller__button">
-          <i class="fa fa-microphone" aria-hidden="true"></i>
-          <label class="controller__label">
-            <select class="controller__audio-source">
-              <option value="microphone">Microphone</option>
-              <option value="file">File (ellen.mp4)</option>
-            </select>
-          </label>
-        </span>
         <a class="controller__button controller__button-start"
           >Start <i class="fa fa-play"></i>
         </a>
@@ -70,6 +64,9 @@
       <video id="webcam" autoplay="true" class="picCapture"></video>
 
       <video id="video" controls src="assets/ellen.mp4"></video>
+
+      <!-- Container for uploaded media player -->
+      <div id="uploaded-media-player"></div>
 
       <!-- <video
       id="video"
