@@ -1,0 +1,160 @@
+/* Left Drawer Panel */
+
+.drawer {
+  position: fixed;
+  top: 0;
+  left: -350px; /* Hidden by default */
+  width: 350px;
+  height: 100vh;
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
+  border-right: 1px solid #333;
+}
+
+.drawer.open {
+  left: 0;
+}
+
+.drawer__header {
+  position: sticky;
+  top: 0;
+  background: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.drawer__title {
+  font-size: 20px;
+  color: #fff;
+  margin: 0;
+  font-weight: 300;
+}
+
+.drawer__close {
+  background: transparent;
+  border: none;
+  color: #ccc;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: color 0.2s;
+}
+
+.drawer__close:hover {
+  color: #fff;
+}
+
+.drawer__content {
+  padding: 20px;
+}
+
+/* Overlay/Backdrop */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.drawer-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Toggle Button */
+.drawer-toggle {
+  background: rgba(30, 30, 30, 0.9);
+  border: 1px solid #444;
+  color: #ccc;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.drawer-toggle:hover {
+  background: rgba(50, 50, 50, 0.9);
+  color: #fff;
+  border-color: #666;
+}
+
+.drawer-toggle i {
+  font-size: 18px;
+}
+
+/* Adjust header to accommodate toggle button */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.header__left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Move controls styling into drawer */
+.drawer #controller {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.drawer #controlboard {
+  margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .drawer {
+    width: 85vw;
+    left: -85vw;
+  }
+}
+
+/* Scrollbar styling for drawer */
+.drawer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.drawer::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.drawer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.drawer::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

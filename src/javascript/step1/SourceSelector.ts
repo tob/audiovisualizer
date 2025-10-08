@@ -1,9 +1,8 @@
 import { audioSourceManager } from '../audio/AudioSourceManager';
 import { MicrophoneSource } from '../audio/sources/MicrophoneSource';
-import { MediaElementSource } from '../audio/sources/MediaElementSource';
 import { UploadFileSource } from '../audio/sources/UploadFileSource';
 
-export type SourceType = 'microphone' | 'file' | 'upload';
+export type SourceType = 'microphone' | 'upload';
 
 /**
  * Step 1: Source Selection UI
@@ -56,12 +55,6 @@ export class SourceSelector {
               <span class="source-selector__description">Capture live audio from your microphone</span>
             </button>
 
-            <button class="source-selector__option" data-source="file">
-              <i class="fa fa-file-video-o source-selector__icon"></i>
-              <span class="source-selector__label">Video File</span>
-              <span class="source-selector__description">Use embedded video file (ellen.mp4)</span>
-            </button>
-
             <button class="source-selector__option source-selector__option--upload" data-source="upload" type="button">
               <i class="fa fa-upload source-selector__icon"></i>
               <span class="source-selector__label">Upload File</span>
@@ -92,8 +85,9 @@ export class SourceSelector {
 
     options.forEach(option => {
       option.addEventListener('click', (e) => {
-        // For upload option, trigger file input instead
         const source = option.getAttribute('data-source') as SourceType;
+
+        // For upload option, trigger file input instead
         if (source === 'upload') {
           fileInput.click();
           e.preventDefault();
@@ -180,12 +174,7 @@ export class SourceSelector {
       audioSourceManager.registerSource('microphone', microphoneSource);
     }
 
-    if (!audioSourceManager.getSource('file')) {
-      const videoSource = new MediaElementSource('#video');
-      audioSourceManager.registerSource('file', videoSource);
-    }
-
-    if (!audioSourceManager.getSource('upload')) {
+    if (source === 'upload' && !audioSourceManager.getSource('upload')) {
       // For upload, we create the source with the selected file
       if (!this.selectedFile) {
         throw new Error('No file selected for upload');

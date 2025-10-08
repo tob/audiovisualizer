@@ -116,6 +116,22 @@ function startAudioVisual() {
       // Use cached layers array (updated by MutationObserver)
       const layers = cachedLayers;
 
+      // Check if any layer uses video fillMode and update webcam visibility
+      const hasVideoFill = layers.some((layer) => {
+        const layerId = parseInt(layer.getAttribute("data-layer-id") || "1");
+        const { fillMode } = updateControllersValues(layer, layerId);
+        return fillMode === "video";
+      });
+
+      const webcamElement = document.getElementById('webcam');
+      if (webcamElement) {
+        if (hasVideoFill) {
+          webcamElement.classList.add('active');
+        } else {
+          webcamElement.classList.remove('active');
+        }
+      }
+
       // Clear the canvas if option checked
       clearCanvas();
 

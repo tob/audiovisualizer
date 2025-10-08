@@ -1,4 +1,5 @@
 import { SourceSelector, SourceType } from "./step1/SourceSelector";
+import { Drawer } from "./components/Drawer";
 import { connectMidi } from "./utils/midi-controller";
 import connectWebCam from "./utils/webcam";
 import { addCanvas, createButtons } from "./step2/drawings/drawSettings";
@@ -8,6 +9,7 @@ import { shortenUrl } from "./utils/urlshortener";
 import { startAudioVisual, stopAudioVisual } from "./step2/drawings/startDrawing";
 import dragula from "dragula";
 import "../styles/index.css";
+import "../styles/drawer.css";
 import "../styles/step1/source-selector.css";
 import "../styles/step2/controller.css";
 import "../styles/step2/controlBoard.css";
@@ -76,8 +78,8 @@ function handleStartStop(button: Element) {
     (button as HTMLElement).style.color = "red";
     button.classList.toggle("blink", window.listening);
 
-    // Add small delay for video sources to ensure layout is settled
-    if (selectedSource === 'file') {
+    // Add small delay for upload sources to ensure layout is settled
+    if (selectedSource === 'upload') {
       setTimeout(() => startAudioVisual(), 100);
     } else {
       startAudioVisual();
@@ -102,6 +104,13 @@ function initializeMainUI() {
 
   const imageWrapper = document.querySelector(".assets-container");
   images.map((img) => appendImage(img, imageWrapper));
+
+  // Initialize drawer
+  const drawer = new Drawer();
+  const drawerToggle = document.getElementById('drawer-toggle');
+  if (drawerToggle) {
+    drawerToggle.addEventListener('click', () => drawer.toggle());
+  }
 
   const startButton = document.getElementsByClassName("controller__button-start")[0];
   const shortenButton = document.getElementsByClassName("controller__button-shorten")[0];
@@ -176,8 +185,8 @@ function initializeMainUI() {
     (startButton as HTMLElement).style.color = "red";
     startButton.classList.toggle("blink", window.listening);
 
-    // Add delay for media file sources (video/upload) to ensure proper canvas sizing
-    if (selectedSource === 'file' || selectedSource === 'upload') {
+    // Add delay for upload sources to ensure proper canvas sizing
+    if (selectedSource === 'upload') {
       setTimeout(() => startAudioVisual(), 100);
     } else {
       startAudioVisual();
