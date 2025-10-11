@@ -77,7 +77,8 @@ display: none;
   height: 100vh;
   object-fit: cover;
   display: none;
-  z-index: 3;
+  z-index: -1;
+  visibility: hidden;
 }
 
 #webcam.active {
@@ -91,11 +92,11 @@ display: none;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 2;
+  z-index: -1;
   pointer-events: none;
 }
 
-/* Video elements as full-screen background */
+/* Video elements hidden - drawn into canvas with destination-over */
 video.uploaded-media {
   position: fixed;
   top: 0;
@@ -103,7 +104,8 @@ video.uploaded-media {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  pointer-events: auto;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* Audio player as control panel in bottom-right */
@@ -117,6 +119,7 @@ audio.uploaded-media {
   background: #000;
   pointer-events: auto;
   z-index: 1000;
+  visibility: visible;
 }
 
 @media (max-width: 768px) {
