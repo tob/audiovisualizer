@@ -72,8 +72,8 @@ function startAudioVisual() {
   const stream = el.captureStream();
 
   const soundAllowed = function (stream: MediaStream) {
-    // (stream) to get input from microphone
     const { analyser, frequencyArray } = getAudioInput(stream);
+
     const state = {
       canvas1: {
         asset: 1,
@@ -114,6 +114,13 @@ function startAudioVisual() {
 
       // Clear the canvas if option checked
       clearCanvas();
+
+      // Get canvas and ensure it exists
+      const canvas = document.querySelector('.canvas-1') as HTMLCanvasElement;
+      if (!canvas) {
+        console.error('Canvas not found in videoAudiolizer!');
+        return;
+      }
 
       // For each layer do a drawing
       layers.map((layer, index) => {

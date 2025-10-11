@@ -95,6 +95,43 @@ const createButtons = (parent, settings, i) => {
 
   // Store the input cache on the container element for fast retrieval
   (containerButtons as any).__inputCache = inputCache;
+
+  // Add delete button at the end
+  const deleteButton = document.createElement("button");
+  deleteButton.className = "container-buttons__delete";
+  deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
+  deleteButton.title = "Delete layer";
+  deleteButton.addEventListener("click", () => {
+    // Only allow deletion if there's more than one layer
+    const totalLayers = document.getElementsByClassName("container-buttons").length;
+    if (totalLayers <= 1) {
+      alert("Cannot delete the last layer. At least one layer is required.");
+      return;
+    }
+
+    // Confirm deletion
+    if (confirm("Are you sure you want to delete this layer?")) {
+      containerButtons.remove();
+    }
+  });
+  containerButtons.appendChild(deleteButton);
+};
+
+// Global function to resize all canvases to match window size
+const resizeAllCanvases = () => {
+  const canvases = document.querySelectorAll('canvas');
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  console.log(`[RESIZE] Window: ${width}x${height}, Found ${canvases.length} canvas(es)`);
+
+  canvases.forEach((canvas) => {
+    const htmlCanvas = canvas as HTMLCanvasElement;
+    console.log(`[RESIZE] Canvas ${htmlCanvas.className} before: ${htmlCanvas.width}x${htmlCanvas.height}`);
+    htmlCanvas.width = width;
+    htmlCanvas.height = height;
+    console.log(`[RESIZE] Canvas ${htmlCanvas.className} after: ${htmlCanvas.width}x${htmlCanvas.height}`);
+  });
 };
 
 const addCanvas = (main) => {
@@ -105,25 +142,18 @@ const addCanvas = (main) => {
   ctx.className = `canvas-${i}`;
   ctx.id = "canvas";
 
-  // Set canvas buffer size to match display size
-  const resizeCanvas = () => {
-    ctx.width = window.innerWidth;
-    ctx.height = window.innerHeight;
-    console.log(`Canvas created/resized: ${ctx.width}x${ctx.height}`);
-  };
-
-  // Set initial size before appending
-  resizeCanvas();
-
-  // Also resize when window changes
-  window.addEventListener('resize', resizeCanvas);
+  // Set canvas size IMMEDIATELY to window size
+  // Don't wait for async callbacks - canvas defaults to 300x150 otherwise!
+  ctx.width = window.innerWidth;
+  ctx.height = window.innerHeight;
+  console.log(`[CREATE] Canvas created with size: ${ctx.width}x${ctx.height}`);
 
   main.appendChild(ctx);
-
-  // Force another resize after appending to ensure it's correct
-  setTimeout(resizeCanvas, 0);
 
   return ctx;
 };
 
-export { addCanvas, createButtons };
+// Also resize when window changes
+window.addEventListener('resize', resizeAllCanvases);
+
+export { addCanvas, createButtons, resizeAllCanvases };

@@ -215,7 +215,13 @@ export const updateControllersValues = (layer, index) => {
   // hardcoded 1 instead of {index} because using always the same canvas
   const canvas = getCanvasElement(`.canvas-1`);
   const canvasContext = canvas.getContext("2d");
-  
+
+  // CRITICAL FIX: Canvas size gets reset somewhere - ensure it's always correct
+  if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+    console.warn(`[FIX] Canvas size mismatch detected! Canvas: ${canvas.width}x${canvas.height}, Window: ${window.innerWidth}x${window.innerHeight} - fixing...`);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
 
   return {
     rangeStart,

@@ -48,17 +48,12 @@ function startAudioVisual() {
 
     const { analyser, frequencyArray } = analyzerResult;
 
-    // Debug: Check canvas size at start and force resize all canvases
+    // Debug: Check canvas size at start
     const allCanvases = document.querySelectorAll('canvas');
     console.log(`Starting visualization - Found ${allCanvases.length} canvas(es), Window: ${window.innerWidth}x${window.innerHeight}`);
-
     allCanvases.forEach((canvas, i) => {
       const htmlCanvas = canvas as HTMLCanvasElement;
-      console.log(`Canvas ${i+1} before: ${htmlCanvas.width}x${htmlCanvas.height}`);
-      // Force canvas buffer size to match window
-      htmlCanvas.width = window.innerWidth;
-      htmlCanvas.height = window.innerHeight;
-      console.log(`Canvas ${i+1} after: ${htmlCanvas.width}x${htmlCanvas.height}`);
+      console.log(`Canvas ${i+1}: ${htmlCanvas.width}x${htmlCanvas.height}`);
     });
     const state = {
       canvas1: {
@@ -135,15 +130,37 @@ function startAudioVisual() {
       // Clear the canvas if option checked
       clearCanvas();
 
-      // Ensure canvas buffer size matches window size (once per frame, not per layer)
+      // Get canvas reference
       const canvas = document.querySelector('.canvas-1') as HTMLCanvasElement;
-      if (canvas) {
-        if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-        }
-      } else {
+      if (!canvas) {
         console.error('Canvas not found!');
+        return;
+      }
+
+      // Draw video FIRST as base layer (before shapes)
+      // This ensures video animates properly and shapes effects don't affect it
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // Save the current composite operation
+        const savedComposite = ctx.globalCompositeOperation;
+        ctx.globalCompositeOperation = 'source-over';
+
+        // Draw uploaded video/audio (priority 2)
+        const uploadedMedia = document.querySelector('.uploaded-media') as HTMLVideoElement;
+        if (uploadedMedia && uploadedMedia instanceof HTMLVideoElement && uploadedMedia.readyState >= 2) {
+          ctx.drawImage(uploadedMedia, 0, 0, canvas.width, canvas.height);
+        }
+
+        // Draw webcam (priority 1 - highest, draws on top of uploaded media)
+        if (hasVideoFill && webcamElement) {
+          const webcam = webcamElement as HTMLVideoElement;
+          if (webcam.readyState >= 2) {
+            ctx.drawImage(webcam, 0, 0, canvas.width, canvas.height);
+          }
+        }
+
+        // Restore composite operation
+        ctx.globalCompositeOperation = savedComposite;
       }
 
       // For each layer do a drawing
