@@ -24,6 +24,9 @@ let size = 1,
   WIDTH = window.innerWidth,
   HEIGHT = window.innerHeight;
 
+// Track next available layer ID to prevent duplicates after deletion
+let nextLayerId = 1;
+
 function appendSnapshotImage(canvas, target, downloadButton) {
   // set canvasImg image src to data
   canvas.toBlob(function (blob) {
@@ -35,7 +38,6 @@ function appendSnapshotImage(canvas, target, downloadButton) {
 
 function loadDrawingFromParams(parent, settings) {
   const search_params = new URLSearchParams(window.location.search);
-  let index = 0;
   const levels = search_params.values();
   for (let value of levels) {
     const drawings = value.toString().split("&");
@@ -46,8 +48,8 @@ function loadDrawingFromParams(parent, settings) {
       }
     });
     console.log("urlSettings", settings);
-    createButtons(parent, settings, index);
-    index++;
+    createButtons(parent, settings, nextLayerId);
+    nextLayerId++;
   }
 }
 
@@ -156,26 +158,18 @@ function initializeMainUI() {
   );
 
   plusButton.addEventListener("click", () => {
-    const i =
-      Array.prototype.slice.apply(
-        document.getElementsByClassName("container-buttons")
-      ).length + 1;
-    createButtons(controlBoard, settings, i);
+    createButtons(controlBoard, settings, nextLayerId);
+    nextLayerId++;
   });
 
   // Create initial layer
-  createButtons(controlBoard, settings, size);
+  createButtons(controlBoard, settings, nextLayerId);
+  nextLayerId++;
 
-  // Wait for layout to settle, then auto-start visualization
+  // Canvas size is now set immediately when created
+  // Just wait a moment for everything to settle, then start
   setTimeout(() => {
-    // Force canvas resize to ensure correct dimensions
-    const allCanvases = document.querySelectorAll('canvas');
-    allCanvases.forEach((canvas) => {
-      const htmlCanvas = canvas as HTMLCanvasElement;
-      htmlCanvas.width = window.innerWidth;
-      htmlCanvas.height = window.innerHeight;
-      console.log(`Canvas resized to: ${htmlCanvas.width}x${htmlCanvas.height}`);
-    });
+    console.log(`[INIT] Starting visualization. Window: ${window.innerWidth}x${window.innerHeight}`);
 
     // Auto-start visualization
     window.listening = true;
@@ -185,13 +179,8 @@ function initializeMainUI() {
     (startButton as HTMLElement).style.color = "red";
     startButton.classList.toggle("blink", window.listening);
 
-    // Add delay for upload sources to ensure proper canvas sizing
-    if (selectedSource === 'upload') {
-      setTimeout(() => startAudioVisual(), 100);
-    } else {
-      startAudioVisual();
-    }
-  }, 200);
+    startAudioVisual();
+  }, 100);
 }
 
 // Start: Step 1 - Source Selection
